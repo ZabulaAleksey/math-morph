@@ -1,31 +1,31 @@
-# Format Policy
+# Политика форматов
 
-## Inputs
+## Входные форматы
 
 ### XMCD
-Legacy XML-based Mathcad worksheet family. Parse safely, preserve namespaces/version metadata, region coordinates and unknown nodes as diagnostics/unsupported structures.
+Устаревшее семейство worksheets Mathcad на основе XML. Выполняй безопасный parsing, сохраняй namespaces, метаданные версии, координаты областей и неизвестные узлы как диагностику или неподдерживаемые структуры.
 
 ### MCDX
-Mathcad Prime container family. Treat as untrusted archive/container input. Apply path traversal, entry-count, expanded-size, compression-ratio and nesting limits before parsing contained XML/resources.
+Семейство контейнеров Mathcad Prime. Считай входной архив или контейнер недоверенным. До parsing содержащихся XML и ресурсов применяй защиту от path traversal и ограничения количества записей, распакованного размера, степени сжатия и вложенности.
 
-## Detection
+## Определение
 
-Never trust extension alone. Record declared extension and detected content format. `FILE_EXTENSION_MISMATCH` may be recoverable if content is confidently recognized and policy allows continuation.
+Никогда не доверяй только расширению. Записывай заявленное расширение и определённый формат содержимого. Ошибка `FILE_EXTENSION_MISMATCH` может быть восстанавливаемой, если содержимое уверенно распознано и политика разрешает продолжение.
 
-## Outputs
+## Выходные форматы
 
 ### DOCX — MVP
-Text as Word paragraphs/runs, supported equations as editable Office Math/OMML, images/plots with preserved geometry where possible.
+Текст в виде абзацев и runs Word, поддерживаемые уравнения как редактируемые Office Math/OMML, изображения и графики с сохранением геометрии, где это возможно.
 
-### Future
-Markdown, PDF, LaTeX, HTML, JSON/web viewer through exporter contracts over `DocumentIR`.
+### В будущем
+Markdown, PDF, LaTeX, HTML, JSON и веб-просмотр через контракты exporters поверх `DocumentIR`.
 
-### Charts
-Current raster path must coexist with `PlotIR`/future `ChartIR` so future Excel export can create editable charts.
+### Диаграммы
+Текущий растровый путь должен сосуществовать с `PlotIR` и будущим `ChartIR`, чтобы будущий экспорт Excel мог создавать редактируемые диаграммы.
 
-### Diagrams
-Current raster path must coexist with `DiagramIR` so future VSDX export can create editable shapes/connectors/groups.
+### Схемы
+Текущий растровый путь должен сосуществовать с `DiagramIR`, чтобы будущий экспорт VSDX мог создавать редактируемые shapes, connectors и groups.
 
-## Unsupported constructs
+## Неподдерживаемые конструкции
 
-Unknown/unsupported nodes must never disappear silently. Produce a structured diagnostic and, where safe, partial conversion with an explicit warning/placeholder.
+Неизвестные или неподдерживаемые узлы никогда не должны исчезать незаметно. Создавай структурированную диагностику и, если это безопасно, частичную конвертацию с явным предупреждением или заполнителем.

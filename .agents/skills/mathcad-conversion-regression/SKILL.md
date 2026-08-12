@@ -1,14 +1,14 @@
 ---
 name: mathcad-conversion-regression
-description: Run a focused Mathcad parser/math-engine/DocumentIR/DOCX regression workflow without duplicating the global AI Dev Team release or QA gate.
+description: Запускает целевой регрессионный workflow Mathcad parser, math-engine, DocumentIR и DOCX без дублирования глобальных release или QA-проверок AI Dev Team.
 ---
 
-Use this Skill only for Mathcad-specific regression work. If the global AI Dev Team already runs generic lint/typecheck/release/security gates, do not repeat them here.
+Используй этот Skill только для специфичной для Mathcad регрессионной работы. Если глобальная AI Dev Team уже запускает универсальные проверки lint, typecheck, release и безопасности, не повторяй их здесь.
 
-1. Determine changed Mathcad modules from git diff.
-2. Select only affected fixture groups first; broaden only with evidence.
-3. Run module tests and relevant conversion tests.
-4. For DOCX changes, validate package/XML/relationships/editable equation structures.
-5. Compare snapshots/golden outputs; never auto-accept a difference.
-6. Report fixture ID, expected/actual behavior and likely layer.
-7. End with PASS/FAIL and only commands actually executed.
+1. Определи изменённые модули Mathcad по git diff.
+2. Сначала выбери только затронутые группы fixtures; расширяй охват только при наличии оснований.
+3. Запусти тесты модулей и относящиеся к задаче тесты конвертации.
+4. Для изменений DOCX проверь структуру пакета, XML, relationships и редактируемых уравнений.
+5. Сравни snapshots и эталонные результаты; никогда не принимай различие автоматически.
+6. Сообщи ID fixture, ожидаемое и фактическое поведение и вероятный слой.
+7. Заверши результатом PASS/FAIL и перечисли только фактически выполненные команды.

@@ -1,55 +1,55 @@
-# Architecture Decisions
+# Архитектурные решения
 
-## ADR-0001 — Progressive context loading
+## ADR-0001 — Прогрессивная загрузка контекста
 
-**Status:** accepted.
+**Статус:** принято.
 
-**Decision:** keep root AGENTS compact; domain rules live in nested AGENTS, Skills and focused docs.
+**Решение:** сохранять корневой AGENTS компактным; предметные правила находятся во вложенных AGENTS, Skills и целевых документах.
 
-**Reason:** reduce context duplication while preserving precise instructions near the affected code.
+**Причина:** уменьшить дублирование контекста, сохраняя точные инструкции рядом с затронутым кодом.
 
-## ADR-0002 — Hooks are guardrails, not application security
+## ADR-0002 — Hooks являются защитными ограничителями, а не безопасностью приложения
 
-**Status:** accepted.
+**Статус:** принято.
 
-**Decision:** hooks enforce only deterministic developer-workflow checks. Application/CI security remains authoritative.
+**Решение:** hooks обеспечивают только детерминированные проверки workflow разработчика. Безопасность приложения и CI остаётся авторитетной.
 
-## ADR-0003 — Subagents inherit parent model unless explicitly needed
+## ADR-0003 — Субагенты наследуют родительскую модель, если явно не требуется другое
 
-**Status:** accepted.
+**Статус:** принято.
 
-**Decision:** project agent TOML files do not hardcode model names. This avoids stale model configuration and lets the parent/session policy choose the model.
+**Решение:** проектные TOML-файлы агентов не фиксируют имена моделей. Это предотвращает устаревание конфигурации модели и позволяет политике родителя или сессии выбирать модель.
 
-## ADR-0004 — Trace requirements without duplicating them
+## ADR-0004 — Трассировка требований без их дублирования
 
-**Status:** accepted.
+**Статус:** принято.
 
-**Decision:** `docs/TRACEABILITY.md` maps canonical specification sections to roadmap stages and verification evidence. It does not restate product requirements.
+**Решение:** `docs/TRACEABILITY.md` сопоставляет разделы канонической спецификации этапам дорожной карты и доказательствам проверки. Он не повторяет требования продукта.
 
-**Reason:** future implementation needs a stable path from requirement to code and tests, while duplicate SPEC files would create context conflicts.
+**Причина:** будущей реализации нужен стабильный путь от требования к коду и тестам, а дублирующие файлы SPEC создавали бы конфликты контекста.
 
-**Consequences:** update the mapping when an accepted requirement changes or a stage becomes verified. A roadmap item or prompt alone never proves implementation.
+**Последствия:** обновлять соответствие при изменении принятого требования или проверке этапа. Пункт дорожной карты или prompt сам по себе никогда не доказывает реализацию.
 
-## ADR template
+## Шаблон ADR
 
-Use this only for consequential architectural or technical decisions.
+Используй только для значимых архитектурных или технических решений.
 
-### ADR-XXXX — Title
+### ADR-XXXX — Название
 
-**Status:** proposed / accepted / superseded.
+**Статус:** предложено / принято / заменено.
 
-**Context:** problem, constraints and affected trust/module boundaries.
+**Контекст:** проблема, ограничения и затронутые границы доверия или модулей.
 
-**Options:** viable alternatives considered.
+**Варианты:** рассмотренные жизнеспособные альтернативы.
 
-**Decision:** selected approach.
+**Решение:** выбранный подход.
 
-**Reason:** why it best satisfies the constraints.
+**Причина:** почему он лучше всего удовлетворяет ограничениям.
 
-**Consequences:** trade-offs, migration and operational impact.
+**Последствия:** компромиссы, миграция и влияние на эксплуатацию.
 
-**Fallback / rollback:** safe reversal path.
+**Fallback / rollback:** безопасный путь отмены.
 
-**Verification:** tests or benchmarks that support the decision.
+**Проверка:** тесты или benchmarks, подтверждающие решение.
 
-**Related requirements:** links to canonical SPEC sections or stable requirement IDs.
+**Связанные требования:** ссылки на канонические разделы SPEC или стабильные ID требований.

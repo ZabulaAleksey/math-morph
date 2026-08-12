@@ -1,10 +1,10 @@
-# Parser Rules
+# Правила parser
 
-- Read root `AGENTS.md` plus `docs/SECURITY.md` sections A05/A06/A10 for input-handling changes.
-- Parser knows Mathcad format/AST, not Word/HTTP/React.
-- Never parse structured XML with regex as the primary parser.
-- Disable/avoid external entity expansion; enforce size/depth/container limits.
-- Preserve source/layout metadata needed for evaluation order and future exporters.
-- Unknown nodes become controlled `Unsupported*` + diagnostics, not panic.
-- Every fixed malformed/compatibility bug gets a regression fixture.
-- Prefer streaming/bounded parsing for large input.
+- При изменениях обработки ввода прочитай корневой `AGENTS.md` и разделы A05/A06/A10 в `docs/SECURITY.md`.
+- Parser знает формат и AST Mathcad, но не Word, HTTP или React.
+- Никогда не используй регулярные выражения как основной parser структурированного XML.
+- Отключай или избегай раскрытия внешних сущностей; применяй ограничения размера, глубины и контейнера.
+- Сохраняй метаданные источника и layout, необходимые для порядка вычисления и будущих exporters.
+- Неизвестные узлы превращаются в контролируемые `Unsupported*` и диагностику, а не panic.
+- Каждая исправленная ошибка повреждённых данных или совместимости получает регрессионный fixture.
+- Для крупных входных данных предпочитай потоковый parsing с ограничениями.

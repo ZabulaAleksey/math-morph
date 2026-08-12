@@ -1,10 +1,10 @@
-# Architecture
+# Архитектура
 
 ## 1. Цель
 
-Платформа разбирает Mathcad-документы, сохраняет математическую и документную семантику, выполняет преобразования и экспортирует результат в редактируемые форматы. Архитектура должна масштабироваться от локального browser/WASM conversion до server-side API/worker processing.
+Платформа разбирает Mathcad-документы, сохраняет математическую и документную семантику, выполняет преобразования и экспортирует результат в редактируемые форматы. Архитектура должна масштабироваться от локальной конвертации в браузере/WASM до серверной обработки API/workers.
 
-## 2. High-level flow
+## 2. Общий поток
 
 ```text
 Input (.xmcd/.mcdx)
@@ -45,85 +45,85 @@ Document IR
 DOCX/OMML          Markdown/...     Future Excel/Visio
 ```
 
-## 3. Основные boundaries
+## 3. Основные границы
 
-### Rust core
+### Core Rust
 
 Владеет:
-- format detection;
-- safe MCDX/XMCD parsing;
+- определение формата;
+- безопасный parsing MCDX/XMCD;
 - AST;
-- semantics;
-- transformations/evaluation;
+- семантика;
+- преобразования и вычисление;
 - Document IR;
-- browser WASM-compatible core where practical.
+- совместимый с браузерным WASM core, где это практично.
 
 Не владеет:
-- user sessions;
-- billing;
-- HTTP authentication;
+- пользовательские сессии;
+- оплата;
+- аутентификация HTTP;
 - React UI.
 
 ### Exporters
 
-- `WordEquationExporter`: AST/Display AST → OMML/Word equation.
+- `WordEquationExporter`: AST/Display AST → уравнение OMML/Word.
 - `MathTypeExporter`: отдельный adapter, потенциально через MathML.
 - `DOCXExporter`: Document IR → DOCX/OOXML.
-- Future: Markdown, LaTeX, PDF, HTML, JSON.
-- `ChartExporter`: текущий raster path + future Excel path.
-- `DiagramExporter`: текущий raster path + future VSDX path.
+- В будущем: Markdown, LaTeX, PDF, HTML, JSON.
+- `ChartExporter`: текущий растровый путь + будущий путь Excel.
+- `DiagramExporter`: текущий растровый путь + будущий путь VSDX.
 
 ### Web
 
 Next.js/React/TypeScript:
-- upload/dropzone;
+- загрузка и dropzone;
 - settings;
-- job state;
-- account/dashboard;
+- состояние задачи;
+- учётная запись и dashboard;
 - API key UI;
-- billing/admin surfaces;
-- WASM local conversion orchestration.
+- области оплаты и администрирования;
+- координация локальной конвертации WASM.
 
-Математическая семантика не реализуется в React components.
+Математическая семантика не реализуется в компонентах React.
 
 ### API
 
 FastAPI/Pydantic/SQLAlchemy:
-- authentication integration;
-- authorization;
-- API keys/scopes;
-- conversion job orchestration;
-- metadata/history/preferences;
-- signed download/upload flows;
-- billing/usage integration.
+- интеграция аутентификации;
+- авторизация;
+- ключи и scopes API;
+- координация задач конвертации;
+- метаданные, история и предпочтения;
+- подписанные flows скачивания и загрузки;
+- интеграция оплаты и учёта использования.
 
-Conversion semantics делегируется общему core.
+Семантика конвертации делегируется общему core.
 
 ### CLI
 
-- Thin local adapter for conversion and safe format inspection.
-- Reuses Rust core, exporter contracts and the common diagnostics model.
-- Does not own parser/math semantics and does not bypass input/security limits.
-- May emit human-readable output plus a stable machine-readable report for automation.
+- Тонкий локальный адаптер конвертации и безопасной проверки формата.
+- Переиспользует core Rust, контракты exporters и общую модель диагностики.
+- Не владеет семантикой parser и математики и не обходит ограничения ввода и безопасности.
+- Может выводить понятный человеку результат и стабильный машиночитаемый отчёт для автоматизации.
 
-### Worker layer
+### Слой workers
 
 RabbitMQ + Celery:
-- server-side conversions;
-- controlled retries;
-- timeout/cancellation where possible;
-- dead-letter/error flow;
-- independent horizontal scaling.
+- серверные конвертации;
+- контролируемые повторы;
+- timeout и отмена, где это возможно;
+- flow dead-letter и ошибок;
+- независимое горизонтальное масштабирование.
 
 ### Data
 
-- PostgreSQL: metadata, users/profile refs, jobs, settings, usage, subscriptions, audit/security events.
-- S3-compatible storage/MinIO: encrypted/temporary objects; не использовать PostgreSQL для крупных файлов.
-- Redis: cache/rate-limit/ephemeral coordination only, не system of record.
+- PostgreSQL: метаданные, ссылки на пользователей и профили, задачи, настройки, использование, подписки, события аудита и безопасности.
+- S3-совместимое хранилище/MinIO: зашифрованные и временные объекты; не использовать PostgreSQL для крупных файлов.
+- Redis: только кэш, rate limit и временная координация, не авторитетное хранилище.
 
-## 4. Privacy model
+## 4. Модель конфиденциальности
 
-Предпочтительный secure path:
+Предпочтительный безопасный путь:
 
 ```text
 Browser
@@ -132,15 +132,15 @@ Browser
   -> ciphertext storage
 ```
 
-Server-side conversion является отдельным trust mode: нельзя одновременно обещать серверную plaintext-обработку и абсолютное zero-knowledge без дополнительной confidential-compute architecture.
+Серверная конвертация является отдельным режимом доверия: нельзя одновременно обещать серверную обработку открытого текста и абсолютный zero knowledge без дополнительной архитектуры конфиденциальных вычислений.
 
-Account recovery и document-key recovery — разные процессы.
+Восстановление учётной записи и восстановление ключа документа — разные процессы.
 
-## 5. API model
+## 5. Модель API
 
-Versioned API `/api/v1`.
+Версионируемый API `/api/v1`.
 
-Typical async flow:
+Типичный асинхронный поток:
 
 ```text
 POST conversion
@@ -153,34 +153,34 @@ POST conversion
  -> status/download
 ```
 
-API conversion history следует user save preferences/explicit request policy.
+История конвертаций API следует пользовательским предпочтениям сохранения и политике явного запроса.
 
-## 6. Error model
+## 6. Модель ошибок
 
 Система различает:
-- warning;
-- recoverable error;
-- fatal error.
+- предупреждение;
+- восстанавливаемая ошибка;
+- фатальная ошибка.
 
-Partial conversion допускается только когда результат не вводит пользователя в заблуждение. Unsupported structure не должна silently disappear.
+Частичная конвертация допускается только тогда, когда результат не вводит пользователя в заблуждение. Неподдерживаемая структура не должна исчезать незаметно.
 
 ## 7. Scaling
 
-Stage 1: Docker Compose, single API + worker.
-Stage 2: stateless API replicas + multiple workers + external storage/DB.
-Stage 3: Kubernetes/Helm только после подтверждённой необходимости.
+Этап 1: Docker Compose, один API и worker.
+Этап 2: stateless-реплики API, несколько workers и внешние хранилище и база данных.
+Этап 3: Kubernetes/Helm только после подтверждённой необходимости.
 
-## 8. Future extensibility
+## 8. Будущая расширяемость
 
-- MathType backend не влияет на parser.
-- Excel chart reconstruction идёт через ChartIR.
-- Visio reconstruction идёт через DiagramIR и генерирует редактируемые shapes/connectors, а не одно изображение.
-- Новые output formats реализуют exporter contract.
+- Backend MathType не влияет на parser.
+- Восстановление диаграмм Excel идёт через ChartIR.
+- Восстановление Visio идёт через DiagramIR и создаёт редактируемые shapes и connectors, а не одно изображение.
+- Новые выходные форматы реализуют контракт exporter.
 
 ## 9. Запрещённые shortcut-архитектуры
 
 - XML → DOCX напрямую без AST/IR.
 - parser, который знает о React/API/Word.
-- формулы-картинки как основной path.
-- admin endpoint для чтения privacy-protected документов.
-- локальная in-memory очередь как production source of truth.
+- формулы-картинки как основной путь.
+- административный endpoint для чтения защищённых конфиденциальностью документов.
+- локальная очередь в памяти как production-источник истины.

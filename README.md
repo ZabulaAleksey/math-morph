@@ -1,36 +1,36 @@
-# Mathcad Converter & Parser Platform — AI Dev Team Overlay
+# Платформа конвертации и parsing Mathcad — overlay AI Dev Team
 
-This pack is designed for a machine where **AI Dev Team Codex is already installed**.
+Этот пакет предназначен для компьютера, на котором **AI Dev Team Codex уже установлена**.
 
-It is intentionally **not** a second full agent team. It adds only Mathcad-specific rules, specialists and workflows.
+Он намеренно **не является** второй полной командой агентов. Пакет добавляет только специфичные для Mathcad правила, специалистов и workflows.
 
-## What is active by default
+## Что активно по умолчанию
 
-- root + local `AGENTS.md` project rules;
-- Mathcad-specific subagents in `.codex/agents/`;
-- Mathcad-specific Skills in `.agents/skills/`;
-- architecture/security/context documentation.
+- корневые и локальные правила проекта `AGENTS.md`;
+- специфичные для Mathcad субагенты в `.codex/agents/`;
+- специфичные для Mathcad Skills в `.agents/skills/`;
+- документация по архитектуре, безопасности и контексту.
 
-## What is intentionally inactive by default
+## Что намеренно неактивно по умолчанию
 
-- generic QA/security/frontend fallback agents → `.codex/agents-optional/`;
-- project hooks → `.codex/hooks-optional/` + `.codex/hooks.optional.toml`;
-- project MCP servers → `.codex/mcp.optional.toml`;
-- fallback full release Skill → `.agents/skills-optional/`.
+- универсальные fallback-агенты QA, безопасности и frontend → `.codex/agents-optional/`;
+- проектные hooks → `.codex/hooks-optional/` + `.codex/hooks.optional.toml`;
+- проектные MCP-серверы → `.codex/mcp.optional.toml`;
+- fallback Skill полной release-проверки → `.agents/skills-optional/`.
 
-The global AI Dev Team should continue to own generic architecture, QA, security, frontend/backend, Git, DevOps, CI and release workflows whenever those capabilities already exist.
+Глобальная AI Dev Team должна продолжать отвечать за универсальную архитектуру, QA, безопасность, frontend/backend, Git, DevOps, CI и release workflows, если эти возможности уже существуют.
 
-See `README_CONTEXT_PACK.md` for installation and compatibility details.
+Подробности установки и совместимости см. в `README_CONTEXT_PACK.md`.
 
-## Install
+## Установка
 
-1. Copy the pack into the project repository.
-2. Keep your existing global/user Codex configuration untouched.
-3. Read `docs/AI_DEV_TEAM_COMPATIBILITY.md` before enabling any optional agent/hook/MCP.
-4. Add your canonical `SPECIFICATION.md`, `TECH_STACK.md`, `PROMPTS.md`, `ROADMAP.md` if not already present.
-5. Fill `docs/DESIGN.md` separately; it is intentionally empty.
-6. Run `python scripts/validate_context_pack.py`.
+1. Скопируй пакет в репозиторий проекта.
+2. Не изменяй существующую глобальную или пользовательскую конфигурацию Codex.
+3. Перед включением любого необязательного agent, hook или MCP прочитай `docs/AI_DEV_TEAM_COMPATIBILITY.md`.
+4. Добавь канонические `SPECIFICATION.md`, `TECH_STACK.md`, `PROMPTS.md`, `ROADMAP.md`, если их ещё нет.
+5. Заполни `docs/DESIGN.md` отдельно; сейчас он намеренно пуст.
+6. Выполни `python scripts/validate_context_pack.py`.
 
-## Context strategy
+## Стратегия контекста
 
-The parent thread should receive only project deltas. Avoid reloading the whole global AI Dev Team setup, all agents, all Skills or the whole roadmap. Delegate only when a domain specialist materially improves the task.
+Родительский поток должен получать только проектные дополнения. Не загружай повторно всю конфигурацию глобальной AI Dev Team, всех агентов, все Skills или всю дорожную карту. Делегируй только тогда, когда предметный специалист существенно улучшает выполнение задачи.

@@ -1,44 +1,44 @@
-# Dependency Policy
+# Политика зависимостей
 
 ## Основной стек
 
 - Frontend: Next.js, React, TypeScript, Tailwind, shadcn/ui, TanStack Query, Zustand, React Hook Form, Zod, next-intl.
 - Core: Rust, quick-xml, Serde, num/num-complex, nalgebra, WASM.
 - Backend: Python, FastAPI, Pydantic, SQLAlchemy, Alembic, HTTPX, `uv`.
-- Data/async: PostgreSQL, RabbitMQ, Celery, Redis, S3-compatible storage/MinIO.
-- Auth: Keycloak/OIDC/OAuth2/WebAuthn/TOTP; Telegram Bot API only for explicitly linked/recovery flows.
-- Observability: OpenTelemetry, Prometheus, Grafana, Sentry with redaction.
-- Infra: Docker/Compose; Kubernetes/Helm only later when justified.
+- Данные и асинхронность: PostgreSQL, RabbitMQ, Celery, Redis, S3-совместимое хранилище/MinIO.
+- Аутентификация: Keycloak/OIDC/OAuth2/WebAuthn/TOTP; Telegram Bot API только для явно связанных flows и восстановления.
+- Наблюдаемость: OpenTelemetry, Prometheus, Grafana, Sentry со скрытием данных.
+- Инфраструктура: Docker/Compose; Kubernetes/Helm только позднее при наличии оснований.
 
-## Добавление новой dependency
+## Добавление новой зависимости
 
 До изменения:
 
-1. Есть ли функция в standard library/уже установленной dependency?
-2. Нужна ли dependency в production или только dev/test?
-3. Кто publisher/maintainer, есть ли официальный репозиторий?
+1. Есть ли функция в стандартной библиотеке или уже установленной зависимости?
+2. Нужна ли зависимость в production или только для разработки и тестов?
+3. Кто её издатель и сопровождающий, есть ли официальный репозиторий?
 4. Лицензия совместима?
-5. Есть ли известные advisories/abandoned status?
-6. Есть ли install/postinstall scripts?
-7. Можно ли pin/lock version?
+5. Есть ли известные advisories или статус заброшенного проекта?
+6. Есть ли scripts установки или postinstall?
+7. Можно ли зафиксировать версию?
 8. Какой размер/транзитивный граф?
-9. Какие permissions/network/filesystem она получает?
+9. Какие разрешения, сетевой и файловый доступ она получает?
 10. Как удалить/заменить её в будущем?
 
-## Supply-chain rules
+## Правила цепочки поставки
 
-- Не использовать `latest` в production manifests/scripts.
+- Не использовать `latest` в production-манифестах и scripts.
 - Lockfiles коммитятся.
-- CI dependency update должен проходить tests/security audit.
-- GitHub Actions и container images pin максимально стабильно.
-- MCP server, Codex plugin, Skill scripts и hooks считать executable dependency.
-- Remote MCP получает минимальные toolsets/approval mode.
-- Никакие secrets не записываются в tracked TOML/MD.
+- Обновление зависимостей в CI должно проходить тесты и аудит безопасности.
+- Версии GitHub Actions и образов контейнеров фиксируются максимально стабильно.
+- MCP-сервер, plugin Codex, scripts Skills и hooks считаются исполняемыми зависимостями.
+- Удалённый MCP получает минимальные наборы инструментов и режим разрешений.
+- Никакие секреты не записываются в отслеживаемые TOML/MD.
 
 ## Python
 
-Использовать `uv`, project `.venv`, общий cache. Не смешивать системный Python с project dependencies.
+Использовать `uv`, проектный `.venv` и общий кэш. Не смешивать системный Python с зависимостями проекта.
 
-## Experimental dependencies
+## Экспериментальные зависимости
 
-Экспериментальная dependency должна быть feature-flagged/isolated и не становиться обязательной для core без отдельного решения.
+Экспериментальная зависимость должна быть изолирована за feature flag и не становиться обязательной для core без отдельного решения.

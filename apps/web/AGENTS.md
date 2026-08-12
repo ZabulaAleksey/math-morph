@@ -1,10 +1,10 @@
-# Web UI Rules
+# Правила веб-интерфейса
 
-- If `docs/DESIGN.md` is non-empty, it is the UI contract.
-- If DESIGN.md is empty, use minimal neutral patterns; do not invent a large design system.
-- All user-facing strings go through i18n.
-- Explicit idle/loading/warning/error/empty states.
-- Error Boundary around converter and other independent critical surfaces.
-- Client validation improves UX but is never a security boundary.
-- Never expose secrets in browser bundle/logs.
-- Math/business semantics belongs in shared core/services, not React components.
+- Если `docs/DESIGN.md` не пуст, он является контрактом UI.
+- Если DESIGN.md пуст, используй минимальные нейтральные шаблоны; не придумывай крупную дизайн-систему.
+- Все пользовательские строки проходят через i18n.
+- Явно поддерживай состояния ожидания, загрузки, предупреждения, ошибки и отсутствия данных.
+- Размещай Error Boundary вокруг конвертера и других независимых критических областей.
+- Клиентская валидация улучшает UX, но никогда не является границей безопасности.
+- Никогда не раскрывай секреты в браузерном bundle или журналах.
+- Математическая и бизнес-семантика относится к общему core и services, а не к компонентам React.

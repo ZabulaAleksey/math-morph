@@ -1,13 +1,13 @@
 ---
 name: mathcad-security-overlay
-description: Add Mathcad-specific OWASP Top 10:2025 checks to an existing AI Dev Team security review, focusing on hostile XMCD/MCDX, conversion privacy and document-processing boundaries.
+description: Добавляет специфичные для Mathcad проверки OWASP Top 10:2025 к существующему review безопасности AI Dev Team с акцентом на враждебные XMCD/MCDX, конфиденциальность конвертации и границы обработки документов.
 ---
 
-This is an overlay, not a second full security review. Prefer the installed AI Dev Team security workflow for generic application security.
+Это overlay, а не второе полное review безопасности. Для общей безопасности приложения предпочитай установленный workflow безопасности AI Dev Team.
 
-1. Read `docs/SECURITY.md` only for affected Mathcad trust boundaries.
-2. Check hostile XML/ZIP/container parsing, file-size/decompression limits and exceptional conditions.
-3. Check conversion/report/logging paths for document or formula leakage.
-4. Check zero-knowledge/admin boundaries if storage or support-sharing changed.
-5. For Mathcad-related dependency/format-library changes, note supply-chain provenance and pinning.
-6. Return only Mathcad-specific delta findings not already covered by the global review.
+1. Читай `docs/SECURITY.md` только для затронутых границ доверия Mathcad.
+2. Проверь parsing враждебных XML, ZIP и контейнеров, ограничения размера файлов и распаковки и исключительные условия.
+3. Проверь пути конвертации, отчётов и журналирования на утечку документов или формул.
+4. Проверь границы zero-knowledge и администрирования, если изменилось хранение или предоставление данных поддержке.
+5. Для изменений зависимостей и библиотек форматов Mathcad укажи происхождение цепочки поставки и фиксацию версий.
+6. Верни только специфичные для Mathcad дополнительные замечания, ещё не охваченные глобальным review.

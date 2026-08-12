@@ -1,34 +1,34 @@
-# Privacy Model
+# Модель конфиденциальности
 
-## Principles
+## Принципы
 
-- Minimize document/content exposure and retained metadata.
-- Never log worksheet text, formulas, decrypted filenames, passwords, tokens, API secrets or encryption keys.
-- Client-side processing/encryption is preferred when functionality allows it.
-- Marketing/privacy claims must be technically true for the selected trust mode.
+- Минимизируй раскрытие документов и содержимого и объём сохраняемых метаданных.
+- Никогда не записывай в журналы текст worksheet, формулы, расшифрованные имена файлов, пароли, tokens, секреты API или ключи шифрования.
+- Предпочитай обработку и шифрование на клиенте, если функциональность это позволяет.
+- Заявления о продукте и конфиденциальности должны быть технически верными для выбранного режима доверия.
 
-## Processing modes
+## Режимы обработки
 
-### Local/WASM mode
+### Локальный режим/WASM
 
-Browser uses shared Rust core compiled to WebAssembly. The source document can remain on the client for supported operations.
+Браузер использует общий core Rust, скомпилированный в WebAssembly. Для поддерживаемых операций исходный документ может оставаться на клиенте.
 
-### Server conversion mode
+### Режим серверной конвертации
 
-Plaintext may be processed by controlled backend workers. Do not describe this mode as absolute zero-knowledge unless a separate confidential-compute architecture actually provides that property.
+Открытый текст может обрабатываться контролируемыми workers backend. Не описывай этот режим как абсолютный zero knowledge, если отдельная архитектура конфиденциальных вычислений фактически не обеспечивает это свойство.
 
-## Saved objects
+## Сохранённые объекты
 
-For zero-knowledge-compatible storage, encrypt client-side with authenticated encryption before upload. Server stores ciphertext + minimized metadata and does not possess a usable plaintext recovery key.
+Для хранения, совместимого с zero knowledge, перед загрузкой выполняй на клиенте аутентифицированное шифрование. Сервер хранит шифротекст и минимизированные метаданные и не имеет пригодного для использования ключа восстановления открытого текста.
 
-## Recovery
+## Восстановление
 
-Account login recovery and encrypted-document key recovery are distinct. Resetting an account password must not silently grant the server access to encrypted documents.
+Восстановление входа в учётную запись и восстановление ключа зашифрованного документа различаются. Сброс пароля учётной записи не должен незаметно предоставлять серверу доступ к зашифрованным документам.
 
-## Support
+## Поддержка
 
-Support access to protected content must require explicit, scoped, time-limited user sharing. Admin panels do not include a hidden plaintext bypass.
+Доступ поддержки к защищённому содержимому должен требовать явного, ограниченного по области и времени предоставления пользователем. В административных панелях нет скрытого обхода к открытому тексту.
 
-## Deletion/retention
+## Удаление и хранение
 
-Retention is policy/plan-configurable. Deletion removes metadata and schedules physical object/temp cleanup. Backups and deletion lag must be documented honestly.
+Срок хранения настраивается политикой или планом. Удаление стирает метаданные и планирует физическую очистку объектов и временных файлов. Резервные копии и задержка удаления должны быть честно документированы.

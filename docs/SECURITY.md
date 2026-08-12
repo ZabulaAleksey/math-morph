@@ -1,220 +1,220 @@
-# Security Baseline — OWASP Top 10:2025
+# Базовый уровень безопасности — OWASP Top 10:2025
 
 Источник: https://owasp.org/Top10/2025/
 
-Этот документ задаёт минимальный baseline, а не заменяет threat modeling, ASVS, secure code review или penetration testing.
+Этот документ задаёт минимальный базовый уровень, а не заменяет моделирование угроз, ASVS, review безопасности кода или тестирование на проникновение.
 
-## Security invariants проекта
+## Инварианты безопасности проекта
 
 - Пользовательский файл — недоверенный input независимо от extension/MIME.
 - Документ/формула/filename могут содержать секретные или вредоносные данные.
 - Admin role не получает автоматического права расшифровать пользовательский документ.
-- Authenticated != authorized: каждая object/action проверяет ownership/role/scope.
+- Аутентификация не равна авторизации: каждый объект и действие проверяет владельца, роль и scope.
 - Ключи/пароли/tokens не логируются и не хранятся plaintext.
-- Security failure должен fail closed там, где это не разрушает recoverability.
-- Parser/worker должен переживать malformed input без process crash/panic.
+- Сбой безопасности должен завершаться отказом по умолчанию там, где это не разрушает возможность восстановления.
+- Parser и worker должны переживать повреждённый ввод без сбоя процесса или panic.
 
 ---
 
-## A01:2025 — Broken Access Control
+## A01:2025 — Нарушение контроля доступа
 
 Применение:
-- object-level authorization для documents/conversions/API keys/billing;
-- tenant/user isolation;
-- deny-by-default routes;
-- server-side authorization для каждого protected action;
-- API scopes + ownership checks одновременно;
+- авторизация на уровне объектов для документов, конвертаций, ключей API и оплаты;
+- изоляция tenants и пользователей;
+- маршруты с запретом по умолчанию;
+- серверная авторизация для каждого защищённого действия;
+- одновременная проверка scopes API и владельца;
 - admin RBAC с минимальными правами;
 - signed URLs короткоживущие и привязанные к разрешённому объекту;
-- CSRF защита там, где используется cookie-based state change;
-- SSRF controls для webhook/remote-fetch функций.
+- защита CSRF там, где изменение состояния основано на cookies;
+- средства защиты от SSRF для функций webhook и удалённого получения.
 
 Tests:
-- IDOR: user A не читает/удаляет object user B;
-- revoked API key;
-- scope missing;
-- admin privacy boundary;
-- direct endpoint access без UI.
+- IDOR: пользователь A не читает и не удаляет объект пользователя B;
+- отозванный ключ API;
+- отсутствующий scope;
+- граница конфиденциальности администратора;
+- прямой доступ к endpoint без UI.
 
-## A02:2025 — Security Misconfiguration
+## A02:2025 — Ошибочная конфигурация безопасности
 
 Требования:
-- secure defaults;
-- production debug off;
+- безопасные значения по умолчанию;
+- отключённая отладка в production;
 - минимальные CORS origins;
-- CSP/security headers;
-- non-public S3 buckets;
-- default Keycloak/admin credentials запрещены;
-- unnecessary ports/services disabled;
-- separate dev/stage/prod config;
-- secrets только через environment/secret manager;
-- infrastructure configuration review.
+- CSP и заголовки безопасности;
+- непубличные buckets S3;
+- стандартные учётные данные Keycloak и администратора запрещены;
+- ненужные порты и сервисы отключены;
+- отдельная конфигурация dev, stage и prod;
+- секреты только через окружение или менеджер секретов;
+- review конфигурации инфраструктуры.
 
-Tests/checks:
-- configuration lint;
-- public-bucket check;
-- security header test;
-- accidental debug endpoint scan.
+Тесты и проверки:
+- lint конфигурации;
+- проверка публичных buckets;
+- тест заголовков безопасности;
+- поиск случайно оставленных отладочных endpoints.
 
-## A03:2025 — Software Supply Chain Failures
+## A03:2025 — Сбои цепочки поставки программного обеспечения
 
 Требования:
-- lockfiles и reproducible install;
-- минимизация dependencies;
-- provenance/source review перед новой production dependency;
-- pin/lock versions; не использовать `latest` в production automation;
-- dependency audit для npm/pnpm, Python/uv, Rust/Cargo и container images;
+- lockfiles и воспроизводимая установка;
+- минимизация зависимостей;
+- review происхождения и источника перед добавлением новой production-зависимости;
+- фиксация версий; не использовать `latest` в production-автоматизации;
+- аудит зависимостей для npm/pnpm, Python/uv, Rust/Cargo и образов контейнеров;
 - SBOM для release по мере зрелости;
 - проверять install/postinstall scripts;
-- CI actions pin на immutable refs/digests по возможности;
-- container images pin на version/digest;
-- review MCP servers/plugins/hooks как executable supply-chain components.
+- по возможности фиксировать actions CI на неизменяемые refs или digests;
+- фиксировать образы контейнеров по версии или digest;
+- проводить review MCP-серверов, plugins и hooks как исполняемых компонентов цепочки поставки.
 
 Нельзя автоматически подключать случайный MCP/npm package только ради удобства.
 
-## A04:2025 — Cryptographic Failures
+## A04:2025 — Криптографические сбои
 
 Требования:
-- TLS для data in transit;
-- authenticated encryption для client-side document encryption (например AES-GCM);
+- TLS для данных при передаче;
+- аутентифицированное шифрование для клиентского шифрования документов, например AES-GCM;
 - уникальные nonces/IV согласно библиотеке/алгоритму;
-- keys отделены от ciphertext;
+- ключи отделены от шифротекста;
 - не писать собственную криптографию;
 - API keys хранить hash/secure verifier, секрет показывать один раз;
-- document recovery key не смешивать с account password recovery;
-- backup/key lifecycle документировать;
-- crypto errors не должны silently fallback на plaintext.
+- ключ восстановления документа не смешивать с восстановлением пароля учётной записи;
+- документировать жизненный цикл резервных копий и ключей;
+- криптографические ошибки не должны незаметно возвращаться к открытому тексту.
 
 Tests:
-- ciphertext tampering fails;
-- plaintext marker отсутствует в storage/logs;
-- lost/invalid key не вызывает plaintext fallback.
+- изменение шифротекста вызывает сбой;
+- маркер открытого текста отсутствует в хранилище и журналах;
+- потерянный или недействительный ключ не вызывает fallback к открытому тексту.
 
 ## A05:2025 — Injection
 
 Threats:
 - SQL/NoSQL injection;
-- shell/command injection;
-- XML attacks;
+- shell и command injection;
+- атаки XML;
 - template injection;
-- XSS через filenames/metadata/errors;
-- future spreadsheet formula injection;
-- unsafe OOXML/SVG/content embedding.
+- XSS через имена файлов, метаданные и ошибки;
+- будущая injection формул электронных таблиц;
+- небезопасное встраивание OOXML, SVG и содержимого.
 
 Controls:
-- parameterized ORM/queries;
+- параметризованные ORM и запросы;
 - не строить shell command из пользовательского input;
-- безопасный XML parser: DTD/external entities запрещены, limits enforced;
-- sanitize/escape UI output по контексту;
-- allow-list output formats/options;
-- Excel export в будущем экранирует/контролирует formula-like cell content;
-- SVG/HTML imports рассматриваются как active content.
+- безопасный XML parser: DTD и внешние сущности запрещены, ограничения применяются;
+- очистка и экранирование вывода UI по контексту;
+- allow-list выходных форматов и параметров;
+- будущий экспорт Excel экранирует и контролирует похожее на формулы содержимое ячеек;
+- импорт SVG/HTML рассматривается как активное содержимое.
 
-## A06:2025 — Insecure Design
+## A06:2025 — Небезопасный дизайн
 
 Требования:
-- threat model перед auth/crypto/storage/API support-sharing;
-- abuse cases: oversized files, conversion bombs, quota bypass, recovery abuse, webhook SSRF;
-- explicit trust modes: local/WASM vs server conversion;
+- модель угроз перед изменением аутентификации, криптографии, хранения, API или предоставления доступа поддержке;
+- случаи злоупотребления: слишком большие файлы, conversion bombs, обход квот, злоупотребление восстановлением и SSRF webhook;
+- явные режимы доверия: локальный/WASM и серверная конвертация;
 - privacy claims должны соответствовать технической реальности;
-- rate/size/time/memory limits — часть дизайна, не поздний patch;
-- dangerous features за feature flags + staged rollout.
+- ограничения частоты, размера, времени и памяти — часть дизайна, а не поздний patch;
+- опасные функции за feature flags и поэтапным rollout.
 
-## A07:2025 — Authentication Failures
+## A07:2025 — Сбои аутентификации
 
 Требования:
 - использовать зрелый IdP (например Keycloak), не самописную password auth;
 - MFA TOTP/WebAuthn/passkeys;
-- recovery tokens one-time + TTL + rate limit;
-- Telegram recovery только после подтверждённого account linking;
-- session rotation после login/recovery/privilege change;
-- revoke sessions;
-- brute-force/rate-limit controls;
+- одноразовые tokens восстановления с TTL и rate limit;
+- восстановление через Telegram только после подтверждённой привязки учётной записи;
+- ротация сессии после входа, восстановления или изменения привилегий;
+- отзыв сессий;
+- защита от brute force и rate limit;
 - generic recovery responses, не раскрывающие наличие аккаунта без необходимости;
-- secure cookies (`HttpOnly`, `Secure`, appropriate `SameSite`) при cookie sessions.
+- безопасные cookies (`HttpOnly`, `Secure`, подходящий `SameSite`) для сессий на cookies.
 
-## A08:2025 — Software or Data Integrity Failures
+## A08:2025 — Сбои целостности программного обеспечения или данных
 
 Требования:
 - проверять integrity загруженных контейнеров;
-- conversion reports/version metadata позволяют воспроизводимость;
-- signed/verified payment webhooks;
-- signed/verified internal callbacks where relevant;
+- отчёты конвертации и метаданные версии обеспечивают воспроизводимость;
+- подписанные и проверенные платёжные webhooks;
+- подписанные и проверенные внутренние callbacks, где это уместно;
 - CI/release artifacts должны происходить из доверенного pipeline;
 - нельзя автоматически принимать изменённый golden output;
-- migrations/fixtures/versioned transformations reviewable;
-- untrusted deserialization запрещена.
+- миграции, fixtures и версионируемые преобразования доступны для review;
+- недоверенная десериализация запрещена.
 
-## A09:2025 — Security Logging and Alerting Failures
+## A09:2025 — Сбои журналирования и оповещения безопасности
 
 Логировать:
 - auth failures с безопасной агрегацией;
-- recovery attempts;
-- API key lifecycle;
-- privilege/admin actions;
-- access-control denials;
-- rate-limit/security events;
-- worker/security failures;
-- webhook signature failures.
+- попытки восстановления;
+- жизненный цикл ключей API;
+- действия с привилегиями и административные действия;
+- отказы контроля доступа;
+- события rate limit и безопасности;
+- сбои workers и безопасности;
+- ошибки подписи webhook.
 
 Не логировать:
-- document contents;
+- содержимое документов;
 - formulas;
 - passwords;
-- recovery tokens;
-- API secrets;
-- encryption keys;
-- decrypted filenames в zero-knowledge режиме.
+- tokens восстановления;
+- секреты API;
+- ключи шифрования;
+- расшифрованные имена файлов в режиме zero knowledge.
 
 Требования:
-- request/correlation ID;
-- log redaction;
-- alerting для abnormal security events;
+- ID запроса и корреляции;
+- скрытие данных в журналах;
+- оповещение об аномальных событиях безопасности;
 - audit trail должен быть защищён от обычного пользователя.
 
-## A10:2025 — Mishandling of Exceptional Conditions
+## A10:2025 — Неправильная обработка исключительных условий
 
 Особенно важно для конвертера.
 
 Требования:
-- invalid/corrupted/huge files имеют controlled errors;
-- fail closed для auth/authz/crypto/integrity;
-- timeouts, memory/size/depth limits;
-- retry только transient errors; malformed input не retry бесконечно;
-- dead-letter/error flow;
-- idempotency для job creation/payment/webhook flows;
-- partial conversion только с явным warning/report;
+- недействительные, повреждённые и огромные файлы имеют контролируемые ошибки;
+- отказ по умолчанию для аутентификации, авторизации, криптографии и целостности;
+- timeout и ограничения памяти, размера и глубины;
+- повтор только временных ошибок; повреждённый ввод не повторяется бесконечно;
+- flow dead-letter и ошибок;
+- идемпотентность для flows создания задач, оплаты и webhook;
+- частичная конвертация только с явным предупреждением и отчётом;
 - network disconnect не создаёт дубликат job автоматически;
-- frontend Error Boundaries и recoverable UI state;
-- error message не раскрывает stack trace/secrets/internal paths в production.
+- Error Boundaries frontend и восстанавливаемое состояние UI;
+- сообщение об ошибке не раскрывает stack trace, секреты или внутренние пути в production.
 
-## File/parser specific hardening
+## Усиление безопасности файлов и parser
 
-- Verify content signature/structure, not extension only.
-- ZIP: entry count, uncompressed size, ratio, path traversal, duplicate/conflicting names.
-- XML: external entities/DTD off; depth/size limits; strict encoding handling.
-- Embedded images/SVG/relationships: validate type/size/URI; remote relationships запрещены/контролируются.
-- Temporary files: random names, restrictive permissions, cleanup, quotas.
-- Conversion worker: sandbox/isolation as feasible; least privilege; no access to unrelated user objects.
+- Проверяй сигнатуру и структуру содержимого, а не только расширение.
+- ZIP: количество записей, распакованный размер, степень сжатия, path traversal, дублирующие и конфликтующие имена.
+- XML: внешние сущности и DTD отключены; ограничения глубины и размера; строгая обработка кодировки.
+- Встроенные изображения, SVG и relationships: проверять тип, размер и URI; удалённые relationships запрещены или контролируются.
+- Временные файлы: случайные имена, ограничительные разрешения, очистка и квоты.
+- Worker конвертации: sandbox и изоляция, где возможно; минимальные привилегии; отсутствие доступа к объектам других пользователей.
 
-## Required security gates by change type
+## Обязательные проверки безопасности по типу изменения
 
-| Change | Minimum checks |
+| Изменение | Минимальные проверки |
 |---|---|
-| Parser/upload | A05, A06, A10 + malformed/fuzz tests |
-| Auth/recovery | A01, A07, A09, A10 |
-| Crypto/storage | A01, A04, A06, A08, A09 |
-| Dependencies/CI/MCP/hooks | A02, A03, A08 |
-| API/admin | A01, A02, A05, A07, A09 |
-| Billing/webhooks | A01, A05, A08, A09, A10 |
+| Parser и загрузка | A05, A06, A10 + тесты повреждённых данных и fuzz |
+| Аутентификация и восстановление | A01, A07, A09, A10 |
+| Криптография и хранение | A01, A04, A06, A08, A09 |
+| Зависимости, CI, MCP и hooks | A02, A03, A08 |
+| API и администрирование | A01, A02, A05, A07, A09 |
+| Оплата и webhooks | A01, A05, A08, A09, A10 |
 
-## Security DoD
+## DoD безопасности
 
-- [ ] Trust boundary identified.
-- [ ] Relevant OWASP 2025 categories reviewed.
-- [ ] Negative/abuse test added where behavior changed.
-- [ ] No secrets/document contents introduced into logs.
-- [ ] Access control checked server-side.
-- [ ] Limits/timeouts considered.
-- [ ] Dependency/supply-chain impact checked.
-- [ ] Failure mode documented and fail-open avoided for security controls.
+- [ ] Граница доверия определена.
+- [ ] Относящиеся к задаче категории OWASP 2025 проверены.
+- [ ] При изменении поведения добавлен негативный тест или тест злоупотребления.
+- [ ] В журналы не добавлены секреты или содержимое документов.
+- [ ] Контроль доступа проверяется на сервере.
+- [ ] Ограничения и timeout учтены.
+- [ ] Влияние на зависимости и цепочку поставки проверено.
+- [ ] Режим сбоя документирован, а для средств безопасности исключён fail-open.

@@ -1,9 +1,9 @@
-# DOCX / Word Rules
+# Правила DOCX / Word
 
-- Read architecture before changing exporter contracts.
-- Supported equations must be editable Word/OMML structures, not screenshots.
-- Word-specific XML belongs in exporter layer, never Mathcad AST.
-- DOCX package/relationships/XML must be structurally validated in tests.
-- External relationships and embedded active content require explicit security review.
-- Unsupported equation uses explicit fallback + conversion warning; never silent loss.
-- MathType remains a separate backend/adapter.
+- Перед изменением контрактов exporter прочитай архитектуру.
+- Поддерживаемые уравнения должны быть редактируемыми структурами Word/OMML, а не снимками экрана.
+- Специфичный для Word XML относится к слою exporter, но никогда не к Mathcad AST.
+- Структура пакета DOCX, relationships и XML должна проверяться тестами.
+- Внешние relationships и встроенное активное содержимое требуют явного review безопасности.
+- Для неподдерживаемого уравнения используй явный fallback и предупреждение о конвертации; не допускай незаметной потери.
+- MathType остаётся отдельным backend или адаптером.

@@ -1,39 +1,39 @@
-# Mathcad Converter & Parser Platform — repository context pack
+# Платформа конвертации и parsing Mathcad — пакет контекста репозитория
 
-This archive is laid out to be extracted **directly into the repository root**.
-There is no wrapper directory inside the ZIP.
+Архив подготовлен для распаковки **непосредственно в корень репозитория**.
+Внутри ZIP нет дополнительного каталога-обёртки.
 
-## Important compatibility rule
+## Важное правило совместимости
 
-A global **AI Dev Team Codex** is already assumed to exist. This repository is a domain overlay, not a second generic agent team.
+Предполагается, что глобальная **AI Dev Team Codex** уже существует. Этот репозиторий является предметным overlay, а не второй универсальной командой агентов.
 
-- Generic architect/QA/security/frontend/backend/DevOps/release/Git roles: reuse the global AI Dev Team.
-- Active local agents: only Mathcad-specific format/parser/math/OpenXML specialists.
-- Project hooks: disabled by default; templates are optional.
-- Project MCP: disabled by default; templates are optional.
-- Generic fallback agents/skills remain outside active discovery directories.
+- Универсальные роли architect, QA, безопасности, frontend, backend, DevOps, release и Git: переиспользуют глобальную AI Dev Team.
+- Активные локальные агенты: только специфичные для Mathcad специалисты по форматам, parser, математике и OpenXML.
+- Проектные hooks: по умолчанию отключены; шаблоны необязательны.
+- Проектный MCP: по умолчанию отключён; шаблоны необязательны.
+- Универсальные fallback agents и skills остаются вне активных каталогов обнаружения.
 
-Read first:
+Сначала прочитай:
 
 1. `AGENTS.md`
 2. `docs/AI_DEV_TEAM_COMPATIBILITY.md`
-3. only the task-relevant local `AGENTS.md` and docs.
+3. только относящиеся к задаче локальные `AGENTS.md` и документы.
 
-## Canonical documents
+## Канонические документы
 
-- `docs/SPECIFICATION.md` — product requirements.
-- `docs/TECH_STACK.md` — approved baseline stack.
-- `docs/ARCHITECTURE.md` — system boundaries and data flow.
-- `docs/ROADMAP.md` — staged development sequence.
-- `docs/TRACEABILITY.md` — lightweight mapping from specification sections to roadmap stages and verification evidence.
-- `docs/PROMPTS.md` — Codex prompt library; read only the current stage.
-- `docs/SECURITY.md` — OWASP Top 10:2025 mapping and project security rules.
-- `docs/PRIVACY.md` — privacy/zero-knowledge rules.
-- `docs/TESTING.md` — test strategy and DoD.
-- `docs/FORMATS.md` — input/output format policy.
-- `docs/API.md` — API contract direction.
-- `docs/DESIGN.md` — intentionally empty until the owner supplies the design.
+- `docs/SPECIFICATION.md` — требования продукта.
+- `docs/TECH_STACK.md` — утверждённый базовый стек.
+- `docs/ARCHITECTURE.md` — границы системы и поток данных.
+- `docs/ROADMAP.md` — поэтапная последовательность разработки.
+- `docs/TRACEABILITY.md` — компактное соответствие разделов спецификации этапам дорожной карты и доказательствам проверки.
+- `docs/PROMPTS.md` — библиотека prompts Codex; читай только текущий этап.
+- `docs/SECURITY.md` — соответствие OWASP Top 10:2025 и правила безопасности проекта.
+- `docs/PRIVACY.md` — правила конфиденциальности и zero knowledge.
+- `docs/TESTING.md` — стратегия тестирования и DoD.
+- `docs/FORMATS.md` — политика входных и выходных форматов.
+- `docs/API.md` — направление контракта API.
+- `docs/DESIGN.md` — намеренно пуст до предоставления дизайна владельцем.
 
-## Do not blindly overwrite an existing project AGENTS.md
+## Не перезаписывай существующий проектный AGENTS.md без проверки
 
-If this repository already has a project-specific `AGENTS.md`, merge the Mathcad overlay rules rather than discarding existing repository rules. Global/user AI Dev Team rules are not copied here.
+Если в репозитории уже есть проектный `AGENTS.md`, объедини с ним правила overlay Mathcad, а не отбрасывай существующие правила репозитория. Глобальные и пользовательские правила AI Dev Team сюда не копируются.

@@ -1,109 +1,109 @@
-# AI Dev Team Codex Compatibility
+# Совместимость с AI Dev Team Codex
 
-## Purpose
+## Назначение
 
-This repository is a **project-specific overlay** on top of an already installed AI Dev Team Codex setup. The repository must not create a second generic development team.
+Этот репозиторий является **проектным overlay** поверх уже установленной конфигурации AI Dev Team Codex. Репозиторий не должен создавать вторую универсальную команду разработки.
 
-## Priority model
+## Модель приоритетов
 
-1. System/user/global Codex configuration and the installed AI Dev Team remain the owner of generic engineering workflow.
-2. Root `AGENTS.md` adds only Mathcad-platform invariants and routing.
-3. Local `AGENTS.md` files add module-specific rules.
-4. `.codex/agents/*.toml` contains only Mathcad-specific specialists.
-5. The current task prompt narrows scope further.
+1. Системная, пользовательская и глобальная конфигурация Codex и установленная AI Dev Team остаются владельцами универсального инженерного workflow.
+2. Корневой `AGENTS.md` добавляет только инварианты и маршрутизацию платформы Mathcad.
+3. Локальные файлы `AGENTS.md` добавляют правила модулей.
+4. `.codex/agents/*.toml` содержит только специфичных для Mathcad специалистов.
+5. Prompt текущей задачи дополнительно сужает объём.
 
-When rules overlap, follow the higher-priority/effective Codex instruction and treat this repository as a domain overlay rather than a replacement.
+При пересечении правил следуй действующей инструкции Codex с более высоким приоритетом и считай репозиторий предметным overlay, а не заменой.
 
-## Do not duplicate global roles
+## Не дублировать глобальные роли
 
-Before delegating a generic task, inspect the agents/capabilities already available in the installed AI Dev Team.
+Перед делегированием универсальной задачи проверь агентов и возможности, уже доступные в установленной AI Dev Team.
 
-Prefer existing global roles for capabilities such as:
+Предпочитай существующие глобальные роли для следующих возможностей:
 
-- architect / architecture review;
-- generic backend/frontend implementation;
-- generic QA/test review;
-- generic security review;
-- code review;
-- DevOps/CI/release;
+- architect и архитектурное review;
+- универсальная реализация backend/frontend;
+- универсальное QA и review тестов;
+- универсальное review безопасности;
+- review кода;
+- DevOps, CI и release;
 - Git/GitHub workflow;
-- documentation research.
+- исследование документации.
 
-Project agents should be used only when Mathcad-specific domain knowledge materially helps.
+Проектных агентов следует использовать только тогда, когда специфичные для Mathcad предметные знания существенно помогают.
 
-Active project-specific roles:
+Активные проектные роли:
 
 - `mathcad_format_forensics`
 - `mathcad_parser_engineer`
 - `mathcad_math_semantics`
 - `mathcad_word_openxml`
 
-Fallback generic project agents live in `.codex/agents-optional/` and are **not active**. Copy one into `.codex/agents/` only if you have confirmed that the AI Dev Team has no equivalent capability.
+Универсальные fallback-агенты проекта находятся в `.codex/agents-optional/` и **не активны**. Копируй их в `.codex/agents/` только после подтверждения отсутствия эквивалентной возможности в AI Dev Team.
 
-## Total subagent budget
+## Общий лимит субагентов
 
-The budget is shared across **global + project** agents; it is not additive.
+Лимит общий для **глобальных и проектных** агентов; он не суммируется.
 
-- SIMPLE: 0 subagents normally.
-- STANDARD: 1–2 total subagents.
-- COMPLEX: up to 3–4 total subagents only for independent workstreams.
+- SIMPLE: обычно 0 субагентов.
+- STANDARD: всего 1–2 субагента.
+- COMPLEX: всего до 3–4 субагентов только для независимых направлений работы.
 
-Never launch both a global reviewer and a project fallback reviewer for the same question.
+Никогда не запускай одновременно глобального reviewer и проектного fallback reviewer для одного вопроса.
 
-Never let multiple agents edit the same files concurrently.
+Не разрешай нескольким агентам одновременно редактировать одни и те же файлы.
 
 ## Hooks
 
-The installed AI Dev Team owns generic session-start, safety, formatting, quality-gate and release hooks unless a concrete gap is proven.
+Установленная AI Dev Team владеет универсальными hooks начала сессии, безопасности, форматирования, проверки качества и release, если не доказан конкретный пробел.
 
-Therefore this pack does **not** register project hooks by default.
+Поэтому пакет по умолчанию **не** регистрирует проектные hooks.
 
-- Optional scripts: `.codex/hooks-optional/`
-- Optional registration snippet: `.codex/hooks.optional.toml`
+- Необязательные scripts: `.codex/hooks-optional/`
+- Необязательный фрагмент регистрации: `.codex/hooks.optional.toml`
 
-Before activating a project hook:
+Перед включением проектного hook:
 
-1. inspect existing global/user/project hook behavior;
-2. identify the exact missing capability;
-3. activate only the smallest missing hook;
-4. avoid duplicate SessionStart/Stop/PostToolUse checks;
-5. keep hook output tiny.
+1. проверь поведение существующих глобальных, пользовательских и проектных hooks;
+2. определи точную отсутствующую возможность;
+3. включи только минимальный недостающий hook;
+4. избегай дублирующих проверок SessionStart, Stop и PostToolUse;
+5. сохраняй вывод hook минимальным.
 
 ## MCP
 
-The installed AI Dev Team is the source of truth for shared MCP servers.
+Установленная AI Dev Team является источником истины для общих MCP-серверов.
 
-This repository does not activate duplicate MCP servers by default.
+Репозиторий по умолчанию не включает дублирующие MCP-серверы.
 
-- Optional MCP template: `.codex/mcp.optional.toml`
-- Policy: `docs/MCP.md`
+- Необязательный шаблон MCP: `.codex/mcp.optional.toml`
+- Политика: `docs/MCP.md`
 
-If GitHub, docs, browser/devtools, Context7 or another equivalent server already exists globally, reuse it instead of declaring another project server.
+Если GitHub, документация, browser/devtools, Context7 или другой эквивалентный сервер уже существует глобально, переиспользуй его вместо объявления ещё одного проектного сервера.
 
 ## Skills
 
-Keep only domain-specific skills active:
+Оставляй активными только предметные skills:
 
 - `mathcad-format-forensics`
 - `mathcad-conversion-regression`
 - `mathcad-security-overlay`
 
-Generic release/quality workflows should come from the existing AI Dev Team. A fallback template exists in `.agents/skills-optional/` only for installations without such a workflow.
+Универсальные workflows release и качества должны поступать из существующей AI Dev Team. Fallback-шаблон в `.agents/skills-optional/` предназначен только для установок без такого workflow.
 
-## Context minimization
+## Минимизация контекста
 
-Do not reload the entire AI Dev Team documentation from this repository.
+Не загружай повторно из этого репозитория всю документацию AI Dev Team.
 
-The effective global rules are assumed to already be active. Project instructions should only add Mathcad-specific deltas.
+Предполагается, что действующие глобальные правила уже активны. Проектные инструкции должны добавлять только специфичные для Mathcad дополнения.
 
-Avoid:
+Избегай:
 
-- restating generic Git workflow;
-- restating generic coding standards;
-- restating generic QA/security roles;
-- duplicating MCP descriptions;
-- loading all Skills;
-- loading all agent TOMLs;
-- reading all roadmap/prompts for one local change.
+- повторения универсального Git workflow;
+- повторения универсальных стандартов кода;
+- повторения универсальных ролей QA и безопасности;
+- дублирования описаний MCP;
+- загрузки всех Skills;
+- загрузки всех TOML агентов;
+- чтения всей дорожной карты и prompts для одного локального изменения.
 
-Prefer capability lookup + the smallest relevant local document.
+Предпочитай поиск возможности и минимальный относящийся к задаче локальный документ.

@@ -1,6 +1,6 @@
-# Sources
+# Источники
 
-External baselines used while preparing this context pack:
+Внешние источники, использованные при подготовке этого пакета контекста:
 
 - OpenAI Codex — AGENTS.md / agent configuration: https://learn.chatgpt.com/docs/agent-configuration/agents-md
 - OpenAI Codex — Subagents: https://learn.chatgpt.com/docs/agent-configuration/subagents
@@ -9,4 +9,4 @@ External baselines used while preparing this context pack:
 - OpenAI Codex — Skills: https://learn.chatgpt.com/docs/build-skills
 - OWASP Top 10:2025: https://owasp.org/Top10/2025/
 
-Project policy deliberately avoids duplicating shared/global AI Dev Team hooks, MCP servers and generic reviewer roles. Codex hook sources can accumulate rather than replacing one another, and subagent workflows consume additional context/tokens; therefore project automation is kept domain-specific and opt-in where overlap is likely.
+Политика проекта намеренно исключает дублирование общих и глобальных hooks AI Dev Team, MCP-серверов и универсальных ролей reviewer. Источники hooks Codex могут накапливаться, а не заменять друг друга, а workflows субагентов расходуют дополнительный контекст и tokens; поэтому проектная автоматизация остаётся предметной и требует явного включения там, где вероятно пересечение.

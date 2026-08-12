@@ -1,43 +1,43 @@
-# Product Specification — Mathcad Converter & Parser Platform
+# Спецификация продукта — платформа конвертации и parsing Mathcad
 
-## 1. Purpose
+## 1. Назначение
 
-Build an extensible SaaS/platform that parses Mathcad worksheets, preserves mathematical/document semantics, performs configurable transformations and exports editable documents. The first product path is Mathcad → Microsoft Word; the architecture must support future Markdown, PDF, LaTeX, HTML, JSON/web viewer, editable Excel charts and editable Visio diagrams.
+Создать расширяемую SaaS-платформу, которая выполняет parsing worksheets Mathcad, сохраняет математическую и документную семантику, выполняет настраиваемые преобразования и экспортирует редактируемые документы. Первый продуктовый путь — Mathcad → Microsoft Word; архитектура должна поддерживать будущие Markdown, PDF, LaTeX, HTML, JSON и веб-просмотр, редактируемые диаграммы Excel и схемы Visio.
 
-The product is more than a file converter: it includes a parser, mathematical semantic analysis, substitution/evaluation traces, notation transformation, complex-number presentation, public API, account area, privacy controls, authentication, billing and administration.
+Продукт является не только конвертером файлов: он включает parser, математический семантический анализ, traces подстановки и вычисления, преобразование нотации, представление комплексных чисел, публичный API, личный кабинет, средства управления конфиденциальностью, аутентификацию, оплату и администрирование.
 
-## 2. Input formats
+## 2. Входные форматы
 
-Initial mandatory inputs:
+Изначально обязательные входы:
 
-- `.xmcd` — legacy XML worksheet family;
-- `.mcdx` — Mathcad Prime container family.
+- `.xmcd` — устаревшее семейство XML worksheets;
+- `.mcdx` — семейство контейнеров Mathcad Prime.
 
-Format detection must inspect content, not trust extension/MIME alone. Extension/content mismatch is a structured warning/error depending on the actual condition. Corrupted or hostile input must fail safely.
+Определение формата должно проверять содержимое, а не доверять только расширению или MIME. Несоответствие расширения содержимому является структурированным предупреждением или ошибкой в зависимости от фактического состояния. Повреждённый или враждебный ввод должен завершаться безопасным сбоем.
 
-## 3. Output formats
+## 3. Выходные форматы
 
 MVP:
 
 - `.docx`.
 
-Planned exporters:
+Планируемые exporters:
 
 - Markdown `.md`;
 - PDF `.pdf`;
 - LaTeX `.tex`;
 - HTML `.html`;
 - JSON `.json`;
-- web viewer representation.
+- представление для веб-просмотра.
 
-Future structured exports:
+Будущие структурированные форматы экспорта:
 
-- editable Excel charts;
-- editable Visio `.vsdx` diagrams.
+- редактируемые диаграммы Excel;
+- редактируемые схемы Visio `.vsdx`.
 
-## 4. Conversion architecture requirement
+## 4. Требования к архитектуре конвертации
 
-Do not implement direct XML → DOCX coupling. Required flow:
+Не реализовывать прямую связь XML → DOCX. Требуемый поток:
 
 ```text
 Input → Format Detector / Safe Container Reader → Mathcad Parser
@@ -45,182 +45,182 @@ Input → Format Detector / Safe Container Reader → Mathcad Parser
       → Document IR → Exporter
 ```
 
-Parser/AST/semantic layers must not depend on React, HTTP or Word-specific markup.
+Слои parser, AST и семантики не должны зависеть от React, HTTP или специфичной для Word разметки.
 
-## 5. Formula conversion
+## 5. Конвертация формул
 
-Supported mathematical structures must be exported as editable equations, not raster images.
+Поддерживаемые математические структуры должны экспортироваться как редактируемые уравнения, а не растровые изображения.
 
-Equation backend abstraction:
+Абстракция backend уравнений:
 
-- `WordEquationExporter` — native Microsoft Word equations / OMML, primary backend;
-- `MathTypeExporter` — later/optional backend, isolated from parser core, potentially via MathML.
+- `WordEquationExporter` — нативные уравнения Microsoft Word / OMML, основной backend;
+- `MathTypeExporter` — будущий необязательный backend, изолированный от core parser, возможно через MathML.
 
-A controlled image/text fallback is permitted only for unsupported constructs and must emit a visible conversion warning.
+Контролируемый fallback в изображение или текст допускается только для неподдерживаемых конструкций и должен создавать заметное предупреждение о конвертации.
 
-## 6. Mathematical transformations
+## 6. Математические преобразования
 
-The system must preserve original mathematical semantics and apply presentation transformations on a separate display/transformation layer.
+Система должна сохранять исходную математическую семантику и применять преобразования представления в отдельном слое отображения и преобразования.
 
-Examples:
+Примеры:
 
-- Mathcad definition `:=` may be rendered as `=`, `≔` or original notation according to a notation profile while remaining a `Definition` internally;
-- configurable substitution of previously defined values;
-- result-only, substitution and detailed trace modes;
-- independent computation precision and presentation rounding.
+- определение Mathcad `:=` может отображаться как `=`, `≔` или исходная нотация согласно профилю, оставаясь внутри `Definition`;
+- настраиваемая подстановка ранее определённых значений;
+- режимы только результата, подстановки и подробного trace;
+- независимые точность вычисления и округление представления.
 
-## 7. Complex numbers
+## 7. Комплексные числа
 
-Support algebraic and polar representations.
+Поддерживать алгебраическое и полярное представления.
 
-Presentation rules:
+Правила представления:
 
-- multiplication/division: allow trace through polar form, then final result in polar and algebraic form;
-- addition/subtraction: primarily algebraic calculation;
-- output options: algebraic, polar or both;
-- edge cases: zero, pure real/imaginary, quadrants, angle normalization, division by zero, rounding boundaries.
+- умножение и деление: разрешать trace через полярную форму, затем итоговый результат в полярной и алгебраической форме;
+- сложение и вычитание: преимущественно алгебраическое вычисление;
+- варианты вывода: алгебраический, полярный или оба;
+- граничные случаи: ноль, чисто вещественное или мнимое значение, квадранты, нормализация угла, деление на ноль и границы округления.
 
-## 8. Graphs
+## 8. Графики
 
-Initial behavior: preserve/copy graph preview into DOCX with size/aspect ratio and warning fallback if unavailable.
+Исходное поведение: сохранять или копировать предпросмотр графика в DOCX с размером и соотношением сторон и использовать fallback с предупреждением при недоступности.
 
-Architecture must preserve `PlotIR`/future `ChartIR`; raster output must not destroy semantics required for later editable Excel chart reconstruction.
+Архитектура должна сохранять `PlotIR` и будущий `ChartIR`; растровый вывод не должен уничтожать семантику, необходимую для последующего восстановления редактируемой диаграммы Excel.
 
-## 9. Diagrams/schemes
+## 9. Диаграммы и схемы
 
-Initial behavior: copy/render as image into DOCX.
+Исходное поведение: копировать или рендерить как изображение в DOCX.
 
-Future `DiagramIR` must support shapes, connectors, groups, text, styles, coordinates and bounds. Future VSDX output must be a real editable Visio project; inserting one large image into VSDX does not satisfy the requirement.
+Будущий `DiagramIR` должен поддерживать shapes, connectors, groups, текст, стили, координаты и границы. Будущий вывод VSDX должен быть настоящим редактируемым проектом Visio; вставка одного большого изображения в VSDX не удовлетворяет требованию.
 
-## 10. Main website pages
+## 10. Основные страницы сайта
 
-### Home
+### Главная
 
-Blocks: header/navigation, hero upload CTA, capabilities, privacy/security explanation, API teaser, pricing teaser, footer/legal/status.
+Блоки: header и навигация, hero с CTA загрузки, возможности, объяснение конфиденциальности и безопасности, краткая информация об API и тарифах, footer, юридическая информация и статус.
 
-### Converter
+### Конвертер
 
-Blocks: dropzone, file information/validation, output format, equation backend, notation/substitution/precision/complex options, save preferences, convert action, progress state, result/report.
+Блоки: dropzone, сведения о файле и валидация, выходной формат, backend уравнений, параметры нотации, подстановки, точности и комплексных чисел, предпочтения сохранения, действие конвертации, состояние прогресса, результат и отчёт.
 
-### Result
+### Результат
 
-Show status, file/result metadata, warnings, download, retry/reconfigure, report.
+Показывать статус, метаданные файла и результата, предупреждения, скачивание, повтор или изменение конфигурации и отчёт.
 
-### Account
+### Учётная запись
 
-Sections: overview, documents, conversion history, API keys, API usage, security, connected accounts, billing, settings/privacy.
+Разделы: обзор, документы, история конвертаций, ключи API, использование API, безопасность, связанные учётные записи, оплата, настройки и конфиденциальность.
 
-### API documentation
+### Документация API
 
-Human-readable quick start, authentication, conversion creation, async job states, download/report, errors, limits, persistence policy, SDK/examples, future webhooks.
+Понятный человеку быстрый старт, аутентификация, создание конвертации, состояния асинхронной задачи, скачивание и отчёт, ошибки, ограничения, политика сохранения, SDK и примеры, будущие webhooks.
 
-### Admin
+### Администрирование
 
-Users/account metadata, plans/billing metadata, conversion/worker/queue metrics, parser error and unsupported-node statistics, feature flags, security events. Admin must not bypass privacy-protected document boundaries.
+Метаданные пользователей и учётных записей, тарифов и оплаты, метрики конвертаций, workers и очередей, статистика ошибок parser и неподдерживаемых узлов, feature flags и события безопасности. Администратор не должен обходить защищённые конфиденциальностью границы документов.
 
-## 11. File and conversion UX states
+## 11. Состояния UX файла и конвертации
 
-Explicitly handle:
+Явно обрабатывать:
 
-- empty file;
-- unsupported extension;
-- extension/content mismatch;
-- corrupted MCDX/XMCD;
-- unsupported/partially supported Mathcad version;
-- file too large (including exact limit boundary);
-- conversion warning/partial conversion;
-- fatal conversion failure;
+- пустой файл;
+- неподдерживаемое расширение;
+- несоответствие расширения содержимому;
+- повреждённый MCDX/XMCD;
+- неподдерживаемую или частично поддерживаемую версию Mathcad;
+- слишком большой файл, включая точную границу лимита;
+- предупреждение конвертации или частичную конвертацию;
+- фатальный сбой конвертации;
 - timeout;
-- network loss before upload/during upload/after job creation/during result download;
-- service unavailable;
-- quota/rate limit exceeded.
+- потерю сети до или во время загрузки, после создания задачи или во время скачивания результата;
+- недоступность сервиса;
+- превышение квоты или rate limit.
 
-Every user-facing error must answer: what happened, whether data is safe, and what the user can do next. Never expose raw stack traces.
+Каждая пользовательская ошибка должна объяснять, что произошло, находятся ли данные в безопасности и что пользователь может сделать дальше. Никогда не раскрывать исходные stack traces.
 
-## 12. Authentication and account recovery
+## 12. Аутентификация и восстановление учётной записи
 
-Support standard login/password and extensible OIDC/OAuth providers (e.g. Google, Microsoft, GitHub).
+Поддерживать стандартные логин и пароль и расширяемых providers OIDC/OAuth, например Google, Microsoft и GitHub.
 
-Security features:
+Функции безопасности:
 
-- email verification;
+- проверка email;
 - TOTP 2FA;
-- recovery codes;
+- коды восстановления;
 - WebAuthn/passkeys;
-- confirmed email recovery;
-- confirmed phone/SMS recovery;
-- Telegram linking and later recovery through a previously linked Telegram account.
+- подтверждённое восстановление через email;
+- подтверждённое восстановление через телефон или SMS;
+- привязка Telegram и последующее восстановление через ранее связанную учётную запись Telegram.
 
-Telegram recovery must use an explicit account linking flow with one-time, expiring, replay-protected tokens; never trust a typed `@username` as identity proof.
+Восстановление через Telegram должно использовать явный flow привязки учётной записи с одноразовыми, истекающими и защищёнными от replay tokens; никогда не доверять введённому `@username` как доказательству личности.
 
-Account recovery and encrypted-document recovery are separate processes.
+Восстановление учётной записи и зашифрованного документа являются отдельными процессами.
 
 ## 13. API
 
-Versioned REST API starting at `/api/v1`.
+Версионируемый REST API, начинающийся с `/api/v1`.
 
-Core flow:
+Основной поток:
 
 ```text
 Client → auth/API key → validate/quota → create conversion job
        → queue/worker → result/report → policy-controlled storage
 ```
 
-Core endpoints conceptually include conversions, status, result/report, documents, API keys and usage. Long-running conversions use asynchronous jobs.
+Основные endpoints концептуально включают конвертации, статус, результат и отчёт, документы, ключи API и использование. Длительные конвертации используют асинхронные задачи.
 
-Job states: created, queued, processing, completed, completed_with_warnings, failed, cancelled, expired.
+Состояния задач: created, queued, processing, completed, completed_with_warnings, failed, cancelled, expired.
 
-API keys:
+Ключи API:
 
-- shown in full only once;
-- stored only as secure hash/derived verifier plus prefix/metadata;
-- revocable, expirable and scoped;
-- usage/rate-limit accounting.
+- полностью показываются только один раз;
+- хранятся только как безопасный hash или производный verifier с префиксом и метаданными;
+- поддерживают отзыв, срок действия и scopes;
+- учитывают использование и rate limit.
 
-Explicit request settings override profile defaults when policy permits; otherwise profile defaults apply.
+Явные настройки запроса переопределяют значения профиля по умолчанию, если политика это разрешает; иначе применяются значения профиля.
 
-### Local CLI adapter
+### Локальный адаптер CLI
 
-Provide a thin developer/operator CLI for local conversion and format inspection. It must reuse the same parser, semantic pipeline, exporters and structured diagnostics as the web/API paths rather than implement separate conversion behavior.
+Предоставить тонкий CLI разработчика и оператора для локальной конвертации и проверки формата. Он должен переиспользовать те же parser, семантический конвейер, exporters и структурированную диагностику, что и пути web/API, а не реализовывать отдельное поведение конвертации.
 
-Initial commands cover conversion and safe inspection, with machine-readable report output for automation. The CLI is not a second service boundary and must not bypass input limits, privacy rules or unsupported-content diagnostics.
+Начальные команды охватывают конвертацию и безопасную проверку с машиночитаемым отчётом для автоматизации. CLI не является второй сервисной границей и не должен обходить ограничения ввода, правила конфиденциальности или диагностику неподдерживаемого содержимого.
 
-## 14. Saved documents
+## 14. Сохранённые документы
 
-User preferences independently control saving web conversions, API conversions, originals and outputs.
+Пользовательские настройки независимо управляют сохранением веб-конвертаций, конвертаций API, оригиналов и результатов.
 
-Stored file objects belong in S3-compatible object storage; PostgreSQL stores metadata only. Retention must be configurable by plan/policy. Delete requests must clean metadata and schedule object cleanup.
+Сохранённые файловые объекты находятся в S3-совместимом объектном хранилище; PostgreSQL хранит только метаданные. Срок хранения должен настраиваться тарифом или политикой. Запросы удаления должны очищать метаданные и планировать очистку объектов.
 
-## 15. Privacy / zero-knowledge direction
+## 15. Направление конфиденциальности и zero knowledge
 
-Preferred high-privacy path uses the Rust core compiled to WebAssembly for local processing where supported, plus client-side authenticated encryption for saved objects.
+Предпочтительный путь повышенной конфиденциальности использует core Rust, скомпилированный в WebAssembly, для локальной обработки там, где она поддерживается, и клиентское аутентифицированное шифрование сохранённых объектов.
 
-Do not promise absolute zero-knowledge for operations that require plaintext server-side conversion. Secure marketing claims must map to actual architecture.
+Не обещать абсолютный zero knowledge для операций, которым требуется серверная конвертация открытого текста. Заявления о безопасности должны соответствовать фактической архитектуре.
 
-If server-side storage cannot read encrypted documents, administrators and support cannot read them either without explicit user-controlled sharing/recovery capability.
+Если серверное хранилище не может читать зашифрованные документы, администраторы и поддержка также не могут их читать без явного контролируемого пользователем предоставления доступа или восстановления.
 
-## 16. Internationalization
+## 16. Интернационализация
 
-All user-facing strings are externalized through i18n catalogs. Adding a locale must not require business-logic changes. Backend returns stable error codes; frontend localizes them.
+Все пользовательские строки вынесены в каталоги i18n. Добавление локали не должно требовать изменения бизнес-логики. Backend возвращает стабильные коды ошибок, а frontend их локализует.
 
-## 17. Billing/monetization
+## 17. Оплата и монетизация
 
-Plan model should support Free, Pro, API, Team and future Enterprise. Quotas can vary by conversion count, file size, formats, storage/retention, API allowance, batch processing and queue priority.
+Модель тарифов должна поддерживать Free, Pro, API, Team и будущий Enterprise. Квоты могут различаться по числу конвертаций, размеру файлов, форматам, хранилищу и сроку хранения, доступу API, пакетной обработке и приоритету очереди.
 
-Billing must use a provider abstraction to allow regional/international providers without coupling core logic.
+Оплата должна использовать абстракцию provider для поддержки региональных и международных providers без связывания основной логики.
 
-## 18. Non-functional requirements
+## 18. Нефункциональные требования
 
-- modular and extensible architecture;
-- deterministic parser/AST where applicable;
-- streaming/bounded parsing for large XML/container input;
-- stateless API where practical;
-- horizontally scalable workers;
-- structured diagnostics and observability without content leakage;
-- accessibility and responsive UI;
-- comprehensive automated tests;
-- secure defaults and fail-closed behavior for auth/access/crypto/integrity boundaries.
+- модульная и расширяемая архитектура;
+- детерминированные parser и AST, где применимо;
+- потоковый parsing с ограничениями для крупных входных XML и контейнеров;
+- stateless API, где это практично;
+- горизонтально масштабируемые workers;
+- структурированная диагностика и наблюдаемость без утечки содержимого;
+- доступность и адаптивный UI;
+- комплексные автоматизированные тесты;
+- безопасные значения по умолчанию и fail-closed поведение на границах аутентификации, доступа, криптографии и целостности.
 
-## 19. MVP success criteria
+## 19. Критерии успеха MVP
 
-A user can register/login, upload supported Mathcad input, receive safe validation, configure DOCX/Word-equation transformation options, convert supported text/formulas, preserve plots as images, receive clear warnings for unsupported elements, download the result, choose whether to save it, view saved/history metadata, create/use an API key, perform equivalent API conversion, switch locale and use 2FA/recovery without document contents leaking into logs.
+Пользователь может зарегистрироваться и войти, загрузить поддерживаемый вход Mathcad, получить безопасную валидацию, настроить параметры преобразования DOCX и уравнений Word, конвертировать поддерживаемые текст и формулы, сохранить графики как изображения, получить понятные предупреждения о неподдерживаемых элементах, скачать результат, выбрать его сохранение, просматривать метаданные сохранённых документов и истории, создать и использовать ключ API, выполнить эквивалентную конвертацию через API, переключить локаль и использовать 2FA и восстановление без утечки содержимого документов в журналы.

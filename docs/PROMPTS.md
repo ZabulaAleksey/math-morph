@@ -1,1936 +1,1936 @@
-# Codex Prompt Library — 304 atomic stages
+# Библиотека prompts Codex — 304 атомарных этапа
 
-## Usage
+## Использование
 
-Do **not** load this entire file for a normal task. `AGENTS.md` explicitly requires reading only the current stage/section. Run one stage, review, fix, commit, then continue.
+Для обычной задачи **не** загружай этот файл целиком. `AGENTS.md` явно требует читать только текущий этап или раздел. Выполни один этап, проведи review, исправь замечания, создай коммит и только затем продолжай.
 
-## Base prompt
+## Базовый prompt
 
 ```text
-Before starting this stage:
+Перед началом этапа:
 
-1. Read root `AGENTS.md`.
-2. Read only the local `AGENTS.md` files and canonical docs relevant to the files you may change.
-3. Reuse the already installed global AI Dev Team for generic architect/QA/security/frontend/backend/DevOps/release/Git capabilities. Do not create or run a duplicate generic project agent.
-4. Use Mathcad project subagents only when domain expertise materially helps. Total global+project subagent budget follows `AGENTS.md`.
-5. Implement only this stage; do not pre-build later stages.
-6. Add targeted tests and a relevant negative/boundary case. A bug fix requires a regression test/fixture.
-7. Run only relevant checks during development; do not duplicate a global release gate.
-8. Update `PROGRESS.md` for meaningful completion and update DECISIONS/ARCHITECTURE/SECURITY only if their contracts changed.
-9. Never log document content, formulas, secrets or encryption keys.
-10. End with: Completed / Files changed / Tests added / Validation performed / Test results / Architecture decisions / Known limitations / Next stage / Not implemented intentionally.
+1. Прочитай корневой `AGENTS.md`.
+2. Читай только локальные файлы `AGENTS.md` и канонические документы, относящиеся к файлам, которые можно изменить.
+3. Переиспользуй уже установленную глобальную AI Dev Team для универсальных возможностей architect, QA, security, frontend, backend, DevOps, release и Git. Не создавай и не запускай дублирующего универсального проектного агента.
+4. Используй проектных субагентов Mathcad только тогда, когда предметная экспертиза приносит существенную пользу. Общий лимит глобальных и проектных субагентов определяется `AGENTS.md`.
+5. Реализуй только этот этап; не создавай заранее функции последующих этапов.
+6. Добавь целевые тесты и относящийся к задаче негативный или граничный случай. Исправление ошибки требует регрессионного теста или fixture.
+7. Во время разработки запускай только относящиеся к задаче проверки; не дублируй глобальную release-проверку.
+8. При существенном завершении обнови `PROGRESS.md`, а DECISIONS, ARCHITECTURE и SECURITY обновляй только при изменении их контрактов.
+9. Никогда не записывай в журналы содержимое документов, формулы, секреты или ключи шифрования.
+10. Заверши отчётом: завершено / изменённые файлы / добавленные тесты / выполненные проверки / результаты тестов / архитектурные решения / известные ограничения / следующий этап / намеренно не реализовано.
 ```
 
-# Foundation
+# Основа
 
-## Prompt 001 — monorepo
+## Этап 001 — `monorepo`
 
 ```text
-Create the baseline monorepo/workspace directories and buildable empty application/service/crate shells according to TECH_STACK. Do not add business logic.
+Создай базовые каталоги monorepo и workspace и собираемые пустые каркасы приложений, сервисов и crates в соответствии с TECH_STACK. Не добавляй бизнес-логику.
 ```
 
-## Prompt 002 — canonical docs
+## Этап 002 — `canonical docs`
 
 ```text
-Ensure all canonical docs exist and contain only known requirements; unknown decisions remain TBD.
+Убедись, что все канонические документы существуют и содержат только известные требования; неизвестные решения должны оставаться TBD.
 ```
 
-## Prompt 003 — empty design contract
+## Этап 003 — `empty design contract`
 
 ```text
-Keep docs/DESIGN.md completely empty. Do not invent design tokens or UI style.
+Оставь docs/DESIGN.md полностью пустым. Не придумывай design tokens или стиль UI.
 ```
 
-## Prompt 004 — root AGENTS
+## Этап 004 — `root AGENTS`
 
 ```text
-Create/maintain root AGENTS.md as a compact router/overlay compatible with the existing global AI Dev Team.
+Создай или поддерживай корневой AGENTS.md как компактный router и overlay, совместимый с существующей глобальной AI Dev Team.
 ```
 
-## Prompt 005 — parser AGENTS
+## Этап 005 — `parser AGENTS`
 
 ```text
-Implement only roadmap stage **005 — parser AGENTS**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **005 — `parser AGENTS`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 006 — math-engine AGENTS
+## Этап 006 — `math-engine AGENTS`
 
 ```text
-Implement only roadmap stage **006 — math-engine AGENTS**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **006 — `math-engine AGENTS`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 007 — DOCX AGENTS
+## Этап 007 — `DOCX AGENTS`
 
 ```text
-Implement only roadmap stage **007 — DOCX AGENTS**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **007 — `DOCX AGENTS`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 008 — frontend AGENTS
+## Этап 008 — `frontend AGENTS`
 
 ```text
-Implement only roadmap stage **008 — frontend AGENTS**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **008 — `frontend AGENTS`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 009 — API AGENTS
+## Этап 009 — `API AGENTS`
 
 ```text
-Implement only roadmap stage **009 — API AGENTS**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **009 — `API AGENTS`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 010 — tests AGENTS
+## Этап 010 — `tests AGENTS`
 
 ```text
-Implement only roadmap stage **010 — tests AGENTS**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **010 — `tests AGENTS`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
 # Fixtures
 
-## Prompt 011 — fixture taxonomy
+## Этап 011 — `fixture taxonomy`
 
 ```text
-Implement only roadmap stage **011 — fixture taxonomy**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **011 — `fixture taxonomy`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 012 — fixture manifest
+## Этап 012 — `fixture manifest`
 
 ```text
-Implement only roadmap stage **012 — fixture manifest**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **012 — `fixture manifest`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 013 — fixture validator
+## Этап 013 — `fixture validator`
 
 ```text
-Implement only roadmap stage **013 — fixture validator**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **013 — `fixture validator`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 014 — corrupted/security starter fixtures
+## Этап 014 — `corrupted/security starter fixtures`
 
 ```text
-Implement only roadmap stage **014 — corrupted/security starter fixtures**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **014 — `corrupted/security starter fixtures`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Format detection
+# Определение формата
 
-## Prompt 015 — InputFormat/FormatDetector
+## Этап 015 — `InputFormat/FormatDetector`
 
 ```text
-Implement InputFormat and FormatDetector with Xmcd, Mcdx and Unknown; detection must not rely only on extension.
+Реализуй InputFormat и FormatDetector со значениями Xmcd, Mcdx и Unknown; определение формата не должно полагаться только на расширение.
 ```
 
-## Prompt 016 — XMCD content detection
+## Этап 016 — `XMCD content detection`
 
 ```text
-Implement only roadmap stage **016 — XMCD content detection**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **016 — `XMCD content detection`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 017 — MCDX content detection
+## Этап 017 — `MCDX content detection`
 
 ```text
-Implement only roadmap stage **017 — MCDX content detection**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **017 — `MCDX content detection`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 018 — extension/content mismatch diagnostics
+## Этап 018 — `extension/content mismatch diagnostics`
 
 ```text
-Implement only roadmap stage **018 — extension/content mismatch diagnostics**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **018 — `extension/content mismatch diagnostics`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# MCDX container
+# Контейнер MCDX
 
-## Prompt 019 — safe container open
+## Этап 019 — `safe container open`
 
 ```text
-Implement safe MCDX container listing only; no worksheet parsing yet.
+Реализуй только безопасное перечисление содержимого контейнера MCDX; parsing worksheet пока не требуется.
 ```
 
-## Prompt 020 — path traversal defense
+## Этап 020 — `path traversal defense`
 
 ```text
-Implement only roadmap stage **020 — path traversal defense**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **020 — `path traversal defense`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 021 — ZIP limits
+## Этап 021 — `ZIP limits`
 
 ```text
-Implement only roadmap stage **021 — ZIP limits**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **021 — `ZIP limits`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 022 — container manifest
+## Этап 022 — `container manifest`
 
 ```text
-Implement only roadmap stage **022 — container manifest**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **022 — `container manifest`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 023 — worksheet part discovery
+## Этап 023 — `worksheet part discovery`
 
 ```text
-Implement only roadmap stage **023 — worksheet part discovery**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **023 — `worksheet part discovery`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 024 — embedded resources metadata
+## Этап 024 — `embedded resources metadata`
 
 ```text
-Implement only roadmap stage **024 — embedded resources metadata**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **024 — `embedded resources metadata`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 025 — unknown part handling
+## Этап 025 — `unknown part handling`
 
 ```text
-Implement only roadmap stage **025 — unknown part handling**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **025 — `unknown part handling`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# XMCD/XML structure
+# Структура XMCD/XML
 
-## Prompt 026 — namespace/schema metadata
+## Этап 026 — `namespace/schema metadata`
 
 ```text
-Implement only roadmap stage **026 — namespace/schema metadata**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **026 — `namespace/schema metadata`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 027 — worksheet metadata
+## Этап 027 — `worksheet metadata`
 
 ```text
-Implement only roadmap stage **027 — worksheet metadata**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **027 — `worksheet metadata`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 028 — region discovery
+## Этап 028 — `region discovery`
 
 ```text
-Implement only roadmap stage **028 — region discovery**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **028 — `region discovery`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 029 — region coordinates/layout
+## Этап 029 — `region coordinates/layout`
 
 ```text
-Implement only roadmap stage **029 — region coordinates/layout**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **029 — `region coordinates/layout`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 030 — deterministic ordering
+## Этап 030 — `deterministic ordering`
 
 ```text
-Implement only roadmap stage **030 — deterministic ordering**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **030 — `deterministic ordering`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 031 — text region
+## Этап 031 — `text region`
 
 ```text
-Implement only roadmap stage **031 — text region**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **031 — `text region`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 032 — math region
+## Этап 032 — `math region`
 
 ```text
-Implement only roadmap stage **032 — math region**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **032 — `math region`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 033 — plot region
+## Этап 033 — `plot region`
 
 ```text
-Implement only roadmap stage **033 — plot region**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **033 — `plot region`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 034 — image region
+## Этап 034 — `image region`
 
 ```text
-Implement only roadmap stage **034 — image region**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **034 — `image region`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 035 — unknown region
+## Этап 035 — `unknown region`
 
 ```text
-Implement only roadmap stage **035 — unknown region**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **035 — `unknown region`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Math AST
+# Математическое AST
 
-## Prompt 036 — minimal scalar/operators AST
+## Этап 036 — `minimal scalar/operators AST`
 
 ```text
-Implement the minimal Mathcad AST for real values, variables and arithmetic operators. No evaluator yet.
+Реализуй минимальное AST Mathcad для вещественных значений, переменных и арифметических операторов. Evaluator пока не требуется.
 ```
 
-## Prompt 037 — AST snapshots
+## Этап 037 — `AST snapshots`
 
 ```text
-Implement only roadmap stage **037 — AST snapshots**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **037 — `AST snapshots`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 038 — Definition
+## Этап 038 — `Definition`
 
 ```text
-Implement only roadmap stage **038 — Definition**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **038 — `Definition`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 039 — Evaluation
+## Этап 039 — `Evaluation`
 
 ```text
-Implement only roadmap stage **039 — Evaluation**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **039 — `Evaluation`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 040 — FunctionCall
+## Этап 040 — `FunctionCall`
 
 ```text
-Implement only roadmap stage **040 — FunctionCall**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **040 — `FunctionCall`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 041 — FunctionDefinition
+## Этап 041 — `FunctionDefinition`
 
 ```text
-Implement only roadmap stage **041 — FunctionDefinition**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **041 — `FunctionDefinition`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 042 — unary operators
+## Этап 042 — `unary operators`
 
 ```text
-Implement only roadmap stage **042 — unary operators**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **042 — `unary operators`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 043 — grouping
+## Этап 043 — `grouping`
 
 ```text
-Implement only roadmap stage **043 — grouping**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **043 — `grouping`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 044 — index/subscript
+## Этап 044 — `index/subscript`
 
 ```text
-Implement only roadmap stage **044 — index/subscript**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **044 — `index/subscript`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 045 — matrix
+## Этап 045 — `matrix`
 
 ```text
-Implement only roadmap stage **045 — matrix**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **045 — `matrix`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 046 — vector
+## Этап 046 — `vector`
 
 ```text
-Implement only roadmap stage **046 — vector**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **046 — `vector`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 047 — range
+## Этап 047 — `range`
 
 ```text
-Implement only roadmap stage **047 — range**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **047 — `range`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 048 — integral
+## Этап 048 — `integral`
 
 ```text
-Implement only roadmap stage **048 — integral**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **048 — `integral`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 049 — derivative
+## Этап 049 — `derivative`
 
 ```text
-Implement only roadmap stage **049 — derivative**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **049 — `derivative`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 050 — sum/product
+## Этап 050 — `sum/product`
 
 ```text
-Implement only roadmap stage **050 — sum/product**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **050 — `sum/product`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 051 — comparisons
+## Этап 051 — `comparisons`
 
 ```text
-Implement only roadmap stage **051 — comparisons**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **051 — `comparisons`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 052 — booleans
+## Этап 052 — `booleans`
 
 ```text
-Implement only roadmap stage **052 — booleans**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **052 — `booleans`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 053 — units
+## Этап 053 — `units`
 
 ```text
-Implement only roadmap stage **053 — units**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **053 — `units`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 054 — UnsupportedNode
+## Этап 054 — `UnsupportedNode`
 
 ```text
-Implement only roadmap stage **054 — UnsupportedNode**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **054 — `UnsupportedNode`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
 # Document IR
 
-## Prompt 055 — DocumentIR
+## Этап 055 — `DocumentIR`
 
 ```text
-Introduce DocumentIR independent of Mathcad XML, DOCX, HTTP and frontend.
+Добавь DocumentIR, независимый от Mathcad XML, DOCX, HTTP и frontend.
 ```
 
-## Prompt 056 — TextBlock
+## Этап 056 — `TextBlock`
 
 ```text
-Implement only roadmap stage **056 — TextBlock**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **056 — `TextBlock`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 057 — EquationBlock
+## Этап 057 — `EquationBlock`
 
 ```text
-Implement only roadmap stage **057 — EquationBlock**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **057 — `EquationBlock`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 058 — ImageBlock
+## Этап 058 — `ImageBlock`
 
 ```text
-Implement only roadmap stage **058 — ImageBlock**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **058 — `ImageBlock`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 059 — PlotBlock
+## Этап 059 — `PlotBlock`
 
 ```text
-Implement only roadmap stage **059 — PlotBlock**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **059 — `PlotBlock`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 060 — DiagramBlock
+## Этап 060 — `DiagramBlock`
 
 ```text
-Implement only roadmap stage **060 — DiagramBlock**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **060 — `DiagramBlock`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 061 — layout model
+## Этап 061 — `layout model`
 
 ```text
-Implement only roadmap stage **061 — layout model**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **061 — `layout model`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# DOCX basics
+# Основы DOCX
 
-## Prompt 062 — minimal valid DOCX
+## Этап 062 — `minimal valid DOCX`
 
 ```text
-Generate the smallest structurally valid DOCX and verify package/XML relationships automatically.
+Создай минимальный структурно корректный DOCX и автоматически проверь relationships пакета и XML.
 ```
 
-## Prompt 063 — single text paragraph
+## Этап 063 — `single text paragraph`
 
 ```text
-Implement only roadmap stage **063 — single text paragraph**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **063 — `single text paragraph`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 064 — multiple paragraphs
+## Этап 064 — `multiple paragraphs`
 
 ```text
-Implement only roadmap stage **064 — multiple paragraphs**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **064 — `multiple paragraphs`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 065 — basic formatting
+## Этап 065 — `basic formatting`
 
 ```text
-Implement only roadmap stage **065 — basic formatting**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **065 — `basic formatting`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 066 — image block
+## Этап 066 — `image block`
 
 ```text
-Implement only roadmap stage **066 — image block**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **066 — `image block`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 067 — image sizing
+## Этап 067 — `image sizing`
 
 ```text
-Implement only roadmap stage **067 — image sizing**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **067 — `image sizing`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 068 — page dimensions
+## Этап 068 — `page dimensions`
 
 ```text
-Implement only roadmap stage **068 — page dimensions**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **068 — `page dimensions`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 069 — DOCX structural validator
+## Этап 069 — `DOCX structural validator`
 
 ```text
-Implement only roadmap stage **069 — DOCX structural validator**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **069 — `DOCX structural validator`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Word equations
+# Уравнения Word
 
-## Prompt 070 — EquationExporter
+## Этап 070 — `EquationExporter`
 
 ```text
-Create the replaceable EquationExporter interface without implementing MathType.
+Создай заменяемый интерфейс EquationExporter без реализации MathType.
 ```
 
-## Prompt 071 — WordEquationExporter
+## Этап 071 — `WordEquationExporter`
 
 ```text
-Implement only roadmap stage **071 — WordEquationExporter**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **071 — `WordEquationExporter`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 072 — number
+## Этап 072 — `number`
 
 ```text
-Implement only roadmap stage **072 — number**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **072 — `number`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 073 — variable
+## Этап 073 — `variable`
 
 ```text
-Implement only roadmap stage **073 — variable**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **073 — `variable`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 074 — add/subtract
+## Этап 074 — `add/subtract`
 
 ```text
-Implement only roadmap stage **074 — add/subtract**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **074 — `add/subtract`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 075 — multiply
+## Этап 075 — `multiply`
 
 ```text
-Implement only roadmap stage **075 — multiply**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **075 — `multiply`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 076 — fraction
+## Этап 076 — `fraction`
 
 ```text
-Implement only roadmap stage **076 — fraction**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **076 — `fraction`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 077 — powers
+## Этап 077 — `powers`
 
 ```text
-Implement only roadmap stage **077 — powers**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **077 — `powers`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 078 — roots
+## Этап 078 — `roots`
 
 ```text
-Implement only roadmap stage **078 — roots**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **078 — `roots`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 079 — subscripts
+## Этап 079 — `subscripts`
 
 ```text
-Implement only roadmap stage **079 — subscripts**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **079 — `subscripts`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 080 — sub+sup
+## Этап 080 — `sub+sup`
 
 ```text
-Implement only roadmap stage **080 — sub+sup**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **080 — `sub+sup`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 081 — functions
+## Этап 081 — `functions`
 
 ```text
-Implement only roadmap stage **081 — functions**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **081 — `functions`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 082 — brackets
+## Этап 082 — `brackets`
 
 ```text
-Implement only roadmap stage **082 — brackets**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **082 — `brackets`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 083 — matrices
+## Этап 083 — `matrices`
 
 ```text
-Implement only roadmap stage **083 — matrices**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **083 — `matrices`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 084 — integrals
+## Этап 084 — `integrals`
 
 ```text
-Implement only roadmap stage **084 — integrals**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **084 — `integrals`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 085 — derivatives
+## Этап 085 — `derivatives`
 
 ```text
-Implement only roadmap stage **085 — derivatives**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **085 — `derivatives`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 086 — sum/product
+## Этап 086 — `sum/product`
 
 ```text
-Implement only roadmap stage **086 — sum/product**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **086 — `sum/product`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 087 — nested equations regression
+## Этап 087 — `nested equations regression`
 
 ```text
-Implement only roadmap stage **087 — nested equations regression**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **087 — `nested equations regression`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 088 — manual Word reference validation
+## Этап 088 — `manual Word reference validation`
 
 ```text
-Implement only roadmap stage **088 — manual Word reference validation**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **088 — `manual Word reference validation`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# MathType preparation
+# Подготовка MathType
 
-## Prompt 089 — backend enum/config
+## Этап 089 — `backend enum/config`
 
 ```text
-Implement only roadmap stage **089 — backend enum/config**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **089 — `backend enum/config`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 090 — MathML renderer
+## Этап 090 — `MathML renderer`
 
 ```text
-Implement only roadmap stage **090 — MathML renderer**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **090 — `MathML renderer`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 091 — MathML snapshots
+## Этап 091 — `MathML snapshots`
 
 ```text
-Implement only roadmap stage **091 — MathML snapshots**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **091 — `MathML snapshots`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 092 — experimental MathType adapter
+## Этап 092 — `experimental MathType adapter`
 
 ```text
-Implement only roadmap stage **092 — experimental MathType adapter**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **092 — `experimental MathType adapter`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 093 — compatibility doc
+## Этап 093 — `compatibility doc`
 
 ```text
-Implement only roadmap stage **093 — compatibility doc**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **093 — `compatibility doc`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 094 — feature-gated backend selection
+## Этап 094 — `feature-gated backend selection`
 
 ```text
-Implement only roadmap stage **094 — feature-gated backend selection**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **094 — `feature-gated backend selection`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Notation transformation
+# Преобразование нотации
 
-## Prompt 095 — transformation pipeline
+## Этап 095 — `transformation pipeline`
 
 ```text
-Introduce Original AST → transformation rules → Display AST without mutating original semantics.
+Добавь конвейер Original AST → правила преобразования → Display AST без изменения исходной семантики.
 ```
 
-## Prompt 096 — Definition presentation rule
+## Этап 096 — `Definition presentation rule`
 
 ```text
-Implement only roadmap stage **096 — Definition presentation rule**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **096 — `Definition presentation rule`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 097 — SymbolMappingRegistry
+## Этап 097 — `SymbolMappingRegistry`
 
 ```text
-Implement only roadmap stage **097 — SymbolMappingRegistry**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **097 — `SymbolMappingRegistry`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 098 — NotationProfile
+## Этап 098 — `NotationProfile`
 
 ```text
-Implement only roadmap stage **098 — NotationProfile**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **098 — `NotationProfile`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 099 — semantic-preservation regression
+## Этап 099 — `semantic-preservation regression`
 
 ```text
-Implement only roadmap stage **099 — semantic-preservation regression**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **099 — `semantic-preservation regression`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Dependency graph
+# Граф зависимостей
 
-## Prompt 100 — SymbolTable
+## Этап 100 — `SymbolTable`
 
 ```text
-Create SymbolTable from definitions without substitution.
+Создай SymbolTable по определениям без подстановки.
 ```
 
-## Prompt 101 — variable references
+## Этап 101 — `variable references`
 
 ```text
-Implement only roadmap stage **101 — variable references**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **101 — `variable references`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 102 — dependency graph
+## Этап 102 — `dependency graph`
 
 ```text
-Implement only roadmap stage **102 — dependency graph**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **102 — `dependency graph`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 103 — worksheet evaluation order
+## Этап 103 — `worksheet evaluation order`
 
 ```text
-Implement only roadmap stage **103 — worksheet evaluation order**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **103 — `worksheet evaluation order`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 104 — undefined-variable diagnostic
+## Этап 104 — `undefined-variable diagnostic`
 
 ```text
-Implement only roadmap stage **104 — undefined-variable diagnostic**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **104 — `undefined-variable diagnostic`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 105 — circular dependency diagnostic
+## Этап 105 — `circular dependency diagnostic`
 
 ```text
-Implement only roadmap stage **105 — circular dependency diagnostic**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **105 — `circular dependency diagnostic`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Substitution
+# Подстановка
 
-## Prompt 106 — simple substitution
+## Этап 106 — `simple substitution`
 
 ```text
-Implement only roadmap stage **106 — simple substitution**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **106 — `simple substitution`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 107 — recursive substitution
+## Этап 107 — `recursive substitution`
 
 ```text
-Implement only roadmap stage **107 — recursive substitution**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **107 — `recursive substitution`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 108 — depth limit
+## Этап 108 — `depth limit`
 
 ```text
-Implement only roadmap stage **108 — depth limit**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **108 — `depth limit`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 109 — EvaluationTrace
+## Этап 109 — `EvaluationTrace`
 
 ```text
-Implement only roadmap stage **109 — EvaluationTrace**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **109 — `EvaluationTrace`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 110 — display modes
+## Этап 110 — `display modes`
 
 ```text
-Implement only roadmap stage **110 — display modes**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **110 — `display modes`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 111 — PrecisionPolicy
+## Этап 111 — `PrecisionPolicy`
 
 ```text
-Implement only roadmap stage **111 — PrecisionPolicy**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **111 — `PrecisionPolicy`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Complex numbers
+# Комплексные числа
 
-## Prompt 112 — complex value
+## Этап 112 — `complex value`
 
 ```text
-Introduce complex-number value representation separate from display mode.
+Добавь представление значений комплексных чисел, отделённое от режима отображения.
 ```
 
-## Prompt 113 — algebraic representation
+## Этап 113 — `algebraic representation`
 
 ```text
-Implement only roadmap stage **113 — algebraic representation**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **113 — `algebraic representation`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 114 — polar representation
+## Этап 114 — `polar representation`
 
 ```text
-Implement only roadmap stage **114 — polar representation**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **114 — `polar representation`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 115 — algebraic→polar
+## Этап 115 — `algebraic→polar`
 
 ```text
-Implement only roadmap stage **115 — algebraic→polar**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **115 — `algebraic→polar`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 116 — polar→algebraic
+## Этап 116 — `polar→algebraic`
 
 ```text
-Implement only roadmap stage **116 — polar→algebraic**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **116 — `polar→algebraic`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 117 — multiplication trace
+## Этап 117 — `multiplication trace`
 
 ```text
-Implement only roadmap stage **117 — multiplication trace**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **117 — `multiplication trace`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 118 — division trace
+## Этап 118 — `division trace`
 
 ```text
-Implement only roadmap stage **118 — division trace**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **118 — `division trace`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 119 — addition
+## Этап 119 — `addition`
 
 ```text
-Implement only roadmap stage **119 — addition**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **119 — `addition`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 120 — subtraction
+## Этап 120 — `subtraction`
 
 ```text
-Implement only roadmap stage **120 — subtraction**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **120 — `subtraction`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 121 — output modes
+## Этап 121 — `output modes`
 
 ```text
-Implement only roadmap stage **121 — output modes**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **121 — `output modes`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 122 — edge-case suite
+## Этап 122 — `edge-case suite`
 
 ```text
-Implement only roadmap stage **122 — edge-case suite**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **122 — `edge-case suite`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Plots
+# Графики
 
-## Prompt 123 — plot region semantics
+## Этап 123 — `plot region semantics`
 
 ```text
-Recognize plot regions and preserve semantics/metadata; do not reconstruct Excel charts yet.
+Распознавай области графиков и сохраняй семантику и метаданные; пока не восстанавливай диаграммы Excel.
 ```
 
-## Prompt 124 — PlotIR metadata
+## Этап 124 — `PlotIR metadata`
 
 ```text
-Implement only roadmap stage **124 — PlotIR metadata**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **124 — `PlotIR metadata`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 125 — preview extraction
+## Этап 125 — `preview extraction`
 
 ```text
-Implement only roadmap stage **125 — preview extraction**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **125 — `preview extraction`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 126 — plot image→DOCX
+## Этап 126 — `plot image→DOCX`
 
 ```text
-Implement only roadmap stage **126 — plot image→DOCX**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **126 — `plot image→DOCX`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 127 — plot fallback
+## Этап 127 — `plot fallback`
 
 ```text
-Implement only roadmap stage **127 — plot fallback**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **127 — `plot fallback`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# ChartIR/Excel future
+# Будущее ChartIR/Excel
 
-## Prompt 128 — ChartIR
+## Этап 128 — `ChartIR`
 
 ```text
-Introduce experimental ChartIR only; Excel export remains future/feature-gated.
+Добавь только экспериментальный ChartIR; экспорт Excel остаётся будущей функцией за feature gate.
 ```
 
-## Prompt 129 — series expression extraction
+## Этап 129 — `series expression extraction`
 
 ```text
-Implement only roadmap stage **129 — series expression extraction**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **129 — `series expression extraction`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 130 — reconstruction fixtures
+## Этап 130 — `reconstruction fixtures`
 
 ```text
-Implement only roadmap stage **130 — reconstruction fixtures**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **130 — `reconstruction fixtures`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 131 — ChartExporter
+## Этап 131 — `ChartExporter`
 
 ```text
-Implement only roadmap stage **131 — ChartExporter**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **131 — `ChartExporter`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 132 — experimental Excel chart POC
+## Этап 132 — `experimental Excel chart POC`
 
 ```text
-Implement only roadmap stage **132 — experimental Excel chart POC**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **132 — `experimental Excel chart POC`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Diagrams/Visio future
+# Будущее диаграмм и Visio
 
-## Prompt 133 — diagram detection
+## Этап 133 — `diagram detection`
 
 ```text
-Recognize diagram/graphics regions when format evidence supports it; do not infer semantics that are not present.
+Распознавай области диаграмм и графики при наличии подтверждения в формате; не выводи отсутствующую семантику.
 ```
 
-## Prompt 134 — diagram preview→DOCX
+## Этап 134 — `diagram preview→DOCX`
 
 ```text
-Implement only roadmap stage **134 — diagram preview→DOCX**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **134 — `diagram preview→DOCX`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 135 — DiagramIR
+## Этап 135 — `DiagramIR`
 
 ```text
-Introduce DiagramIR skeleton with shapes/connectors/groups/text/styles/coordinates/bounds. No Visio exporter yet.
+Добавь каркас DiagramIR с shapes, connectors, groups, текстом, стилями, координатами и границами. Exporter Visio пока не требуется.
 ```
 
-## Prompt 136 — shape-forensics report
+## Этап 136 — `shape-forensics report`
 
 ```text
-Implement only roadmap stage **136 — shape-forensics report**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **136 — `shape-forensics report`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 137 — primitive shapes
+## Этап 137 — `primitive shapes`
 
 ```text
-Implement only roadmap stage **137 — primitive shapes**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **137 — `primitive shapes`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 138 — connector graph
+## Этап 138 — `connector graph`
 
 ```text
-Implement only roadmap stage **138 — connector graph**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **138 — `connector graph`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 139 — grouping
+## Этап 139 — `grouping`
 
 ```text
-Implement only roadmap stage **139 — grouping**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **139 — `grouping`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 140 — DiagramExporter
+## Этап 140 — `DiagramExporter`
 
 ```text
-Implement only roadmap stage **140 — DiagramExporter**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **140 — `DiagramExporter`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 141 — VSDX POC
+## Этап 141 — `VSDX POC`
 
 ```text
-Create a standalone editable VSDX proof of concept from synthetic shapes, not Mathcad input.
+Создай отдельный редактируемый proof of concept VSDX из синтетических shapes, а не из ввода Mathcad.
 ```
 
-## Prompt 142 — DiagramIR→VSDX POC
+## Этап 142 — `DiagramIR→VSDX POC`
 
 ```text
-Implement only roadmap stage **142 — DiagramIR→VSDX POC**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **142 — `DiagramIR→VSDX POC`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Unified pipeline
+# Единый конвейер
 
-## Prompt 143 — ConversionPipeline
+## Этап 143 — `ConversionPipeline`
 
 ```text
-Compose the existing stages into one ConversionPipeline without introducing HTTP.
+Объедини существующие этапы в один ConversionPipeline без добавления HTTP.
 ```
 
-## Prompt 144 — DiagnosticsCollector
+## Этап 144 — `DiagnosticsCollector`
 
 ```text
-Implement only roadmap stage **144 — DiagnosticsCollector**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **144 — `DiagnosticsCollector`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 145 — severity model
+## Этап 145 — `severity model`
 
 ```text
-Implement only roadmap stage **145 — severity model**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **145 — `severity model`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 146 — ConversionReport
+## Этап 146 — `ConversionReport`
 
 ```text
-Implement only roadmap stage **146 — ConversionReport**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **146 — `ConversionReport`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 147 — partial conversion
+## Этап 147 — `partial conversion`
 
 ```text
-Implement only roadmap stage **147 — partial conversion**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **147 — `partial conversion`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
 # CLI
 
-## Prompt 148 — minimal convert command
+## Этап 148 — `minimal convert command`
 
 ```text
-Create a CLI that calls the shared conversion core rather than duplicating parser logic.
+Создай CLI, вызывающий общий core конвертации, а не дублирующий логику parser.
 ```
 
-## Prompt 149 — inspect command
+## Этап 149 — `inspect command`
 
 ```text
-Implement only roadmap stage **149 — inspect command**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **149 — `inspect command`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 150 — --format
+## Этап 150 — `--format`
 
 ```text
-Implement only roadmap stage **150 — --format**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **150 — `--format`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 151 — --complex-mode
+## Этап 151 — `--complex-mode`
 
 ```text
-Implement only roadmap stage **151 — --complex-mode**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **151 — `--complex-mode`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 152 — --precision
+## Этап 152 — `--precision`
 
 ```text
-Implement only roadmap stage **152 — --precision**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **152 — `--precision`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 153 — JSON report
+## Этап 153 — `JSON report`
 
 ```text
-Implement only roadmap stage **153 — JSON report**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **153 — `JSON report`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Web UI
+# Веб-интерфейс
 
-## Prompt 154 — Next.js shell
+## Этап 154 — `Next.js shell`
 
 ```text
-Create the Next.js application shell. If DESIGN.md is empty, use minimal neutral structure only.
+Создай каркас приложения Next.js. Если DESIGN.md пуст, используй только минимальную нейтральную структуру.
 ```
 
-## Prompt 155 — design compliance checklist
+## Этап 155 — `design compliance checklist`
 
 ```text
-Implement only roadmap stage **155 — design compliance checklist**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **155 — `design compliance checklist`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 156 — dropzone
+## Этап 156 — `dropzone`
 
 ```text
-Implement only roadmap stage **156 — dropzone**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **156 — `dropzone`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 157 — file validation UI
+## Этап 157 — `file validation UI`
 
 ```text
-Implement only roadmap stage **157 — file validation UI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **157 — `file validation UI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 158 — conversion settings UI
+## Этап 158 — `conversion settings UI`
 
 ```text
-Implement only roadmap stage **158 — conversion settings UI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **158 — `conversion settings UI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 159 — conversion states
+## Этап 159 — `conversion states`
 
 ```text
-Implement only roadmap stage **159 — conversion states**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **159 — `conversion states`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 160 — converter Error Boundary
+## Этап 160 — `converter Error Boundary`
 
 ```text
-Implement only roadmap stage **160 — converter Error Boundary**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **160 — `converter Error Boundary`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 161 — localized error mapping
+## Этап 161 — `localized error mapping`
 
 ```text
-Implement only roadmap stage **161 — localized error mapping**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **161 — `localized error mapping`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
 # i18n
 
-## Prompt 162 — next-intl infrastructure
+## Этап 162 — `next-intl infrastructure`
 
 ```text
-Implement only roadmap stage **162 — next-intl infrastructure**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **162 — `next-intl infrastructure`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 163 — catalog split
+## Этап 163 — `catalog split`
 
 ```text
-Implement only roadmap stage **163 — catalog split**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **163 — `catalog split`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 164 — missing-key CI
+## Этап 164 — `missing-key CI`
 
 ```text
-Implement only roadmap stage **164 — missing-key CI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **164 — `missing-key CI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 165 — second locale
+## Этап 165 — `second locale`
 
 ```text
-Implement only roadmap stage **165 — second locale**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **165 — `second locale`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# FastAPI backend
+# Backend FastAPI
 
-## Prompt 166 — FastAPI skeleton with uv
+## Этап 166 — `FastAPI skeleton with uv`
 
 ```text
-Create a FastAPI skeleton using uv; no conversion endpoint yet.
+Создай каркас FastAPI с использованием uv; endpoint конвертации пока не требуется.
 ```
 
-## Prompt 167 — health endpoint
+## Этап 167 — `health endpoint`
 
 ```text
-Implement only roadmap stage **167 — health endpoint**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **167 — `health endpoint`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 168 — PostgreSQL
+## Этап 168 — `PostgreSQL`
 
 ```text
-Implement only roadmap stage **168 — PostgreSQL**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **168 — `PostgreSQL`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 169 — Alembic
+## Этап 169 — `Alembic`
 
 ```text
-Implement only roadmap stage **169 — Alembic**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **169 — `Alembic`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 170 — API error model
+## Этап 170 — `API error model`
 
 ```text
-Implement only roadmap stage **170 — API error model**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **170 — `API error model`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 171 — request ID
+## Этап 171 — `request ID`
 
 ```text
-Implement only roadmap stage **171 — request ID**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **171 — `request ID`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 172 — /api/v1 versioning
+## Этап 172 — `/api/v1 versioning`
 
 ```text
-Implement only roadmap stage **172 — /api/v1 versioning**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **172 — `/api/v1 versioning`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Authentication
+# Аутентификация
 
-## Prompt 173 — auth integration boundary
+## Этап 173 — `auth integration boundary`
 
 ```text
-Create the authentication integration boundary around the chosen identity provider; do not write custom password crypto unnecessarily.
+Создай границу интеграции аутентификации вокруг выбранного identity provider; не пиши без необходимости собственную парольную криптографию.
 ```
 
-## Prompt 174 — registration
+## Этап 174 — `registration`
 
 ```text
-Implement only roadmap stage **174 — registration**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **174 — `registration`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 175 — password login
+## Этап 175 — `password login`
 
 ```text
-Implement only roadmap stage **175 — password login**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **175 — `password login`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 176 — email verification
+## Этап 176 — `email verification`
 
 ```text
-Implement only roadmap stage **176 — email verification**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **176 — `email verification`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 177 — OIDC provider 1
+## Этап 177 — `OIDC provider 1`
 
 ```text
-Implement only roadmap stage **177 — OIDC provider 1**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **177 — `OIDC provider 1`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 178 — OIDC provider 2
+## Этап 178 — `OIDC provider 2`
 
 ```text
-Implement only roadmap stage **178 — OIDC provider 2**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **178 — `OIDC provider 2`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 179 — TOTP
+## Этап 179 — `TOTP`
 
 ```text
-Implement only roadmap stage **179 — TOTP**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **179 — `TOTP`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 180 — recovery codes
+## Этап 180 — `recovery codes`
 
 ```text
-Implement only roadmap stage **180 — recovery codes**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **180 — `recovery codes`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 181 — passkeys
+## Этап 181 — `passkeys`
 
 ```text
-Implement only roadmap stage **181 — passkeys**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **181 — `passkeys`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 182 — email recovery
+## Этап 182 — `email recovery`
 
 ```text
-Implement only roadmap stage **182 — email recovery**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **182 — `email recovery`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 183 — phone recovery
+## Этап 183 — `phone recovery`
 
 ```text
-Implement only roadmap stage **183 — phone recovery**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **183 — `phone recovery`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 184 — Telegram linking
+## Этап 184 — `Telegram linking`
 
 ```text
-Implement Telegram account linking only through one-time confirmed association; not recovery yet.
+Реализуй привязку учётной записи Telegram только через одноразовое подтверждённое связывание; восстановление пока не требуется.
 ```
 
-## Prompt 185 — Telegram recovery
+## Этап 185 — `Telegram recovery`
 
 ```text
-Add Telegram recovery only for previously linked accounts with expiry, replay protection, rate limiting and audit events.
+Добавь восстановление через Telegram только для ранее связанных учётных записей с истечением срока, защитой от replay, rate limiting и событиями аудита.
 ```
 
-## Prompt 186 — auth abuse suite
+## Этап 186 — `auth abuse suite`
 
 ```text
-Implement only roadmap stage **186 — auth abuse suite**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **186 — `auth abuse suite`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Profile
+# Профиль
 
-## Prompt 187 — basic profile
+## Этап 187 — `basic profile`
 
 ```text
-Implement only roadmap stage **187 — basic profile**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **187 — `basic profile`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 188 — conversion preferences
+## Этап 188 — `conversion preferences`
 
 ```text
-Implement only roadmap stage **188 — conversion preferences**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **188 — `conversion preferences`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 189 — save preferences
+## Этап 189 — `save preferences`
 
 ```text
-Implement only roadmap stage **189 — save preferences**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **189 — `save preferences`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 190 — conversion history metadata
+## Этап 190 — `conversion history metadata`
 
 ```text
-Implement only roadmap stage **190 — conversion history metadata**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **190 — `conversion history metadata`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# API keys
+# Ключи API
 
-## Prompt 191 — API-key model
+## Этап 191 — `API-key model`
 
 ```text
-Create API-key model with secure lifecycle metadata; never store plaintext secret.
+Создай модель ключа API с безопасными метаданными жизненного цикла; никогда не храни секрет в открытом виде.
 ```
 
-## Prompt 192 — secure generation
+## Этап 192 — `secure generation`
 
 ```text
-Implement only roadmap stage **192 — secure generation**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **192 — `secure generation`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 193 — show secret once
+## Этап 193 — `show secret once`
 
 ```text
-Implement only roadmap stage **193 — show secret once**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **193 — `show secret once`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 194 — hashed storage
+## Этап 194 — `hashed storage`
 
 ```text
-Implement only roadmap stage **194 — hashed storage**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **194 — `hashed storage`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 195 — revoke
+## Этап 195 — `revoke`
 
 ```text
-Implement only roadmap stage **195 — revoke**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **195 — `revoke`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 196 — expiry
+## Этап 196 — `expiry`
 
 ```text
-Implement only roadmap stage **196 — expiry**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **196 — `expiry`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 197 — scopes
+## Этап 197 — `scopes`
 
 ```text
-Implement only roadmap stage **197 — scopes**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **197 — `scopes`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 198 — rate limiting
+## Этап 198 — `rate limiting`
 
 ```text
-Implement only roadmap stage **198 — rate limiting**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **198 — `rate limiting`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 199 — usage statistics
+## Этап 199 — `usage statistics`
 
 ```text
-Implement only roadmap stage **199 — usage statistics**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **199 — `usage statistics`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Public API
+# Публичный API
 
-## Prompt 200 — POST conversions
+## Этап 200 — `POST conversions`
 
 ```text
-Implement the first versioned conversion endpoint using the shared ConversionPipeline.
+Реализуй первый версионированный endpoint конвертации с использованием общего ConversionPipeline.
 ```
 
-## Prompt 201 — async jobs
+## Этап 201 — `async jobs`
 
 ```text
-Implement only roadmap stage **201 — async jobs**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **201 — `async jobs`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 202 — status
+## Этап 202 — `status`
 
 ```text
-Implement only roadmap stage **202 — status**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **202 — `status`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 203 — result
+## Этап 203 — `result`
 
 ```text
-Implement only roadmap stage **203 — result**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **203 — `result`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 204 — save preference integration
+## Этап 204 — `save preference integration`
 
 ```text
-Implement only roadmap stage **204 — save preference integration**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **204 — `save preference integration`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 205 — OpenAPI descriptions
+## Этап 205 — `OpenAPI descriptions`
 
 ```text
-Implement only roadmap stage **205 — OpenAPI descriptions**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **205 — `OpenAPI descriptions`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 206 — API docs page
+## Этап 206 — `API docs page`
 
 ```text
-Implement only roadmap stage **206 — API docs page**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **206 — `API docs page`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 207 — curl examples
+## Этап 207 — `curl examples`
 
 ```text
-Implement only roadmap stage **207 — curl examples**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **207 — `curl examples`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 208 — JavaScript example
+## Этап 208 — `JavaScript example`
 
 ```text
-Implement only roadmap stage **208 — JavaScript example**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **208 — `JavaScript example`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 209 — Python example
+## Этап 209 — `Python example`
 
 ```text
-Implement only roadmap stage **209 — Python example**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **209 — `Python example`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# RabbitMQ/workers
+# RabbitMQ и workers
 
-## Prompt 210 — RabbitMQ broker
+## Этап 210 — `RabbitMQ broker`
 
 ```text
-Add RabbitMQ as broker only; keep conversion core independent from Celery.
+Добавь RabbitMQ только как broker; сохраняй независимость core конвертации от Celery.
 ```
 
-## Prompt 211 — Celery test worker
+## Этап 211 — `Celery test worker`
 
 ```text
-Implement only roadmap stage **211 — Celery test worker**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **211 — `Celery test worker`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 212 — conversion task
+## Этап 212 — `conversion task`
 
 ```text
-Implement only roadmap stage **212 — conversion task**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **212 — `conversion task`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 213 — retry policy
+## Этап 213 — `retry policy`
 
 ```text
-Implement only roadmap stage **213 — retry policy**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **213 — `retry policy`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 214 — dead-letter strategy
+## Этап 214 — `dead-letter strategy`
 
 ```text
-Implement only roadmap stage **214 — dead-letter strategy**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **214 — `dead-letter strategy`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 215 — timeout
+## Этап 215 — `timeout`
 
 ```text
-Implement only roadmap stage **215 — timeout**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **215 — `timeout`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 216 — cancellation model
+## Этап 216 — `cancellation model`
 
 ```text
-Implement only roadmap stage **216 — cancellation model**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **216 — `cancellation model`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 217 — idempotency
+## Этап 217 — `idempotency`
 
 ```text
-Implement only roadmap stage **217 — idempotency**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **217 — `idempotency`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Privacy/zero knowledge
+# Конфиденциальность и zero knowledge
 
-## Prompt 218 — threat model
+## Этап 218 — `threat model`
 
 ```text
-Write the project threat model before adding more cryptography.
+Опиши модель угроз проекта до добавления дополнительной криптографии.
 ```
 
-## Prompt 219 — privacy ADR
+## Этап 219 — `privacy ADR`
 
 ```text
-Implement only roadmap stage **219 — privacy ADR**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **219 — `privacy ADR`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 220 — local WASM POC
+## Этап 220 — `local WASM POC`
 
 ```text
-Implement only roadmap stage **220 — local WASM POC**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **220 — `local WASM POC`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 221 — WASM parser/core
+## Этап 221 — `WASM parser/core`
 
 ```text
-Implement only roadmap stage **221 — WASM parser/core**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **221 — `WASM parser/core`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 222 — browser conversion POC
+## Этап 222 — `browser conversion POC`
 
 ```text
-Implement only roadmap stage **222 — browser conversion POC**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **222 — `browser conversion POC`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 223 — Web Worker
+## Этап 223 — `Web Worker`
 
 ```text
-Implement only roadmap stage **223 — Web Worker**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **223 — `Web Worker`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 224 — client-side encryption
+## Этап 224 — `client-side encryption`
 
 ```text
-Implement client-side authenticated encryption according to SECURITY/PRIVACY; do not invent a custom crypto primitive.
+Реализуй клиентское аутентифицированное шифрование в соответствии с SECURITY и PRIVACY; не изобретай собственный криптографический примитив.
 ```
 
-## Prompt 225 — encrypted storage
+## Этап 225 — `encrypted storage`
 
 ```text
-Implement only roadmap stage **225 — encrypted storage**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **225 — `encrypted storage`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 226 — privacy marker regression
+## Этап 226 — `privacy marker regression`
 
 ```text
-Add a privacy regression marker proving plaintext does not appear in DB/object storage/logs/error tracking for encrypted-storage mode.
+Добавь регрессионный маркер конфиденциальности, доказывающий, что в режиме зашифрованного хранения открытый текст не появляется в базе данных, объектном хранилище, журналах или отслеживании ошибок.
 ```
 
-## Prompt 227 — metadata minimization
+## Этап 227 — `metadata minimization`
 
 ```text
-Implement only roadmap stage **227 — metadata minimization**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **227 — `metadata minimization`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 228 — filename protection
+## Этап 228 — `filename protection`
 
 ```text
-Implement only roadmap stage **228 — filename protection**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **228 — `filename protection`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 229 — account vs key recovery
+## Этап 229 — `account vs key recovery`
 
 ```text
-Implement only roadmap stage **229 — account vs key recovery**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **229 — `account vs key recovery`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 230 — Document Recovery Key
+## Этап 230 — `Document Recovery Key`
 
 ```text
-Implement only roadmap stage **230 — Document Recovery Key**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **230 — `Document Recovery Key`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 231 — explicit support sharing
+## Этап 231 — `explicit support sharing`
 
 ```text
-Implement only roadmap stage **231 — explicit support sharing**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **231 — `explicit support sharing`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 232 — privacy claims checklist
+## Этап 232 — `privacy claims checklist`
 
 ```text
-Implement only roadmap stage **232 — privacy claims checklist**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **232 — `privacy claims checklist`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Security
+# Безопасность
 
-## Prompt 233 — file size limits
+## Этап 233 — `file size limits`
 
 ```text
-Enforce authoritative backend file-size limits and matching UX limits.
+Применяй авторитетные ограничения размера файлов в backend и соответствующие ограничения UX.
 ```
 
-## Prompt 234 — XML attack defenses
+## Этап 234 — `XML attack defenses`
 
 ```text
-Implement only roadmap stage **234 — XML attack defenses**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **234 — `XML attack defenses`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 235 — ZIP bomb tests
+## Этап 235 — `ZIP bomb tests`
 
 ```text
-Implement only roadmap stage **235 — ZIP bomb tests**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **235 — `ZIP bomb tests`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 236 — malformed corpus
+## Этап 236 — `malformed corpus`
 
 ```text
-Implement only roadmap stage **236 — malformed corpus**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **236 — `malformed corpus`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 237 — cargo-fuzz target
+## Этап 237 — `cargo-fuzz target`
 
 ```text
-Implement only roadmap stage **237 — cargo-fuzz target**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **237 — `cargo-fuzz target`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 238 — auth rate limits
+## Этап 238 — `auth rate limits`
 
 ```text
-Implement only roadmap stage **238 — auth rate limits**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **238 — `auth rate limits`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 239 — API rate limits
+## Этап 239 — `API rate limits`
 
 ```text
-Implement only roadmap stage **239 — API rate limits**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **239 — `API rate limits`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 240 — security headers
+## Этап 240 — `security headers`
 
 ```text
-Implement only roadmap stage **240 — security headers**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **240 — `security headers`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 241 — CSP
+## Этап 241 — `CSP`
 
 ```text
-Implement only roadmap stage **241 — CSP**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **241 — `CSP`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 242 — dependency audit
+## Этап 242 — `dependency audit`
 
 ```text
-Implement only roadmap stage **242 — dependency audit**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **242 — `dependency audit`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 243 — secret scanning
+## Этап 243 — `secret scanning`
 
 ```text
-Implement only roadmap stage **243 — secret scanning**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **243 — `secret scanning`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 244 — security regression suite
+## Этап 244 — `security regression suite`
 
 ```text
-Implement only roadmap stage **244 — security regression suite**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **244 — `security regression suite`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Billing
+# Оплата
 
-## Prompt 245 — BillingProvider
+## Этап 245 — `BillingProvider`
 
 ```text
-Create BillingProvider abstraction without coupling core to a concrete provider.
+Создай абстракцию BillingProvider без связывания core с конкретным provider.
 ```
 
-## Prompt 246 — plans model
+## Этап 246 — `plans model`
 
 ```text
-Implement only roadmap stage **246 — plans model**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **246 — `plans model`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 247 — quota engine
+## Этап 247 — `quota engine`
 
 ```text
-Implement only roadmap stage **247 — quota engine**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **247 — `quota engine`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 248 — Free quota
+## Этап 248 — `Free quota`
 
 ```text
-Implement only roadmap stage **248 — Free quota**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **248 — `Free quota`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 249 — Pro quota
+## Этап 249 — `Pro quota`
 
 ```text
-Implement only roadmap stage **249 — Pro quota**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **249 — `Pro quota`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 250 — API accounting
+## Этап 250 — `API accounting`
 
 ```text
-Implement only roadmap stage **250 — API accounting**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **250 — `API accounting`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 251 — provider sandbox
+## Этап 251 — `provider sandbox`
 
 ```text
-Implement only roadmap stage **251 — provider sandbox**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **251 — `provider sandbox`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 252 — webhook verification
+## Этап 252 — `webhook verification`
 
 ```text
-Implement only roadmap stage **252 — webhook verification**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **252 — `webhook verification`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 253 — subscription lifecycle
+## Этап 253 — `subscription lifecycle`
 
 ```text
-Implement only roadmap stage **253 — subscription lifecycle**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **253 — `subscription lifecycle`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 254 — failed payment behavior
+## Этап 254 — `failed payment behavior`
 
 ```text
-Implement only roadmap stage **254 — failed payment behavior**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **254 — `failed payment behavior`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 255 — refund workflow
+## Этап 255 — `refund workflow`
 
 ```text
-Implement only roadmap stage **255 — refund workflow**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **255 — `refund workflow`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 256 — billing history
+## Этап 256 — `billing history`
 
 ```text
-Implement only roadmap stage **256 — billing history**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **256 — `billing history`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Admin
+# Администрирование
 
-## Prompt 257 — admin auth boundary
+## Этап 257 — `admin auth boundary`
 
 ```text
-Create a separate admin authentication boundary; normal users cannot access admin surfaces.
+Создай отдельную границу аутентификации администраторов; обычные пользователи не могут получать доступ к административным областям.
 ```
 
-## Prompt 258 — role/permission model
+## Этап 258 — `role/permission model`
 
 ```text
-Implement only roadmap stage **258 — role/permission model**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **258 — `role/permission model`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 259 — user list metadata
+## Этап 259 — `user list metadata`
 
 ```text
-Implement only roadmap stage **259 — user list metadata**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **259 — `user list metadata`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 260 — conversion stats
+## Этап 260 — `conversion stats`
 
 ```text
-Implement only roadmap stage **260 — conversion stats**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **260 — `conversion stats`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 261 — worker health
+## Этап 261 — `worker health`
 
 ```text
-Implement only roadmap stage **261 — worker health**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **261 — `worker health`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 262 — queue stats
+## Этап 262 — `queue stats`
 
 ```text
-Implement only roadmap stage **262 — queue stats**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **262 — `queue stats`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 263 — parser error stats
+## Этап 263 — `parser error stats`
 
 ```text
-Implement only roadmap stage **263 — parser error stats**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **263 — `parser error stats`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 264 — unsupported-node stats
+## Этап 264 — `unsupported-node stats`
 
 ```text
-Implement only roadmap stage **264 — unsupported-node stats**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **264 — `unsupported-node stats`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 265 — API usage metrics
+## Этап 265 — `API usage metrics`
 
 ```text
-Implement only roadmap stage **265 — API usage metrics**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **265 — `API usage metrics`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 266 — billing admin
+## Этап 266 — `billing admin`
 
 ```text
-Implement only roadmap stage **266 — billing admin**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **266 — `billing admin`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 267 — feature flags
+## Этап 267 — `feature flags`
 
 ```text
-Implement only roadmap stage **267 — feature flags**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **267 — `feature flags`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 268 — language metadata
+## Этап 268 — `language metadata`
 
 ```text
-Implement only roadmap stage **268 — language metadata**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **268 — `language metadata`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 269 — security event viewer
+## Этап 269 — `security event viewer`
 
 ```text
-Implement only roadmap stage **269 — security event viewer**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **269 — `security event viewer`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 270 — admin privacy integration test
+## Этап 270 — `admin privacy integration test`
 
 ```text
-Prove through integration tests that admin cannot retrieve privacy-protected plaintext, encryption keys, passwords or full API secrets.
+Докажи интеграционными тестами, что администратор не может получить защищённый конфиденциальностью открытый текст, ключи шифрования, пароли или полные секреты API.
 ```
 
-# Observability
+# Наблюдаемость
 
-## Prompt 271 — structured logging
+## Этап 271 — `structured logging`
 
 ```text
-Introduce structured logging with safe fields only.
+Добавь структурированное журналирование только с безопасными полями.
 ```
 
-## Prompt 272 — log redaction
+## Этап 272 — `log redaction`
 
 ```text
-Implement only roadmap stage **272 — log redaction**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **272 — `log redaction`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 273 — OpenTelemetry traces
+## Этап 273 — `OpenTelemetry traces`
 
 ```text
-Implement only roadmap stage **273 — OpenTelemetry traces**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **273 — `OpenTelemetry traces`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 274 — metrics
+## Этап 274 — `metrics`
 
 ```text
-Implement only roadmap stage **274 — metrics**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **274 — `metrics`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 275 — conversion duration
+## Этап 275 — `conversion duration`
 
 ```text
-Implement only roadmap stage **275 — conversion duration**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **275 — `conversion duration`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 276 — parser failure metrics
+## Этап 276 — `parser failure metrics`
 
 ```text
-Implement only roadmap stage **276 — parser failure metrics**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **276 — `parser failure metrics`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 277 — worker metrics
+## Этап 277 — `worker metrics`
 
 ```text
-Implement only roadmap stage **277 — worker metrics**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **277 — `worker metrics`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 278 — Sentry with sanitization
+## Этап 278 — `Sentry with sanitization`
 
 ```text
-Implement only roadmap stage **278 — Sentry with sanitization**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **278 — `Sentry with sanitization`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Performance
+# Производительность
 
-## Prompt 279 — benchmark fixture classes
+## Этап 279 — `benchmark fixture classes`
 
 ```text
-Implement only roadmap stage **279 — benchmark fixture classes**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **279 — `benchmark fixture classes`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 280 — parser benchmark
+## Этап 280 — `parser benchmark`
 
 ```text
-Implement only roadmap stage **280 — parser benchmark**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **280 — `parser benchmark`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 281 — DOCX benchmark
+## Этап 281 — `DOCX benchmark`
 
 ```text
-Implement only roadmap stage **281 — DOCX benchmark**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **281 — `DOCX benchmark`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 282 — memory benchmark
+## Этап 282 — `memory benchmark`
 
 ```text
-Implement only roadmap stage **282 — memory benchmark**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **282 — `memory benchmark`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 283 — regression thresholds
+## Этап 283 — `regression thresholds`
 
 ```text
-Implement only roadmap stage **283 — regression thresholds**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **283 — `regression thresholds`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 284 — parallel conversion benchmark
+## Этап 284 — `parallel conversion benchmark`
 
 ```text
-Implement only roadmap stage **284 — parallel conversion benchmark**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **284 — `parallel conversion benchmark`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
 # CI/CD
 
-## Prompt 285 — lint CI
+## Этап 285 — `lint CI`
 
 ```text
-Add the first CI lint job without duplicating the global AI Dev Team release workflow.
+Добавь первое задание lint в CI без дублирования глобального release workflow AI Dev Team.
 ```
 
-## Prompt 286 — Rust tests CI
+## Этап 286 — `Rust tests CI`
 
 ```text
-Implement only roadmap stage **286 — Rust tests CI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **286 — `Rust tests CI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 287 — Python tests CI
+## Этап 287 — `Python tests CI`
 
 ```text
-Implement only roadmap stage **287 — Python tests CI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **287 — `Python tests CI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 288 — frontend tests CI
+## Этап 288 — `frontend tests CI`
 
 ```text
-Implement only roadmap stage **288 — frontend tests CI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **288 — `frontend tests CI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 289 — integration CI
+## Этап 289 — `integration CI`
 
 ```text
-Implement only roadmap stage **289 — integration CI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **289 — `integration CI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 290 — fixture regression CI
+## Этап 290 — `fixture regression CI`
 
 ```text
-Implement only roadmap stage **290 — fixture regression CI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **290 — `fixture regression CI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 291 — security CI
+## Этап 291 — `security CI`
 
 ```text
-Implement only roadmap stage **291 — security CI**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **291 — `security CI`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 292 — artifact validation
+## Этап 292 — `artifact validation`
 
 ```text
-Implement only roadmap stage **292 — artifact validation**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **292 — `artifact validation`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 293 — Docker build
+## Этап 293 — `Docker build`
 
 ```text
-Implement only roadmap stage **293 — Docker build**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **293 — `Docker build`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 294 — staging deployment
+## Этап 294 — `staging deployment`
 
 ```text
-Implement only roadmap stage **294 — staging deployment**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **294 — `staging deployment`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 295 — production release gate
+## Этап 295 — `production release gate`
 
 ```text
-Implement only roadmap stage **295 — production release gate**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **295 — `production release gate`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Scaling
+# Масштабирование
 
-## Prompt 296 — Docker Compose baseline
+## Этап 296 — `Docker Compose baseline`
 
 ```text
-Create a production-like Docker Compose baseline with health checks, but do not introduce Kubernetes yet.
+Создай похожую на production базовую конфигурацию Docker Compose с health checks, но пока не добавляй Kubernetes.
 ```
 
-## Prompt 297 — stateless API verification
+## Этап 297 — `stateless API verification`
 
 ```text
-Implement only roadmap stage **297 — stateless API verification**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **297 — `stateless API verification`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 298 — multiple workers
+## Этап 298 — `multiple workers`
 
 ```text
-Implement only roadmap stage **298 — multiple workers**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **298 — `multiple workers`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 299 — multiple API replicas
+## Этап 299 — `multiple API replicas`
 
 ```text
-Implement only roadmap stage **299 — multiple API replicas**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **299 — `multiple API replicas`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 300 — load test
+## Этап 300 — `load test`
 
 ```text
-Implement only roadmap stage **300 — load test**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **300 — `load test`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 301 — storage abstraction
+## Этап 301 — `storage abstraction`
 
 ```text
-Implement only roadmap stage **301 — storage abstraction**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **301 — `storage abstraction`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 302 — benchmark-driven Redis cache
+## Этап 302 — `benchmark-driven Redis cache`
 
 ```text
-Implement only roadmap stage **302 — benchmark-driven Redis cache**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **302 — `benchmark-driven Redis cache`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-## Prompt 303 — Kubernetes POC
+## Этап 303 — `Kubernetes POC`
 
 ```text
-Create Kubernetes only as a proof of concept after validating current deployment assumptions; do not replace the normal deployment path.
+Создай Kubernetes только как proof of concept после проверки текущих предположений о развёртывании; не заменяй обычный путь развёртывания.
 ```
 
-## Prompt 304 — worker autoscaling POC
+## Этап 304 — `worker autoscaling POC`
 
 ```text
-Implement only roadmap stage **304 — worker autoscaling POC**. Preserve existing architecture, add the smallest correct implementation, targeted tests, one relevant negative/boundary case, and update only affected documentation. Do not implement later-stage functionality.
+Реализуй только этап дорожной карты **304 — `worker autoscaling POC`**. Сохрани существующую архитектуру, добавь минимальную корректную реализацию, целевые тесты и один относящийся к задаче негативный или граничный случай. Обнови только затронутую документацию. Не реализуй функции последующих этапов.
 ```
 
-# Reusable review prompts
+# Переиспользуемые prompts review
 
-## Stage quality review
+## Review качества этапа
 
 ```text
-Review only the just-completed stage. Do not add features. Check SPECIFICATION/ARCHITECTURE scope, tests and negative cases, security/privacy regression, DESIGN compliance for UI, and PROGRESS/DECISIONS updates. Return PASS or FAIL with concrete findings. Prefer existing global AI Dev Team reviewer roles; do not run duplicate generic reviewers.
+Проведи review только что завершённого этапа. Не добавляй функции. Проверь объём SPECIFICATION и ARCHITECTURE, тесты и негативные случаи, регрессию безопасности и конфиденциальности, соответствие UI документу DESIGN и обновления PROGRESS и DECISIONS. Верни PASS или FAIL с конкретными замечаниями. Предпочитай существующие глобальные роли reviewer AI Dev Team; не запускай дублирующих универсальных reviewers.
 ```
 
-## Fix review findings
+## Исправление замечаний review
 
 ```text
-Fix only the findings from the latest stage review. Add regression coverage for every corrected bug, rerun relevant checks, and update PROGRESS.md. Do not broaden scope.
+Исправь только замечания последнего review этапа. Добавь регрессионное покрытие для каждой исправленной ошибки, повторно запусти относящиеся к задаче проверки и обнови PROGRESS.md. Не расширяй объём.
 ```
 
-## Next-stage readiness
+## Готовность к следующему этапу
 
 ```text
-Do not implement the next stage. Check that the previous stage is PASS, targeted tests are green, blockers are documented, required fixtures/dependencies exist, and repository state is understandable. Return READY or NOT READY with reasons.
+Не реализуй следующий этап. Проверь, что предыдущий этап имеет статус PASS, целевые тесты проходят, blockers документированы, необходимые fixtures и зависимости существуют, а состояние репозитория понятно. Верни READY или NOT READY с причинами.
 ```

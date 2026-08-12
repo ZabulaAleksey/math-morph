@@ -1,118 +1,118 @@
-# Technology Stack
+# Технологический стек
 
 ## Frontend
 
 - Next.js + React + TypeScript
 - Tailwind CSS + shadcn/ui
-- TanStack Query for server state
-- Zustand for small local UI state
+- TanStack Query для серверного состояния
+- Zustand для небольшого локального состояния UI
 - React Hook Form + Zod
-- next-intl / ICU-compatible catalogs
-- Web Workers for non-blocking local conversion
-- WebAssembly for Rust core in browser
-- Web Crypto API for client-side cryptography
+- next-intl и каталоги, совместимые с ICU
+- Web Workers для неблокирующей локальной конвертации
+- WebAssembly для core Rust в браузере
+- Web Crypto API для клиентской криптографии
 
 ## Mathcad core
 
-Language: **Rust**.
+Язык: **Rust**.
 
-Modules/crates should evolve around:
+Модули и crates должны развиваться вокруг:
 
-- format detection / safe container reading;
-- XMCD/MCDX parsing (`quick-xml`, Serde where appropriate);
+- определения формата и безопасного чтения контейнера;
+- parsing XMCD/MCDX (`quick-xml`, Serde, где уместно);
 - Mathcad AST;
-- semantic analyzer / symbol table / dependency graph;
-- evaluator and `EvaluationTrace`;
-- transformation/display AST;
-- complex-number support (`num-complex`);
-- linear algebra when required (`nalgebra`);
+- семантического анализатора, таблицы символов и графа зависимостей;
+- evaluator и `EvaluationTrace`;
+- AST преобразований и отображения;
+- поддержки комплексных чисел (`num-complex`);
+- линейной алгебры при необходимости (`nalgebra`);
 - `DocumentIR`.
 
-## Equations and documents
+## Уравнения и документы
 
 - DOCX / Office Open XML / WordprocessingML
-- OMML / Office Math for native editable Word equations
-- MathML as an interoperability layer for optional MathType support
-- future exporter contracts for Markdown, LaTeX, HTML, JSON, PDF
-- `PlotIR`/`ChartIR` for future Excel charts
-- `DiagramIR` for future editable VSDX/Visio output
+- OMML / Office Math для нативных редактируемых уравнений Word
+- MathML как слой совместимости для необязательной поддержки MathType
+- будущие контракты exporters для Markdown, LaTeX, HTML, JSON и PDF
+- `PlotIR`/`ChartIR` для будущих диаграмм Excel
+- `DiagramIR` для будущего редактируемого вывода VSDX/Visio
 
 ## Backend/API
 
 - Python + FastAPI
 - Pydantic
 - SQLAlchemy + Alembic
-- HTTPX where needed
-- Python dependency management: **uv**, project `.venv`, shared cache
-- OpenAPI 3.1-oriented public API
+- HTTPX при необходимости
+- управление зависимостями Python: **uv**, проектный `.venv`, общий кэш
+- публичный API, ориентированный на OpenAPI 3.1
 
-## Data and jobs
+## Данные и задачи
 
-- PostgreSQL — system-of-record metadata
-- RabbitMQ — job broker
-- Celery — server-side conversion workers
-- Redis — cache/rate-limit/ephemeral coordination only
-- S3-compatible object storage; MinIO for local/dev
+- PostgreSQL — авторитетные метаданные
+- RabbitMQ — broker задач
+- Celery — workers серверной конвертации
+- Redis — только кэш, rate limit и временная координация
+- S3-совместимое объектное хранилище; MinIO для локальной разработки
 
-## Authentication
+## Аутентификация
 
-- Keycloak or equivalent standards-based identity boundary
+- Keycloak или эквивалентная основанная на стандартах граница идентификации
 - OAuth 2.0 / OpenID Connect
 - TOTP
 - WebAuthn/passkeys
-- recovery codes
-- confirmed email/phone recovery
-- Telegram Bot API for explicit account linking and optional recovery
+- коды восстановления
+- подтверждённое восстановление через email или телефон
+- Telegram Bot API для явной привязки учётной записи и необязательного восстановления
 
-## Billing
+## Оплата
 
-Provider abstraction; regional/international adapters may include LiqPay, WayForPay and a Merchant-of-Record provider such as Paddle where legally/operationally appropriate. Do not hard-code one provider into core business logic.
+Абстракция provider; региональные и международные адаптеры могут включать LiqPay, WayForPay и Merchant of Record, например Paddle, где это уместно юридически и операционно. Не фиксируй одного provider в основной бизнес-логике.
 
 ## Testing
 
 Rust:
 - `cargo test`
-- property testing (`proptest`)
+- property-based тестирование (`proptest`)
 - fuzzing (`cargo-fuzz`)
-- AST/IR snapshots/golden tests where appropriate
+- snapshots и эталонные тесты AST/IR, где уместно
 
 Python:
 - pytest
 - pytest-asyncio
 - Hypothesis
-- HTTPX integration tests
+- интеграционные тесты HTTPX
 
 Frontend:
 - Vitest
 - React Testing Library
 - Playwright
 
-## Observability
+## Наблюдаемость
 
 - OpenTelemetry
 - Prometheus
 - Grafana
-- Sentry/error tracking with strict redaction
+- Sentry и отслеживание ошибок со строгим скрытием данных
 
-## Infrastructure
+## Инфраструктура
 
-Initial:
+Изначально:
 - Docker + Docker Compose
 - GitHub Actions
 
-Later only when justified:
+Позднее, только при наличии оснований:
 - Terraform/OpenTofu
 - Kubernetes
 - Helm
 
-## Security/supply chain
+## Безопасность и цепочка поставки
 
-- lockfiles and reproducible builds
-- dependency audit and secret scanning in CI
-- MCP/plugins/Skills/hooks treated as supply-chain dependencies
-- no unreviewed `latest` dependencies for durable infrastructure
-- OWASP Top 10:2025 mapping in `SECURITY.md`
+- lockfiles и воспроизводимые сборки
+- аудит зависимостей и поиск секретов в CI
+- MCP, plugins, Skills и hooks считаются зависимостями цепочки поставки
+- отсутствие непроверенных зависимостей `latest` для долговечной инфраструктуры
+- соответствие OWASP Top 10:2025 в `SECURITY.md`
 
-## AI/Codex integration
+## Интеграция AI/Codex
 
-Global AI Dev Team owns generic engineering roles/workflows. Project overlay contains only Mathcad-specific agents and skills. Project hooks and shared MCP servers are disabled by default to avoid duplicate execution and context/tool-surface growth.
+Глобальная AI Dev Team владеет универсальными инженерными ролями и workflows. Проектный overlay содержит только специфичных для Mathcad агентов и skills. Проектные hooks и общие MCP-серверы по умолчанию отключены, чтобы избежать дублирования выполнения и роста поверхности контекста и инструментов.

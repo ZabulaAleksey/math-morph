@@ -1,12 +1,12 @@
 ---
 name: mathcad-release-quality-gate-fallback
-description: Optional full project quality gate only when the installed AI Dev Team does not already provide an equivalent release/merge validation workflow.
+description: Необязательная полная проверка качества проекта только тогда, когда установленная AI Dev Team ещё не предоставляет эквивалентный workflow проверки release или merge.
 ---
 
-DO NOT use when a global AI Dev Team release/quality gate is available.
+НЕ используй, когда доступна глобальная release-проверка или проверка качества AI Dev Team.
 
-1. Inspect changed stacks.
-2. Run relevant lint/typecheck/build/tests.
-3. Run Mathcad conversion regression and DOCX validation when applicable.
-4. Run configured security/dependency/secret checks.
-5. Return PASS/FAIL with exact commands/results.
+1. Проверь изменённые стеки.
+2. Запусти относящиеся к изменениям lint, typecheck, build и тесты.
+3. При необходимости запусти регрессионную проверку конвертации Mathcad и проверку DOCX.
+4. Запусти настроенные проверки безопасности, зависимостей и секретов.
+5. Верни PASS/FAIL с точными командами и результатами.

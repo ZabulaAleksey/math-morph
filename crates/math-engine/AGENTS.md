@@ -1,9 +1,9 @@
-# Math Engine Rules
+# Правила математического движка
 
-- Computation and presentation are separate.
-- Definition, equality and evaluation are distinct semantics.
-- Keep Original AST immutable; presentation transformations produce Display AST/trace.
-- Dependency graph/evaluation order must be deterministic.
-- Separate numeric precision from display rounding.
-- Complex-number conversions require quadrant/zero/tolerance edge tests.
-- Do not add Word/MathType-specific logic here.
+- Вычисление и представление разделены.
+- Определение, равенство и вычисление являются различными семантиками.
+- Сохраняй Original AST неизменяемым; преобразования представления создают Display AST и trace.
+- Граф зависимостей и порядок вычислений должны быть детерминированными.
+- Отделяй числовую точность от округления при отображении.
+- Преобразования комплексных чисел требуют граничных тестов для квадрантов, нуля и допуска.
+- Не добавляй сюда логику, специфичную для Word или MathType.

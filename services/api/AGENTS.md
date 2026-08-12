@@ -1,10 +1,10 @@
-# API Rules
+# Правила API
 
-- Read `docs/SECURITY.md` for every auth/authz/API-key/upload/storage change.
-- Version endpoints under `/api/v1` unless an ADR changes policy.
-- Authenticate AND authorize every protected object/action.
-- Structured error code + request ID; no raw stack traces or document data.
-- API key secret shown once; only hash/verifier stored.
-- Web/API/CLI must reuse conversion core rather than duplicate semantics.
-- Enforce server-side size/quota/rate/option validation.
-- Job creation should be idempotent where duplicate requests are possible.
+- При каждом изменении аутентификации, авторизации, ключей API, загрузки или хранения прочитай `docs/SECURITY.md`.
+- Версионируй endpoints под `/api/v1`, если ADR не меняет эту политику.
+- Аутентифицируй И авторизуй каждый защищённый объект и действие.
+- Используй структурированный код ошибки и ID запроса; не возвращай исходные stack traces или данные документа.
+- Секрет ключа API показывается один раз; хранится только hash или verifier.
+- Web/API/CLI должны переиспользовать core конвертации, а не дублировать семантику.
+- Обеспечивай серверную проверку размера, квоты, частоты и параметров.
+- Создание задачи должно быть идемпотентным там, где возможны повторные запросы.

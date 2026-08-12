@@ -1,14 +1,14 @@
-# API Specification Direction
+# Направление спецификации API
 
-Base path: `/api/v1`.
+Базовый путь: `/api/v1`.
 
-## Authentication
+## Аутентификация
 
-API-key/Bearer style credential bound to a user/account. Full secret shown once, verifier/hash stored server-side, with prefix, scopes, creation/last-use/expiry/revocation metadata.
+Учётные данные в стиле ключа API или Bearer привязаны к пользователю или учётной записи. Полный секрет показывается один раз, а verifier или hash хранится на сервере вместе с префиксом, scopes и метаданными создания, последнего использования, истечения срока и отзыва.
 
-## Conversion lifecycle
+## Жизненный цикл конвертации
 
-Conceptual endpoints:
+Предполагаемые endpoints:
 
 - `POST /api/v1/conversions`
 - `GET /api/v1/conversions/{id}`
@@ -16,25 +16,25 @@ Conceptual endpoints:
 - `GET /api/v1/conversions/{id}/report`
 - `GET /api/v1/documents`
 - `DELETE /api/v1/documents/{id}`
-- API-key create/list/revoke/rotate operations
+- операции создания, перечисления, отзыва и ротации ключей API;
 - `GET /api/v1/usage`
 
-Long operations use asynchronous job IDs. Never auto-submit a duplicate job merely because the browser lost connectivity; status must be recoverable by ID/idempotency key.
+Длительные операции используют асинхронные ID задач. Никогда не отправляй автоматически дублирующую задачу только из-за потери соединения браузером; состояние должно восстанавливаться по ID или ключу идемпотентности.
 
-## Job states
+## Состояния задач
 
 `created`, `queued`, `processing`, `completed`, `completed_with_warnings`, `failed`, `cancelled`, `expired`.
 
-## Error envelope
+## Оболочка ошибки
 
-Stable machine-readable code, request ID and safe details. Raw exception/stack/document content is forbidden.
+Стабильный машиночитаемый код, ID запроса и безопасные подробности. Исходное исключение, stack trace и содержимое документа запрещены.
 
-Important codes include file empty/too large/unsupported/mismatch/corrupted, unsupported Mathcad version/node, invalid options, conversion timeout/failure, auth/key/scope failures, quota/rate-limit failures, storage/service unavailable.
+Важные коды охватывают пустой, слишком большой, неподдерживаемый, не соответствующий расширению или повреждённый файл; неподдерживаемую версию или узел Mathcad; недопустимые параметры; timeout или сбой конвертации; ошибки аутентификации, ключа или scope; ошибки квоты и rate limit; недоступность хранилища или сервиса.
 
-## Persistence
+## Сохранение
 
-Explicit request option may override user profile save default according to documented policy. API conversions saved by policy appear in the same user history with source `API`.
+Явный параметр запроса может переопределить значение сохранения по умолчанию из профиля пользователя согласно документированной политике. Сохранённые по политике конвертации API отображаются в общей истории пользователя с источником `API`.
 
-## Future webhooks
+## Будущие webhooks
 
-Signed webhook events for completion/failure with retry/idempotency/delivery history. Not required for initial MVP.
+Подписанные события webhook о завершении и сбое с повтором, идемпотентностью и историей доставки. Для начального MVP не требуются.

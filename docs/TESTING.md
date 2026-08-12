@@ -1,80 +1,80 @@
-# Testing Strategy and Definition of Done
+# Стратегия тестирования и критерии готовности
 
-## Required test layers
+## Обязательные уровни тестирования
 
 ### Parser/core
 
-- unit tests per node/feature;
-- snapshot/golden AST/IR where stable;
-- malformed input and unknown-node tests;
-- property tests for invariants;
-- fuzz targets for XML/container/parser boundaries;
-- memory/size/recursion limits.
+- unit-тесты для каждого узла и функции;
+- snapshot и эталонные AST/IR там, где они стабильны;
+- тесты повреждённого ввода и неизвестных узлов;
+- property-based тесты инвариантов;
+- fuzz-цели для границ XML, контейнера и parser;
+- ограничения памяти, размера и рекурсии.
 
-### Mathematical engine
+### Математический движок
 
-- dependency/symbol tests;
-- substitution traces;
-- precision vs rounding separation;
-- complex algebraic↔polar round-trips with tolerance;
-- quadrant/zero/division/angle normalization cases.
+- тесты зависимостей и символов;
+- traces подстановки;
+- разделение точности и округления;
+- round-trip проверки комплексного алгебраического↔полярного представления с допуском;
+- случаи квадрантов, нуля, деления и нормализации угла.
 
 ### DOCX/OMML
 
-- generated package structural validation;
-- relationship/content-type/XML validity;
-- editable equation structure tests;
-- reference DOCX manual smoke set for Word opening/editing;
-- regression tests for nested equations.
+- проверка структуры созданного пакета;
+- корректность relationships, типов содержимого и XML;
+- тесты структуры редактируемых уравнений;
+- ручной smoke-набор эталонных DOCX для открытия и редактирования в Word;
+- регрессионные тесты вложенных уравнений.
 
 ### API/backend
 
-- authz/API-key scope tests;
-- async job lifecycle/idempotency;
-- save-preference semantics;
-- quota/rate-limit boundaries;
-- retry vs non-retryable failures;
-- storage failure/timeout tests.
+- тесты авторизации и scopes ключей API;
+- жизненный цикл и идемпотентность асинхронных задач;
+- семантика предпочтений сохранения;
+- границы квот и rate limit;
+- повторяемые и неповторяемые сбои;
+- тесты сбоя и timeout хранилища.
 
 ### Frontend/E2E
 
-- upload and drag/drop;
-- file validation states;
-- conversion states and recovery after network interruption;
-- localized structured errors;
-- auth/2FA/recovery flows;
-- dashboard/API keys/privacy settings.
+- загрузка и drag-and-drop;
+- состояния проверки файла;
+- состояния конвертации и восстановление после обрыва сети;
+- локализованные структурированные ошибки;
+- flows аутентификации, 2FA и восстановления;
+- dashboard, ключи API и настройки конфиденциальности.
 
-### Security
+### Безопасность
 
-- XML attacks;
-- ZIP bomb/path traversal;
-- malicious filenames/metadata/SVG;
-- XSS/injection;
-- auth/recovery brute force/replay;
-- secret/log redaction;
-- admin privacy-boundary tests;
-- dependency/MCP/hook/Skill supply-chain review.
+- атаки XML;
+- ZIP bomb и path traversal;
+- вредоносные имена файлов, метаданные и SVG;
+- XSS и injection;
+- brute force и replay для аутентификации и восстановления;
+- скрытие секретов в журналах;
+- тесты границы конфиденциальности администратора;
+- review цепочки поставки зависимостей, MCP, hooks и Skills.
 
-## Fixture layout
+## Структура fixtures
 
 `tests/fixtures/` groups: xmcd, mcdx, formulas, complex, plots, diagrams, mixed, corrupted, security, compatibility.
 
-Every fixture belongs in a manifest with format/version/features/expected status. A corrected parser bug gets a permanent regression fixture when legally/technically possible.
+Каждый fixture включается в манифест с форматом, версией, функциями и ожидаемым статусом. Исправленная ошибка parser получает постоянный регрессионный fixture, если это допустимо юридически и технически.
 
-## Golden rule
+## Правило эталонных данных
 
-Do not update a golden fixture merely because a test failed after implementation changes. First prove that the desired behavior changed intentionally.
+Не обновляй эталонный fixture только потому, что после изменения реализации тест упал. Сначала докажи, что желаемое поведение изменилось намеренно.
 
-## DoD for a stage
+## DoD этапа
 
-- scope implemented without unrelated future features;
-- targeted tests added/passing;
-- relevant negative/boundary test included;
-- lint/typecheck/build for touched area pass;
-- no parser panic/crash on user input path;
-- docs/PROGRESS updated for meaningful stage;
-- DECISIONS/ARCHITECTURE/SECURITY updated only if their contract changed;
-- final report lists checks actually executed, not assumed checks.
+- объём реализован без неотносящихся к нему будущих функций;
+- целевые тесты добавлены и проходят;
+- включён относящийся к задаче негативный или граничный тест;
+- lint, typecheck и build затронутой области проходят;
+- parser не вызывает panic или crash на пути пользовательского ввода;
+- docs/PROGRESS обновлён для существенного этапа;
+- DECISIONS, ARCHITECTURE и SECURITY обновлены только при изменении их контракта;
+- итоговый отчёт перечисляет фактически выполненные, а не предполагаемые проверки.
 
-Generic full release gates should be owned by the already installed global AI Dev Team when it provides them; do not duplicate them locally.
+Универсальные полные release-проверки должны выполняться уже установленной глобальной AI Dev Team, если она их предоставляет; не дублируй их локально.

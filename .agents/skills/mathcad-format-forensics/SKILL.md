@@ -1,12 +1,12 @@
 ---
 name: mathcad-format-forensics
-description: Analyze an unfamiliar XMCD/MCDX fixture or Mathcad version, identify structure/unsupported nodes, and produce a compatibility report without changing production parser code.
+description: Анализирует незнакомый fixture XMCD/MCDX или версию Mathcad, определяет структуру и неподдерживаемые узлы и создаёт отчёт совместимости без изменения production-кода parser.
 ---
 
-1. Read root and parser AGENTS.
-2. Inspect only the target fixture and minimal parser code needed for comparison.
-3. Identify format/container, version/schema/namespaces, region types and unknown nodes.
-4. Classify findings: already supported / partially supported / unknown / malformed.
-5. Note security-relevant container/XML anomalies without executing embedded content.
-6. Return a concise report with evidence and recommended fixtures/tests.
-7. Do not modify production code or golden outputs.
+1. Прочитай корневые AGENTS и AGENTS parser.
+2. Проверь только целевой fixture и минимальный код parser, необходимый для сравнения.
+3. Определи формат или контейнер, версию, схему, namespaces, типы областей и неизвестные узлы.
+4. Классифицируй результаты: уже поддерживается / поддерживается частично / неизвестно / повреждено.
+5. Отметь значимые для безопасности аномалии контейнера и XML, не выполняя встроенное содержимое.
+6. Верни краткий отчёт с доказательствами и рекомендуемыми fixtures и тестами.
+7. Не изменяй production-код или эталонные результаты.

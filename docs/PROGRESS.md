@@ -1,27 +1,27 @@
-# Progress
+# Прогресс
 
-## Snapshot
+## Снимок состояния
 
-- **Status:** project context and architecture baseline prepared; product implementation has not started.
-- **Current stage:** pre-implementation readiness.
-- **Verified checks:** context-pack validator and context conflict audit.
-- **Blockers:** no core blocker; owner-supplied `docs/DESIGN.md` is required before establishing a product visual system.
+- **Статус:** контекст проекта и базовая архитектура подготовлены; реализация продукта не начата.
+- **Текущий этап:** готовность перед реализацией.
+- **Выполненные проверки:** validator пакета контекста и аудит конфликтов контекста.
+- **Blockers:** основных блокировок нет; для создания визуальной системы продукта требуется предоставленный владельцем `docs/DESIGN.md`.
 
-## Completed
+## Завершено
 
-- Mathcad-specific AI Dev Team overlay and module routing.
-- Canonical specification, architecture, security, testing and roadmap documents.
-- Optional hooks/MCP/fallback capabilities isolated from active configuration.
-- Lightweight requirement-to-stage traceability index.
+- Специфичный для Mathcad overlay AI Dev Team и маршрутизация модулей.
+- Канонические документы спецификации, архитектуры, безопасности, тестирования и дорожной карты.
+- Необязательные hooks, MCP и fallback-возможности изолированы от активной конфигурации.
+- Компактный индекс трассировки требований к этапам.
 
-## Suggested first execution stage
+## Предлагаемый первый этап выполнения
 
-`001 — monorepo` if the repository is empty; otherwise inspect existing code and map it to the roadmap before choosing the first missing stage.
+`001 — monorepo`, если репозиторий пуст; иначе проверь существующий код и сопоставь его с дорожной картой перед выбором первого отсутствующего этапа.
 
-## Stage completion
+## Завершение этапа
 
-A roadmap stage becomes verified only after scoped implementation, relevant tests, review and affected canonical-document updates. Prompt or roadmap text alone is not completion evidence.
+Этап дорожной карты считается проверенным только после ограниченной реализации, относящихся к ней тестов, review и обновления затронутых канонических документов. Текст prompt или дорожной карты сам по себе не является доказательством завершения.
 
-## Important
+## Важно
 
-Do not mark roadmap stages complete merely because their specification/prompts exist.
+Не отмечай этапы дорожной карты завершёнными только потому, что существуют их спецификация или prompts.
