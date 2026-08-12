@@ -8,6 +8,8 @@ MCP подключается не «на всякий случай», а ког�
 
 MCP остаётся adapter к реальному источнику или сервису и не должен становиться вторым владельцем бизнес-логики MathMorph.
 
+После стабилизации Application/Core допустим отдельный проектный MCP adapter с узкими semantic tools: `inspect_document`, `convert_document`, `extract_formulas`, `validate_conversion` и `get_conversion_report`. Он переиспользует те же authorization, scopes, jobs, diagnostics и privacy policy, что REST/CLI, и не получает unrestricted filesystem или shell.
+
 ## Настроенные/предусмотренные MCP
 
 ### OpenAI Developer Docs

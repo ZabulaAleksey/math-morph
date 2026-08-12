@@ -50,7 +50,7 @@
 - **032** — `math region`
 - **033** — `plot region`
 - **034** — `image region`
-- **035** — `unknown region`
+- **035** — `table/program/unknown regions`
 
 ## Математическое AST — 036–054
 
@@ -76,7 +76,7 @@
 
 ## Document IR — 055–061
 
-- **055** — `DocumentIR`
+- **055** — `versioned DocumentIR/PageIR/TableIR/MetadataIR`
 - **056** — `TextBlock`
 - **057** — `EquationBlock`
 - **058** — `ImageBlock`
@@ -200,17 +200,17 @@
 - **143** — `ConversionPipeline`
 - **144** — `DiagnosticsCollector`
 - **145** — `severity model`
-- **146** — `ConversionReport`
+- **146** — `ConversionReport fidelity statuses`
 - **147** — `partial conversion`
 
 ## CLI — 148–153
 
 - **148** — `minimal convert command`
 - **149** — `inspect command`
-- **150** — `--format`
+- **150** — `--format/exporter registry including Typst`
 - **151** — `--complex-mode`
 - **152** — `--precision`
-- **153** — `JSON report`
+- **153** — `JSON/Document IR report`
 
 ## Веб-интерфейс — 154–161
 
@@ -228,7 +228,7 @@
 - **162** — `next-intl infrastructure`
 - **163** — `catalog split`
 - **164** — `missing-key CI`
-- **165** — `second locale`
+- **165** — `Ukrainian/Russian/English locale coverage`
 
 ## Backend FastAPI — 166–172
 
@@ -279,10 +279,10 @@
 ## Публичный API — 200–209
 
 - **200** — `POST conversions`
-- **201** — `async jobs`
+- **201** — `durable async jobs/progress/correlation`
 - **202** — `status`
 - **203** — `result`
-- **204** — `save preference integration`
+- **204** — `save/temporary TTL preference integration`
 - **205** — `OpenAPI descriptions`
 - **206** — `API docs page`
 - **207** — `curl examples`
@@ -298,7 +298,7 @@
 - **214** — `dead-letter strategy`
 - **215** — `timeout`
 - **216** — `cancellation model`
-- **217** — `idempotency`
+- **217** — `idempotency/reconnect recovery`
 
 ## Конфиденциальность и zero knowledge — 218–232
 
@@ -370,7 +370,7 @@
 - **271** — `structured logging`
 - **272** — `log redaction`
 - **273** — `OpenTelemetry traces`
-- **274** — `metrics`
+- **274** — `technical and product metrics without content`
 - **275** — `conversion duration`
 - **276** — `parser failure metrics`
 - **277** — `worker metrics`

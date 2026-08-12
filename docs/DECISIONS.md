@@ -30,6 +30,18 @@
 
 **Последствия:** обновлять соответствие при изменении принятого требования или проверке этапа. Пункт дорожной карты или prompt сам по себе никогда не доказывает реализацию.
 
+## ADR-0005 — Версионируемый Document IR является канонической границей exporters
+
+**Статус:** принято.
+
+**Контекст:** будущие DOCX, HTML, Markdown, LaTeX, PDF, JSON, Typst, Excel и Visio adapters не должны повторно разбирать Mathcad или зависеть от внутренней XML-модели.
+
+**Решение:** `DocumentIR` включает version marker и сериализуемые page, text, formula, table, image, plot/chart, diagram и metadata structures. Schema evolution имеет явную миграцию либо диагностируемую несовместимость.
+
+**Последствия:** parser и semantics сохраняют source/layout provenance; exporters зависят от IR-контракта. Round-trip и compatibility fixtures обязательны.
+
+**Связанные требования:** SPEC-04, SPEC-08, SPEC-09.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

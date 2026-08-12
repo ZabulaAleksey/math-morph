@@ -33,8 +33,10 @@ Transformation / Evaluation Engine
         |
         v
 Document IR
+  - PageIR / MetadataIR
   - TextBlock
   - EquationBlock
+  - TableIR
   - ImageBlock
   - PlotBlock / ChartIR
   - DiagramBlock / DiagramIR
@@ -56,6 +58,7 @@ DOCX/OMML          Markdown/...     Future Excel/Visio
 - семантика;
 - преобразования и вычисление;
 - Document IR;
+- версионирование и сериализация Document IR;
 - совместимый с браузерным WASM core, где это практично.
 
 Не владеет:
@@ -69,7 +72,7 @@ DOCX/OMML          Markdown/...     Future Excel/Visio
 - `WordEquationExporter`: AST/Display AST → уравнение OMML/Word.
 - `MathTypeExporter`: отдельный adapter, потенциально через MathML.
 - `DOCXExporter`: Document IR → DOCX/OOXML.
-- В будущем: Markdown, LaTeX, PDF, HTML, JSON.
+- В будущем: Markdown, LaTeX, PDF, HTML, JSON, Typst.
 - `ChartExporter`: текущий растровый путь + будущий путь Excel.
 - `DiagramExporter`: текущий растровый путь + будущий путь VSDX.
 
@@ -111,14 +114,16 @@ FastAPI/Pydantic/SQLAlchemy:
 RabbitMQ + Celery:
 - серверные конвертации;
 - контролируемые повторы;
+- durable job ID, progress и correlation ID;
 - timeout и отмена, где это возможно;
+- идемпотентность и восстановление состояния после reconnect;
 - flow dead-letter и ошибок;
 - независимое горизонтальное масштабирование.
 
 ### Data
 
 - PostgreSQL: метаданные, ссылки на пользователей и профили, задачи, настройки, использование, подписки, события аудита и безопасности.
-- S3-совместимое хранилище/MinIO: зашифрованные и временные объекты; не использовать PostgreSQL для крупных файлов.
+- S3-совместимое хранилище/MinIO: зашифрованные и временные объекты, short-lived signed URLs, retention/delete и изоляция владельца/workspace; не использовать PostgreSQL для крупных файлов.
 - Redis: только кэш, rate limit и временная координация, не авторитетное хранилище.
 
 ## 4. Модель конфиденциальности
@@ -176,6 +181,7 @@ POST conversion
 - Восстановление диаграмм Excel идёт через ChartIR.
 - Восстановление Visio идёт через DiagramIR и создаёт редактируемые shapes и connectors, а не одно изображение.
 - Новые выходные форматы реализуют контракт exporter.
+- REST, CLI, GUI/SDK, workers и будущий MCP являются adapters к общим Application Services и не дублируют parser или бизнес-логику задач.
 
 ## 9. Запрещённые shortcut-архитектуры
 
