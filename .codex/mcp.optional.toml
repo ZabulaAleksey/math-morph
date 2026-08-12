@@ -1,0 +1,21 @@
+# OPTIONAL TEMPLATE — NOT AUTO-LOADED.
+# The installed AI Dev Team is the source of truth for shared MCP servers.
+# Do not merge a server already present globally/user-scoped.
+
+# Example only. Enable only if the existing installation does not already expose
+# current OpenAI/Codex documentation through an equivalent trusted source.
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+enabled = false
+required = false
+default_tools_approval_mode = "auto"
+tool_timeout_sec = 60
+
+# Example only. Prefer the existing AI Dev Team GitHub integration when present.
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/x/repos"
+auth = "oauth"
+enabled = false
+required = false
+default_tools_approval_mode = "writes"
+tool_timeout_sec = 60

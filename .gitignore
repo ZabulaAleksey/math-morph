@@ -1,0 +1,17 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+
+# Python
+.venv/
+__pycache__/
+
+# Local Codex logs/temp
+.codex-log/
+
+# Generated/local artifacts as appropriate
+*.tmp

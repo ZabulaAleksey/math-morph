@@ -1,0 +1,14 @@
+# Project-scoped Codex overlay for Mathcad Converter & Parser Platform.
+# Intentionally minimal because a global AI Dev Team Codex is already installed.
+#
+# DO NOT register generic MCP servers or hooks here by default.
+# Reuse the existing global/user AI Dev Team configuration first.
+# Optional, reviewed snippets live in:
+#   .codex/mcp.optional.toml
+#   .codex/hooks.optional.toml
+#
+# Active project subagents are only Mathcad-domain specialists in .codex/agents/.
+# Generic fallbacks stay inactive in .codex/agents-optional/.
+
+# Keep repository instruction loading bounded to reduce context pressure.
+project_doc_max_bytes = 32768

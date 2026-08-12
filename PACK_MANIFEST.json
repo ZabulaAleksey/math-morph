@@ -1,0 +1,201 @@
+{
+  "layout": "extract-directly-to-repository-root",
+  "files": [
+    {
+      "path": ".agents/skills/mathcad-conversion-regression/SKILL.md",
+      "bytes": 824
+    },
+    {
+      "path": ".agents/skills/mathcad-format-forensics/SKILL.md",
+      "bytes": 726
+    },
+    {
+      "path": ".agents/skills/mathcad-security-overlay/SKILL.md",
+      "bytes": 887
+    },
+    {
+      "path": ".agents/skills-optional/release-quality-gate-fallback/SKILL.md",
+      "bytes": 531
+    },
+    {
+      "path": ".codex/agents/mathcad-format-forensics.toml",
+      "bytes": 872
+    },
+    {
+      "path": ".codex/agents/mathcad-math-semantics.toml",
+      "bytes": 605
+    },
+    {
+      "path": ".codex/agents/mathcad-parser-engineer.toml",
+      "bytes": 706
+    },
+    {
+      "path": ".codex/agents/mathcad-word-openxml.toml",
+      "bytes": 617
+    },
+    {
+      "path": ".codex/agents-optional/mathcad-frontend-review-fallback.toml",
+      "bytes": 581
+    },
+    {
+      "path": ".codex/agents-optional/mathcad-qa-fallback.toml",
+      "bytes": 741
+    },
+    {
+      "path": ".codex/agents-optional/mathcad-security-fallback.toml",
+      "bytes": 639
+    },
+    {
+      "path": ".codex/config.toml",
+      "bytes": 635
+    },
+    {
+      "path": ".codex/hooks-optional/pre_tool_use_policy.py",
+      "bytes": 1933
+    },
+    {
+      "path": ".codex/hooks-optional/session_start.py",
+      "bytes": 1598
+    },
+    {
+      "path": ".codex/hooks-optional/stop_quality_gate.py",
+      "bytes": 1588
+    },
+    {
+      "path": ".codex/hooks.optional.toml",
+      "bytes": 1207
+    },
+    {
+      "path": ".codex/mcp.optional.toml",
+      "bytes": 765
+    },
+    {
+      "path": ".gitignore.context-pack.example",
+      "bytes": 171
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 5586
+    },
+    {
+      "path": "README.md",
+      "bytes": 1784
+    },
+    {
+      "path": "README_CONTEXT_PACK.md",
+      "bytes": 1801
+    },
+    {
+      "path": "apps/web/AGENTS.md",
+      "bytes": 531
+    },
+    {
+      "path": "crates/exporter-docx/AGENTS.md",
+      "bytes": 516
+    },
+    {
+      "path": "crates/math-engine/AGENTS.md",
+      "bytes": 447
+    },
+    {
+      "path": "crates/mathcad-parser/AGENTS.md",
+      "bytes": 592
+    },
+    {
+      "path": "docs/AI_DEV_TEAM_COMPATIBILITY.md",
+      "bytes": 3845
+    },
+    {
+      "path": "docs/API.md",
+      "bytes": 1573
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "bytes": 5254
+    },
+    {
+      "path": "docs/CONTEXT_POLICY.md",
+      "bytes": 2335
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "bytes": 693
+    },
+    {
+      "path": "docs/DEPENDENCIES.md",
+      "bytes": 2286
+    },
+    {
+      "path": "docs/DESIGN.md",
+      "bytes": 0
+    },
+    {
+      "path": "docs/FORMATS.md",
+      "bytes": 1349
+    },
+    {
+      "path": "docs/HOOKS.md",
+      "bytes": 2073
+    },
+    {
+      "path": "docs/MCP.md",
+      "bytes": 2607
+    },
+    {
+      "path": "docs/PRIVACY.md",
+      "bytes": 1511
+    },
+    {
+      "path": "docs/PROGRESS.md",
+      "bytes": 466
+    },
+    {
+      "path": "docs/PROMPTS.md",
+      "bytes": 92750
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "bytes": 10701
+    },
+    {
+      "path": "docs/SECURITY.md",
+      "bytes": 9507
+    },
+    {
+      "path": "docs/SKILLS.md",
+      "bytes": 847
+    },
+    {
+      "path": "docs/SOURCES.md",
+      "bytes": 881
+    },
+    {
+      "path": "docs/SPECIFICATION.md",
+      "bytes": 9101
+    },
+    {
+      "path": "docs/SUBAGENTS.md",
+      "bytes": 1343
+    },
+    {
+      "path": "docs/TECH_STACK.md",
+      "bytes": 3143
+    },
+    {
+      "path": "docs/TESTING.md",
+      "bytes": 2514
+    },
+    {
+      "path": "scripts/validate_context_pack.py",
+      "bytes": 2554
+    },
+    {
+      "path": "services/api/AGENTS.md",
+      "bytes": 555
+    },
+    {
+      "path": "tests/AGENTS.md",
+      "bytes": 470
+    }
+  ]
+}

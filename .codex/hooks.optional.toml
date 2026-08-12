@@ -1,0 +1,31 @@
+# OPTIONAL TEMPLATE — NOT AUTO-LOADED.
+# Merge selected entries into .codex/config.toml only if the global AI Dev Team
+# has no equivalent hook. Never register both generic global and project hooks
+# for the same purpose without a deliberate reason.
+
+[features]
+hooks = true
+
+[[hooks.SessionStart]]
+matcher = "^(startup|resume|compact)$"
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/.codex/hooks-optional/session_start.py"'
+command_windows = 'py -3 "$(git rev-parse --show-toplevel)/.codex/hooks-optional/session_start.py"'
+timeout = 5
+additionalContextLimit = 1200
+
+[[hooks.PreToolUse]]
+matcher = "^(Bash|apply_patch)$"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/.codex/hooks-optional/pre_tool_use_policy.py"'
+command_windows = 'py -3 "$(git rev-parse --show-toplevel)/.codex/hooks-optional/pre_tool_use_policy.py"'
+timeout = 5
+
+[[hooks.Stop]]
+[[hooks.Stop.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/.codex/hooks-optional/stop_quality_gate.py"'
+command_windows = 'py -3 "$(git rev-parse --show-toplevel)/.codex/hooks-optional/stop_quality_gate.py"'
+timeout = 8
