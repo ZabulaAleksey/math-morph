@@ -1,16 +1,18 @@
-# Codex Hooks
+# Optional Codex Hooks
 
-Актуальная проектная конфигурация находится в `.codex/config.toml`, scripts — `.codex/hooks/`.
+Активная проектная конфигурация находится в `.codex/config.toml`. Сейчас она не регистрирует hooks: глобальная AI Dev Team остаётся источником общих lifecycle-проверок.
 
-Codex поддерживает project hooks рядом с config layer и требует trust-review для немanaged command hooks. После копирования/изменения используйте `/hooks` и проверьте точное содержимое перед доверием.
+Опциональные scripts находятся в `.codex/hooks-optional/`, а пример регистрации — в `.codex/hooks.optional.toml`. Пример не загружается автоматически. Включай только конкретный недостающий hook, вручную перенося проверенную секцию в `.codex/config.toml` после сравнения с global/user/plugin hooks.
 
-## Включённые hooks
+Codex обнаруживает project hooks рядом с активным config layer и требует trust-review для unmanaged command hooks. После включения или изменения проверь точное содержимое через `/hooks` перед доверием.
+
+## Доступные опциональные hooks
 
 ### SessionStart
 
 `session_start.py`
 
-Цель: вернуть только короткий routing/context reminder и небольшой фрагмент текущего `PROGRESS.md`. Он не читает всю документацию и ограничивает output.
+Цель: вернуть только короткий routing/context reminder и небольшой фрагмент текущего `docs/PROGRESS.md`. Он не читает всю документацию и ограничивает output.
 
 ### PreToolUse
 
@@ -22,7 +24,7 @@ Codex поддерживает project hooks рядом с config layer и тр�
 
 `stop_quality_gate.py`
 
-Цель: один раз напомнить завершить quality gate/`PROGRESS.md`, если есть code changes. Hook защищён от бесконечного продолжения через `stop_hook_active`.
+Цель: один раз напомнить завершить quality gate/`docs/PROGRESS.md`, если есть code changes. Hook защищён от бесконечного продолжения через `stop_hook_active`.
 
 ## Почему нет тяжёлого PostToolUse
 
@@ -36,4 +38,4 @@ Codex поддерживает project hooks рядом с config layer и тр�
 - Hooks не должны хранить secrets.
 - Любое изменение hook script требует повторного trust-review.
 
-Official reference: https://developers.openai.com/codex/hooks
+Official reference: https://learn.chatgpt.com/docs/hooks

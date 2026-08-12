@@ -51,15 +51,15 @@
     },
     {
       "path": ".codex/hooks-optional/pre_tool_use_policy.py",
-      "bytes": 1933
+      "bytes": 2100
     },
     {
       "path": ".codex/hooks-optional/session_start.py",
-      "bytes": 1598
+      "bytes": 1837
     },
     {
       "path": ".codex/hooks-optional/stop_quality_gate.py",
-      "bytes": 1588
+      "bytes": 1755
     },
     {
       "path": ".codex/hooks.optional.toml",
@@ -70,20 +70,24 @@
       "bytes": 765
     },
     {
+      "path": ".gitignore",
+      "bytes": 171
+    },
+    {
       "path": ".gitignore.context-pack.example",
       "bytes": 171
     },
     {
       "path": "AGENTS.md",
-      "bytes": 5586
+      "bytes": 1263
     },
     {
       "path": "README.md",
-      "bytes": 1784
+      "bytes": 1739
     },
     {
       "path": "README_CONTEXT_PACK.md",
-      "bytes": 1801
+      "bytes": 1923
     },
     {
       "path": "apps/web/AGENTS.md",
@@ -103,7 +107,7 @@
     },
     {
       "path": "docs/AI_DEV_TEAM_COMPATIBILITY.md",
-      "bytes": 3845
+      "bytes": 3848
     },
     {
       "path": "docs/API.md",
@@ -111,15 +115,15 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 5254
+      "bytes": 5568
     },
     {
       "path": "docs/CONTEXT_POLICY.md",
-      "bytes": 2335
+      "bytes": 4929
     },
     {
       "path": "docs/DECISIONS.md",
-      "bytes": 693
+      "bytes": 1951
     },
     {
       "path": "docs/DEPENDENCIES.md",
@@ -135,11 +139,11 @@
     },
     {
       "path": "docs/HOOKS.md",
-      "bytes": 2073
+      "bytes": 2698
     },
     {
       "path": "docs/MCP.md",
-      "bytes": 2607
+      "bytes": 3517
     },
     {
       "path": "docs/PRIVACY.md",
@@ -147,7 +151,7 @@
     },
     {
       "path": "docs/PROGRESS.md",
-      "bytes": 466
+      "bytes": 1162
     },
     {
       "path": "docs/PROMPTS.md",
@@ -163,19 +167,19 @@
     },
     {
       "path": "docs/SKILLS.md",
-      "bytes": 847
+      "bytes": 1080
     },
     {
       "path": "docs/SOURCES.md",
-      "bytes": 881
+      "bytes": 863
     },
     {
       "path": "docs/SPECIFICATION.md",
-      "bytes": 9101
+      "bytes": 9600
     },
     {
       "path": "docs/SUBAGENTS.md",
-      "bytes": 1343
+      "bytes": 2273
     },
     {
       "path": "docs/TECH_STACK.md",
@@ -186,8 +190,12 @@
       "bytes": 2514
     },
     {
+      "path": "docs/TRACEABILITY.md",
+      "bytes": 3888
+    },
+    {
       "path": "scripts/validate_context_pack.py",
-      "bytes": 2554
+      "bytes": 4365
     },
     {
       "path": "services/api/AGENTS.md",

@@ -99,6 +99,13 @@ FastAPI/Pydantic/SQLAlchemy:
 
 Conversion semantics делегируется общему core.
 
+### CLI
+
+- Thin local adapter for conversion and safe format inspection.
+- Reuses Rust core, exporter contracts and the common diagnostics model.
+- Does not own parser/math semantics and does not bypass input/security limits.
+- May emit human-readable output plus a stable machine-readable report for automation.
+
 ### Worker layer
 
 RabbitMQ + Celery:

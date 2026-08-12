@@ -3,6 +3,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+if hasattr(sys.stdin, "reconfigure"):
+    sys.stdin.reconfigure(encoding="utf-8")
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 MAX_PROGRESS = 900
 MAX_CONTEXT = 1800
 
@@ -31,8 +36,10 @@ progress_text = ""
 if progress.exists():
     try:
         raw = progress.read_text(encoding="utf-8", errors="replace")
-        # Prefer current section and cap aggressively.
-        idx = raw.find("## Current")
+        # Prefer the current snapshot and cap aggressively.
+        idx = raw.find("## Snapshot")
+        if idx < 0:
+            idx = raw.find("## Current")
         if idx >= 0:
             raw = raw[idx:]
         progress_text = raw[:MAX_PROGRESS].strip()
@@ -41,7 +48,7 @@ if progress.exists():
 
 context = (
     "Use progressive context loading: root AGENTS first; read only domain docs/local AGENTS needed for the current task. "
-    "Do not bulk-read ROADMAP/PROMPTS. Security-relevant work must consult docs/SECURITY.md; UI work consults DESIGN.md if non-empty. "
+    "Do not bulk-read ROADMAP/PROMPTS. Security-relevant work must consult docs/SECURITY.md; UI work consults docs/DESIGN.md if non-empty. "
     "Use subagents only when independent analysis justifies them."
 )
 if progress_text:

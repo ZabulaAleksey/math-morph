@@ -179,6 +179,12 @@ API keys:
 
 Explicit request settings override profile defaults when policy permits; otherwise profile defaults apply.
 
+### Local CLI adapter
+
+Provide a thin developer/operator CLI for local conversion and format inspection. It must reuse the same parser, semantic pipeline, exporters and structured diagnostics as the web/API paths rather than implement separate conversion behavior.
+
+Initial commands cover conversion and safe inspection, with machine-readable report output for automation. The CLI is not a second service boundary and must not bypass input limits, privacy rules or unsupported-content diagnostics.
+
 ## 14. Saved documents
 
 User preferences independently control saving web conversions, API conversions, originals and outputs.

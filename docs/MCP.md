@@ -1,16 +1,18 @@
 # MCP Policy and Configuration
 
-Конфигурация: `.codex/config.toml`.
+Активная `.codex/config.toml` сейчас не объявляет MCP servers. Выключенный пример находится в `.codex/mcp.optional.toml` и не загружается автоматически; нужную проверенную секцию следует вручную перенести в `.codex/config.toml` только при доказанном проектном пробеле.
 
 ## Принцип
 
 MCP подключается не «на всякий случай», а когда внешний источник/инструмент даёт конкретную пользу. Чем меньше tool surface, тем меньше context/tool-choice noise и supply-chain risk.
 
+MCP остаётся adapter к реальному источнику или сервису и не должен становиться вторым владельцем бизнес-логики MathMorph.
+
 ## Настроенные/предусмотренные MCP
 
 ### OpenAI Developer Docs
 
-Используется для актуальной документации Codex/OpenAI. Может быть включён по умолчанию, поскольку это узкий documentation source.
+Переиспользуется из глобальной AI Dev Team, если уже доступен. Проектный пример в `.codex/mcp.optional.toml` выключен и нужен только при отсутствии эквивалентного trusted documentation source.
 
 ### GitHub official MCP
 
@@ -35,6 +37,8 @@ MCP подключается не «на всякий случай», а ког�
 9. approval mode;
 10. как отключить сервер без поломки проекта.
 
+После настройки проверь соединение, schemas, read/write границы и отказоустойчивость подходящим MCP inspector/client до использования write tools.
+
 ## Data rules
 
 Запрещено передавать через MCP без отдельной необходимости:
@@ -50,5 +54,5 @@ MCP подключается не «на всякий случай», а ког�
 - Disabled MCP не должен считаться обязательной частью задач.
 - Docs research лучше делегировать read-only subagent, чтобы основной thread получил только итог.
 
-Official Codex reference: https://developers.openai.com/codex/mcp
+Official Codex reference: https://learn.chatgpt.com/docs/extend/mcp
 Official GitHub MCP: https://github.com/github/github-mcp-server

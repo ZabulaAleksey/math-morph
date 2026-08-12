@@ -1,7 +1,3 @@
-# Mathcad Converter & Parser Platform — Codex Overlay
-
-See `README_CONTEXT_PACK.md` for installation/compatibility.
-
 # Mathcad Converter & Parser Platform — AI Dev Team Overlay
 
 This pack is designed for a machine where **AI Dev Team Codex is already installed**.
@@ -23,6 +19,8 @@ It is intentionally **not** a second full agent team. It adds only Mathcad-speci
 - fallback full release Skill → `.agents/skills-optional/`.
 
 The global AI Dev Team should continue to own generic architecture, QA, security, frontend/backend, Git, DevOps, CI and release workflows whenever those capabilities already exist.
+
+See `README_CONTEXT_PACK.md` for installation and compatibility details.
 
 ## Install
 

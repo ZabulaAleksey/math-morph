@@ -2,6 +2,11 @@ import json
 import re
 import sys
 
+if hasattr(sys.stdin, "reconfigure"):
+    sys.stdin.reconfigure(encoding="utf-8")
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 def deny(reason: str):
     print(json.dumps({
         "hookSpecificOutput": {

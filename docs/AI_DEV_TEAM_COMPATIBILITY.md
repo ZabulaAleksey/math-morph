@@ -46,7 +46,7 @@ The budget is shared across **global + project** agents; it is not additive.
 
 - SIMPLE: 0 subagents normally.
 - STANDARD: 1–2 total subagents.
-- DEEP: up to 3–4 total subagents only for independent workstreams.
+- COMPLEX: up to 3–4 total subagents only for independent workstreams.
 
 Never launch both a global reviewer and a project fallback reviewer for the same question.
 

@@ -25,6 +25,7 @@ Read first:
 - `docs/TECH_STACK.md` — approved baseline stack.
 - `docs/ARCHITECTURE.md` — system boundaries and data flow.
 - `docs/ROADMAP.md` — staged development sequence.
+- `docs/TRACEABILITY.md` — lightweight mapping from specification sections to roadmap stages and verification evidence.
 - `docs/PROMPTS.md` — Codex prompt library; read only the current stage.
 - `docs/SECURITY.md` — OWASP Top 10:2025 mapping and project security rules.
 - `docs/PRIVACY.md` — privacy/zero-knowledge rules.
