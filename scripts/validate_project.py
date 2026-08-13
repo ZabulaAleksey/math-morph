@@ -13,6 +13,7 @@ REQUIRED_FILES = (
     "README.md",
     "Cargo.toml",
     "Cargo.lock",
+    "rust-toolchain.toml",
     "package.json",
     "pnpm-workspace.yaml",
     "pnpm-lock.yaml",
@@ -246,6 +247,14 @@ def validate_project(root: Path) -> list[str]:
             crate = _load_toml(manifest_path, errors)
             if crate.get("package", {}).get("name") != expected_name:
                 errors.append(f"unexpected crate name in {relative}")
+        if cargo.get("workspace", {}).get("package", {}).get("rust-version") != "1.88":
+            errors.append("Cargo workspace rust-version must equal 1.88")
+
+    toolchain_path = root / "rust-toolchain.toml"
+    if toolchain_path.is_file():
+        toolchain = _load_toml(toolchain_path, errors)
+        if toolchain.get("toolchain", {}).get("channel") != "1.88.0":
+            errors.append("rust-toolchain.toml channel must equal 1.88.0")
 
     cargo_lock_path = root / "Cargo.lock"
     if cargo_lock_path.is_file():

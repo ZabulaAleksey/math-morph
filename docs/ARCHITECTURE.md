@@ -67,6 +67,15 @@ DOCX/OMML          Markdown/...     Future Excel/Visio
 - аутентификация HTTP;
 - React UI.
 
+Текущая реализованная входная граница `mathcad-parser` разделена на четыре узких модуля:
+
+- `format` сопоставляет заявленное расширение с форматом, подтверждённым содержимым;
+- `mcdx` выполняет bounded ZIP preflight, перечисление и классификацию частей без извлечения на диск;
+- `xml_metadata` читает только безопасный root envelope, namespaces и schema URI без загрузки схем;
+- `diagnostic` содержит только scoped-коды этапов 015–026 до появления общего collector.
+
+Эта граница намеренно заканчивается до worksheet metadata, regions и AST. Неизвестные безопасные MCDX parts сохраняются в `ContainerManifest`, а не исчезают и не интерпретируются эвристически.
+
 ### Exporters
 
 - `WordEquationExporter`: AST/Display AST → уравнение OMML/Word.

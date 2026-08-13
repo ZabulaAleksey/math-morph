@@ -12,6 +12,12 @@
 
 Никогда не доверяй только расширению. Записывай заявленное расширение и определённый формат содержимого. Ошибка `FILE_EXTENSION_MISMATCH` может быть восстанавливаемой, если содержимое уверенно распознано и политика разрешает продолжение.
 
+Текущий detector подтверждает XMCD по root `worksheet` и namespace семейства `http://schemas.mathsoft.com/worksheet<version>`. MCDX подтверждается только корректно проинспектированным ZIP с точной частью `mathcad/worksheet.xml`; generic ZIP и один magic header не достаточны.
+
+Текущий MCDX reader ничего не извлекает на диск. Он применяет лимиты feature-SPEC, отвергает traversal, абсолютные/drive/backslash paths, duplicate/case-conflicting имена, symlinks, encryption и неподдерживаемое сжатие, затем сохраняет worksheet, resource и unknown metadata в детерминированном manifest. CRC32 является только metadata повреждения, не доказательством доверия.
+
+XML metadata reader разрешает только UTF-8, запрещает `DOCTYPE` и возвращает root namespace bindings и `xsi:schemaLocation` как строки без сетевой загрузки. Worksheet metadata и дочерние regions до этапа 027 не читаются.
+
 ## Выходные форматы
 
 ### DOCX — MVP

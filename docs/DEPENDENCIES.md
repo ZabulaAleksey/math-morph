@@ -3,7 +3,7 @@
 ## Основной стек
 
 - Frontend: Next.js, React, TypeScript, Tailwind, shadcn/ui, TanStack Query, Zustand, React Hook Form, Zod, next-intl.
-- Core: Rust, quick-xml, Serde, num/num-complex, nalgebra, WASM.
+- Core: Rust 1.88+, `quick-xml = 0.41.0`, `zip = 8.6.0`, Serde, num/num-complex, nalgebra, WASM.
 - Backend: Python, FastAPI, Pydantic, SQLAlchemy, Alembic, HTTPX, `uv`.
 - Данные и асинхронность: PostgreSQL, RabbitMQ, Celery, Redis, S3-совместимое хранилище/MinIO.
 - Аутентификация: Keycloak/OIDC/OAuth2/WebAuthn/TOTP; Telegram Bot API только для явно связанных flows и восстановления.
@@ -42,3 +42,11 @@
 ## Экспериментальные зависимости
 
 Экспериментальная зависимость должна быть изолирована за feature flag и не становиться обязательной для core без отдельного решения.
+
+## Принятые зависимости входной границы
+
+- `quick-xml = 0.41.0`: потоковый namespace-aware XML reader без optional features; выбранная версия закрывает известные DoS-проблемы более ранних releases.
+- `zip = 8.6.0`: поддерживаемая upstream ветка, default features отключены, включён только Rust Deflate backend; решение и повышение MSRV описаны в ADR-0006.
+- `thiserror = 2.0.17`: typed domain errors без включения payload в публичный `Display`.
+
+Все три версии и транзитивный граф закреплены в `Cargo.lock`. ZIP и XML readers не получают сетевой доступ и не выполняют postinstall scripts.

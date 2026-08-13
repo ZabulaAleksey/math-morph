@@ -68,6 +68,14 @@ def validate_fixtures(project_root: Path) -> list[str]:
     for category in sorted(TAXONOMY):
         if not (fixture_root / category).is_dir():
             errors.append(f"missing fixture category: {category}")
+    if fixture_root.is_dir():
+        actual_categories = {
+            path.name
+            for path in fixture_root.iterdir()
+            if path.is_dir() and not path.name.startswith(".")
+        }
+        for category in sorted(actual_categories - TAXONOMY):
+            errors.append(f"unknown fixture category: {category}")
 
     if not manifest_path.is_file():
         errors.append("missing fixture manifest: tests/fixtures/manifest.json")

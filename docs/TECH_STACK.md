@@ -14,12 +14,12 @@
 
 ## Mathcad core
 
-Язык: **Rust**.
+Язык: **Rust 1.88+**.
 
 Модули и crates должны развиваться вокруг:
 
 - определения формата и безопасного чтения контейнера;
-- parsing XMCD/MCDX (`quick-xml`, Serde, где уместно);
+- parsing XMCD/MCDX (`quick-xml = 0.41.0`, `zip = 8.6.0` с минимальными features; Serde, где уместно);
 - Mathcad AST;
 - семантического анализатора, таблицы символов и графа зависимостей;
 - evaluator и `EvaluationTrace`;

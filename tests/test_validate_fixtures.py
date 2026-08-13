@@ -33,6 +33,16 @@ class FixtureValidatorTests(unittest.TestCase):
 
         self.assertIn("fixture file is missing from manifest: corrupted/unlisted.xmcd", errors)
 
+    def test_unknown_taxonomy_category_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            fixture_root = self._copy_fixture_tree(root)
+            (fixture_root / "alien").mkdir()
+
+            errors = validate_fixtures(root)
+
+        self.assertIn("unknown fixture category: alien", errors)
+
     def test_parent_traversal_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
