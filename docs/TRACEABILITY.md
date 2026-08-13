@@ -21,8 +21,12 @@
 | Область требований | Этапы дорожной карты | Ожидаемая реализация / доказательства проверки | Статус |
 |---|---:|---|---|
 | NFR-FOUNDATION-001/002 | 001 | workspace manifests/lockfiles, пустые каркасы, `scripts/validate_project.py`, `tests/test_validate_project.py`, сборки Python/Next.js и `cargo check --workspace --locked` | verified |
-| NFR-CONTEXT-001/002 | 002–010 | канонические документы, project overlay и модульные `AGENTS.md`; каждый этап требует отдельной проверки | planned |
-| SPEC-02 входные форматы и безопасное определение | 011–035 | `crates/mathcad-parser/`, fixtures форматов, тесты повреждённых данных и контейнеров | planned |
+| NFR-CONTEXT-001/002 | 002–010 | канонические документы, project overlay и модульные `AGENTS.md`; `scripts/validate_project.py`, `tests/test_validate_project.py` | verified |
+| SPEC-02 fixture corpus | 011–014 | `tests/fixtures/manifest.json`, taxonomy directories, `scripts/validate_fixtures.py`, `tests/test_validate_fixtures.py` | verified |
+| SPEC-02 определение формата | 015–018 | `crates/mathcad-parser/src/format.rs`, `diagnostic.rs`, detector/mismatch tests в `tests/input_boundary.rs` | verified |
+| SPEC-02 безопасный MCDX container | 019–025 | `crates/mathcad-parser/src/mcdx.rs`, path/collision/limits/manifest tests в `tests/input_boundary.rs` | verified |
+| SPEC-02 XML root metadata | 026 | `crates/mathcad-parser/src/xml_metadata.rs`, UTF-8/DTD/namespace/schema/limits tests в `tests/input_boundary.rs` | verified |
+| SPEC-02 worksheet structure | 027–035 | worksheet metadata, regions, ordering, version compatibility и regression coverage | planned |
 | SPEC-04 архитектура конвертации | 036–061, 143–147 | AST, семантические границы, Document IR, тесты контракта конвейера | planned |
 | SPEC-05 экспорт редактируемых формул | 062–094 | `crates/exporter-docx/`, тесты OMML и пакета, smoke-эталоны Word | planned |
 | SPEC-06 преобразования и точность | 095–111 | `crates/math-engine/`, тесты сохранения семантики и trace | planned |

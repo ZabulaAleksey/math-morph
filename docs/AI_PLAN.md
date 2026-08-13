@@ -1,6 +1,6 @@
 # Текущий план AI — этапы 002–026
 
-**Статус:** выполняется с 2026-08-14.
+**Статус:** завершён и проверен 2026-08-14.
 
 ## Цель
 
@@ -26,12 +26,21 @@
 
 ## Контрольные точки
 
-- context contracts verified;
-- fixtures verified;
-- detector verified;
-- safe container verified;
-- XML metadata verified;
-- итоговый security/reviewer verdict без существенных замечаний.
+- context contracts — verified;
+- fixtures — verified;
+- detector — verified;
+- safe container — verified;
+- XML metadata — verified;
+- итоговые security/reviewer verdict — PASS без открытых существенных замечаний.
+
+## Результат
+
+- Этапы 002–010 подтверждены validator и отрицательными contract tests.
+- Этапы 011–026 реализованы в пределах `specs/features/input-formats-and-containers.spec.md`; worksheet parsing этапа 027+ не начат.
+- Python validators и 14 unit-тестов прошли.
+- На Rust 1.88 прошли format, 17 integration tests и Clippy с запретом warnings.
+- `Cargo.lock` просканирован `cargo-audit 0.22.2` по актуальной RustSec advisory DB: уязвимости не найдены.
+- Code review и security review завершены; найденные обходы path/XML validation и расхождения manifest/typed-error contract закрыты regression-тестами.
 
 ## Откат
 
