@@ -20,7 +20,8 @@
 
 | Область требований | Этапы дорожной карты | Ожидаемая реализация / доказательства проверки | Статус |
 |---|---:|---|---|
-| NFR-FOUNDATION-001/002, NFR-CONTEXT-001/002 | 001–010 | workspace manifests/lockfiles, пустые каркасы, канонические документы, `scripts/validate_project.py` и `tests/test_validate_project.py`; `cargo check` ожидает Rust toolchain | in progress |
+| NFR-FOUNDATION-001/002 | 001 | workspace manifests/lockfiles, пустые каркасы, `scripts/validate_project.py`, `tests/test_validate_project.py`, сборки Python/Next.js и `cargo check --workspace --locked` | verified |
+| NFR-CONTEXT-001/002 | 002–010 | канонические документы, project overlay и модульные `AGENTS.md`; каждый этап требует отдельной проверки | planned |
 | SPEC-02 входные форматы и безопасное определение | 011–035 | `crates/mathcad-parser/`, fixtures форматов, тесты повреждённых данных и контейнеров | planned |
 | SPEC-04 архитектура конвертации | 036–061, 143–147 | AST, семантические границы, Document IR, тесты контракта конвейера | planned |
 | SPEC-05 экспорт редактируемых формул | 062–094 | `crates/exporter-docx/`, тесты OMML и пакета, smoke-эталоны Word | planned |

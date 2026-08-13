@@ -1,5 +1,7 @@
 # Текущий план AI — этап 001
 
+**Статус:** завершён и проверен 2026-08-14.
+
 ## Цель
 
 Создать минимальный собираемый monorepo-каркас без бизнес-логики и одновременно привести project overlay к каноническому глобальному контракту.
@@ -31,6 +33,8 @@
 - `AC-FOUNDATION-003`: Python package собирается через `uv build`.
 - `AC-FOUNDATION-004`: Next.js app проходит typecheck и production build.
 - `AC-FOUNDATION-005`: в каркасах нет parser, conversion, API endpoint или UI-функций будущих этапов.
+
+Все критерии этапа выполнены. `cargo check --workspace --locked` подтверждён в официальном контейнере Rust 1.85; остальные проверки перечислены в `docs/AI_STATUS.md` и итоговом отчёте этапа.
 
 ## Откат
 
