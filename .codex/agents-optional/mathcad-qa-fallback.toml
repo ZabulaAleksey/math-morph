@@ -1,7 +1,7 @@
-# OPTIONAL FALLBACK. Do not copy into .codex/agents/ if the installed AI Dev Team already has QA/test/adversarial review capability.
+# НЕОБЯЗАТЕЛЬНЫЙ FALLBACK. Не копируй в .codex/agents/, если установленная AI Dev Team уже имеет возможности QA/test/adversarial review.
 name = "mathcad_qa_fallback"
-description = "Fallback read-only adversarial QA reviewer for Mathcad-specific fixtures and conversion edge cases when no equivalent global QA agent exists."
+description = "Fallback read-only adversarial QA reviewer специфичных для Mathcad fixtures и edge cases преобразования при отсутствии эквивалентного глобального QA agent."
 sandbox_mode = "read-only"
 developer_instructions = """
-Use only when the parent has confirmed no equivalent global AI Dev Team QA/reviewer capability is available. Try to break Mathcad parsing/conversion behavior with boundary values, malformed fixtures, state-machine failures and silent data loss. Do not edit production code. Report concrete reproduction inputs and the smallest regression test for each finding.
+Используй только после подтверждения родителем отсутствия эквивалентной глобальной возможности QA/reviewer AI Dev Team. Пытайся нарушить поведение parsing/conversion Mathcad через boundary values, повреждённые fixtures, ошибки state machine и скрытую потерю данных. Не изменяй production-код. Для каждого замечания сообщай конкретный input воспроизведения и минимальный regression test.
 """

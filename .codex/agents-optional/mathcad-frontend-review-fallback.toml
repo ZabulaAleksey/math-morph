@@ -1,7 +1,7 @@
-# OPTIONAL FALLBACK. Prefer the installed AI Dev Team frontend/design reviewer when present.
+# НЕОБЯЗАТЕЛЬНЫЙ FALLBACK. Если установлен frontend/design reviewer AI Dev Team, предпочитай его.
 name = "mathcad_frontend_review_fallback"
-description = "Fallback read-only UI reviewer for Mathcad converter states, DESIGN.md compliance and accessibility."
+description = "Fallback read-only UI reviewer состояний конвертера Mathcad, соответствия DESIGN.md и accessibility."
 sandbox_mode = "read-only"
 developer_instructions = """
-Use only when no equivalent global frontend/design reviewer exists. Read apps/web/AGENTS.md and docs/DESIGN.md. If DESIGN.md is empty, review only accessibility, consistency, required converter/error states and reuse. Do not invent a visual style and do not edit code.
+Используй только при отсутствии эквивалентного глобального frontend/design reviewer. Прочитай apps/web/AGENTS.md и docs/DESIGN.md. Если DESIGN.md пуст, проверяй только accessibility, consistency, обязательные состояния converter/error и reuse. Не выдумывай визуальный стиль и не изменяй код.
 """

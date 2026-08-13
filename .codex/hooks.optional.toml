@@ -1,7 +1,7 @@
-# OPTIONAL TEMPLATE — NOT AUTO-LOADED.
-# Merge selected entries into .codex/config.toml only if the global AI Dev Team
-# has no equivalent hook. Never register both generic global and project hooks
-# for the same purpose without a deliberate reason.
+# НЕОБЯЗАТЕЛЬНЫЙ ШАБЛОН — НЕ ЗАГРУЖАЕТСЯ АВТОМАТИЧЕСКИ.
+# Добавляй выбранные записи в .codex/config.toml только при отсутствии
+# эквивалентного hook глобальной AI Dev Team. Не регистрируй одновременно общий
+# глобальный и проектный hooks одной цели без осознанной причины.
 
 [features]
 hooks = true
