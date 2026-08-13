@@ -6,7 +6,6 @@ import sys
 import tomllib
 from pathlib import Path
 
-
 REQUIRED_FILES = (
     "AGENTS.md",
     "README.md",
@@ -18,16 +17,45 @@ REQUIRED_FILES = (
     "specs/README.md",
     "specs/system.spec.md",
     "docs/ARCHITECTURE.md",
+    "docs/API.md",
+    "docs/DEPENDENCIES.md",
     "docs/DECISIONS.md",
     "docs/DESIGN.md",
+    "docs/FORMATS.md",
     "docs/AI_PLAN.md",
     "docs/AI_STATUS.md",
+    "docs/PRIVACY.md",
+    "docs/PROMPTS.md",
     "docs/ROADMAP.md",
+    "docs/SECURITY.md",
+    "docs/TECH_STACK.md",
+    "docs/TESTING.md",
+    "docs/TRACEABILITY.md",
     "docs/CONTEXT_COMPATIBILITY.md",
+    "crates/mathcad-parser/AGENTS.md",
+    "crates/math-engine/AGENTS.md",
+    "crates/exporter-docx/AGENTS.md",
+    "apps/web/AGENTS.md",
+    "services/api/AGENTS.md",
+    "tests/AGENTS.md",
     "services/api/pyproject.toml",
     "services/api/uv.lock",
     "apps/web/package.json",
 )
+
+CONTEXT_CONTRACTS = {
+    "AGENTS.md": ("Маршрутизация контекста", "Инварианты проекта"),
+    "docs/DESIGN.md": (
+        "Пользовательский интерфейс ещё не реализован",
+        "визуальная система владельцем продукта не утверждена",
+    ),
+    "crates/mathcad-parser/AGENTS.md": ("Parser знает формат",),
+    "crates/math-engine/AGENTS.md": ("Вычисление и представление разделены",),
+    "crates/exporter-docx/AGENTS.md": ("редактируемыми структурами Word/OMML",),
+    "apps/web/AGENTS.md": ("docs/DESIGN.md",),
+    "services/api/AGENTS.md": ("/api/v1",),
+    "tests/AGENTS.md": ("регрессионный тест или fixture",),
+}
 
 LEGACY_PATHS = (
     ".agents/skills-optional",
@@ -66,6 +94,28 @@ EXPECTED_CRATES = {
     "crates/math-engine": "math-engine",
     "crates/exporter-docx": "exporter-docx",
 }
+
+CANONICAL_DOCUMENTS = (
+    "README.md",
+    "specs/README.md",
+    "specs/system.spec.md",
+    "docs/API.md",
+    "docs/ARCHITECTURE.md",
+    "docs/CONTEXT_COMPATIBILITY.md",
+    "docs/DECISIONS.md",
+    "docs/DEPENDENCIES.md",
+    "docs/DESIGN.md",
+    "docs/FORMATS.md",
+    "docs/AI_PLAN.md",
+    "docs/AI_STATUS.md",
+    "docs/PRIVACY.md",
+    "docs/PROMPTS.md",
+    "docs/ROADMAP.md",
+    "docs/SECURITY.md",
+    "docs/TECH_STACK.md",
+    "docs/TESTING.md",
+    "docs/TRACEABILITY.md",
+)
 
 MARKDOWN_LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 IGNORED_MARKDOWN_PARTS = {
@@ -128,9 +178,22 @@ def validate_project(root: Path) -> list[str]:
         if (root / relative).exists():
             errors.append(f"legacy path must be removed: {relative}")
 
-    design = root / "docs/DESIGN.md"
-    if design.is_file() and not design.read_text(encoding="utf-8").strip():
-        errors.append("docs/DESIGN.md must explicitly describe the current UI/design state")
+    for relative, markers in CONTEXT_CONTRACTS.items():
+        path = root / relative
+        if not path.is_file():
+            continue
+        contents = path.read_text(encoding="utf-8")
+        if not contents.strip():
+            errors.append(f"context contract must not be empty: {relative}")
+            continue
+        for marker in markers:
+            if marker not in contents:
+                errors.append(f"context contract {relative} is missing marker: {marker}")
+
+    for relative in CANONICAL_DOCUMENTS:
+        path = root / relative
+        if path.is_file() and not path.read_text(encoding="utf-8").strip():
+            errors.append(f"canonical document must not be empty: {relative}")
 
     spec = root / "specs/system.spec.md"
     if spec.is_file():
