@@ -21,6 +21,14 @@ fn archive(entries: &[(&str, &[u8], CompressionMethod)]) -> Vec<u8> {
     writer.finish().expect("finish test ZIP").into_inner()
 }
 
+fn archive_with_directory() -> Vec<u8> {
+    let mut writer = ZipWriter::new(Cursor::new(Vec::new()));
+    writer
+        .add_directory("resources/", SimpleFileOptions::default())
+        .expect("test ZIP directory");
+    writer.finish().expect("finish test ZIP").into_inner()
+}
+
 fn mcdx() -> Vec<u8> {
     archive(&[(
         "mathcad/worksheet.xml",
@@ -132,6 +140,7 @@ fn builds_deterministic_manifest_without_extracting_parts() {
         .expect("safe inventory");
 
     assert_eq!(manifest.parts.len(), 3);
+    assert!(!manifest.parts[0].is_directory);
     assert_eq!(manifest.parts[0].kind, ContainerPartKind::Worksheet);
     assert_eq!(
         manifest.parts[1].kind,
@@ -149,11 +158,23 @@ fn builds_deterministic_manifest_without_extracting_parts() {
 }
 
 #[test]
+fn records_directory_flag_and_kind_in_manifest() {
+    let manifest = SafeMcdxReader::default()
+        .inspect(&archive_with_directory())
+        .expect("safe directory inventory");
+
+    assert_eq!(manifest.parts.len(), 1);
+    assert!(manifest.parts[0].is_directory);
+    assert_eq!(manifest.parts[0].kind, ContainerPartKind::Directory);
+}
+
+#[test]
 fn rejects_traversal_drive_backslash_and_ambiguous_paths() {
     for unsafe_name in [
         "../escape.xml",
         "/absolute.xml",
         "C:/drive.xml",
+        "C:drive-relative.xml",
         "mathcad\\worksheet.xml",
         "mathcad//worksheet.xml",
     ] {
@@ -239,6 +260,21 @@ fn rejects_encrypted_and_unsupported_compression_metadata() {
         ),
         "{compression_error:?}"
     );
+}
+
+#[test]
+fn rejects_out_of_bounds_local_header_offset_without_panic() {
+    let mut bytes = archive(&[("entry.bin", b"value", CompressionMethod::Stored)]);
+    let central = bytes
+        .windows(4)
+        .position(|window| window == b"PK\x01\x02")
+        .expect("central header");
+    bytes[central + 42..central + 46].copy_from_slice(&u32::MAX.to_le_bytes());
+
+    assert!(matches!(
+        SafeMcdxReader::default().inspect(&bytes),
+        Err(ContainerError::InvalidZip)
+    ));
 }
 
 #[test]
@@ -382,6 +418,24 @@ fn rejects_unsupported_encoding_and_malformed_schema_location() {
         inspect_xml_metadata(malformed, XmlMetadataLimits::default()),
         Err(XmlMetadataError::MalformedSchemaLocation)
     ));
+
+    let invalid_utf8 = b"<worksheet note=\"\xff\"/>";
+    assert!(matches!(
+        inspect_xml_metadata(invalid_utf8, XmlMetadataLimits::default()),
+        Err(XmlMetadataError::UnsupportedEncoding)
+    ));
+
+    let unknown_entity = br#"<worksheet note="&undefined;"/>"#;
+    assert!(matches!(
+        inspect_xml_metadata(unknown_entity, XmlMetadataLimits::default()),
+        Err(XmlMetadataError::MalformedXml)
+    ));
+
+    let unknown_namespace_entity = br#"<worksheet xmlns:x="&undefined;"/>"#;
+    assert!(matches!(
+        inspect_xml_metadata(unknown_namespace_entity, XmlMetadataLimits::default()),
+        Err(XmlMetadataError::MalformedXml)
+    ));
 }
 
 #[test]
@@ -410,6 +464,6 @@ fn enforces_xml_input_attribute_and_namespace_limits() {
     };
     assert!(matches!(
         inspect_xml_metadata(b"<worksheet xmlns:a=\"a\" xmlns:b=\"b\"/>", limits),
-        Err(XmlMetadataError::NamespaceLimitExceeded) | Err(XmlMetadataError::MalformedXml)
+        Err(XmlMetadataError::NamespaceLimitExceeded)
     ));
 }

@@ -83,6 +83,7 @@ pub enum ContainerPartKind {
 pub struct ContainerPart {
     pub index: usize,
     pub name: String,
+    pub is_directory: bool,
     pub compressed_size: u64,
     pub uncompressed_size: u64,
     pub crc32: u32,
@@ -232,6 +233,7 @@ impl SafeMcdxReader {
             parts.push(ContainerPart {
                 index,
                 name: canonical_name,
+                is_directory,
                 compressed_size,
                 uncompressed_size,
                 crc32: entry.crc32(),
@@ -279,10 +281,10 @@ fn validate_raw_name(
     limits: &ContainerLimits,
 ) -> Result<String, ContainerError> {
     let trimmed_name = raw_name.trim_end_matches('/');
-    let has_drive_prefix = raw_name
-        .split('/')
-        .next()
-        .is_some_and(|component| component.ends_with(':'));
+    let has_drive_prefix = raw_name.split('/').next().is_some_and(|component| {
+        let bytes = component.as_bytes();
+        bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':'
+    });
     if raw_name.is_empty()
         || trimmed_name.is_empty()
         || raw_name.as_bytes().contains(&0)
@@ -346,7 +348,7 @@ fn preflight_zip(bytes: &[u8], limits: &ContainerLimits) -> Result<usize, Contai
     let mut folded_names = HashSet::new();
     let mut ranges = Vec::with_capacity(entry_count);
     for index in 0..entry_count {
-        if bytes.get(cursor..cursor + 4) != Some(b"PK\x01\x02") {
+        if read_slice(bytes, cursor, 4)? != b"PK\x01\x02" {
             return Err(ContainerError::InvalidZip);
         }
         let flags = read_u16(bytes, cursor + 8)?;
@@ -392,15 +394,28 @@ fn preflight_zip(bytes: &[u8], limits: &ContainerLimits) -> Result<usize, Contai
             return Err(ContainerError::Symlink { index });
         }
 
-        if bytes.get(local_start..local_start + 4) != Some(b"PK\x03\x04") {
+        if read_slice(bytes, local_start, 4)? != b"PK\x03\x04" {
             return Err(ContainerError::InvalidZip);
         }
-        if read_u16(bytes, local_start + 6)? != flags || read_u16(bytes, local_start + 8)? != method
+        let local_flags_offset = local_start
+            .checked_add(6)
+            .ok_or(ContainerError::InvalidZip)?;
+        let local_method_offset = local_start
+            .checked_add(8)
+            .ok_or(ContainerError::InvalidZip)?;
+        if read_u16(bytes, local_flags_offset)? != flags
+            || read_u16(bytes, local_method_offset)? != method
         {
             return Err(ContainerError::InvalidZip);
         }
-        let local_name_len = usize::from(read_u16(bytes, local_start + 26)?);
-        let local_extra_len = usize::from(read_u16(bytes, local_start + 28)?);
+        let local_name_length_offset = local_start
+            .checked_add(26)
+            .ok_or(ContainerError::InvalidZip)?;
+        let local_extra_length_offset = local_start
+            .checked_add(28)
+            .ok_or(ContainerError::InvalidZip)?;
+        let local_name_len = usize::from(read_u16(bytes, local_name_length_offset)?);
+        let local_extra_len = usize::from(read_u16(bytes, local_extra_length_offset)?);
         let local_name_start = local_start
             .checked_add(30)
             .ok_or(ContainerError::InvalidZip)?;
@@ -446,17 +461,20 @@ fn find_eocd(bytes: &[u8]) -> Option<usize> {
 }
 
 fn read_u16(bytes: &[u8], offset: usize) -> Result<u16, ContainerError> {
-    let value = bytes
-        .get(offset..offset + 2)
-        .ok_or(ContainerError::InvalidZip)?;
+    let value = read_slice(bytes, offset, 2)?;
     Ok(u16::from_le_bytes([value[0], value[1]]))
 }
 
 fn read_u32(bytes: &[u8], offset: usize) -> Result<u32, ContainerError> {
-    let value = bytes
-        .get(offset..offset + 4)
-        .ok_or(ContainerError::InvalidZip)?;
+    let value = read_slice(bytes, offset, 4)?;
     Ok(u32::from_le_bytes([value[0], value[1], value[2], value[3]]))
+}
+
+fn read_slice(bytes: &[u8], offset: usize, length: usize) -> Result<&[u8], ContainerError> {
+    let end = offset
+        .checked_add(length)
+        .ok_or(ContainerError::InvalidZip)?;
+    bytes.get(offset..end).ok_or(ContainerError::InvalidZip)
 }
 
 fn exceeds_ratio(uncompressed: u64, compressed: u64, maximum: u64) -> bool {

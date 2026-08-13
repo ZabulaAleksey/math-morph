@@ -1,7 +1,7 @@
 use std::str;
 
 use quick_xml::events::{BytesStart, Event};
-use quick_xml::name::{PrefixDeclaration, ResolveResult};
+use quick_xml::name::{NamespaceError, PrefixDeclaration, ResolveResult};
 use quick_xml::{NsReader, XmlVersion};
 use thiserror::Error;
 
@@ -80,6 +80,7 @@ pub fn inspect_xml_metadata(
     if starts_with_utf16_bom(bytes) {
         return Err(XmlMetadataError::UnsupportedEncoding);
     }
+    str::from_utf8(bytes).map_err(|_| XmlMetadataError::UnsupportedEncoding)?;
 
     let mut reader = NsReader::from_reader(bytes);
     reader
@@ -172,6 +173,9 @@ fn build_metadata(
         if attribute.value.len() > limits.max_attribute_value_bytes {
             return Err(XmlMetadataError::AttributeLimitExceeded);
         }
+        let value = attribute
+            .decoded_and_normalized_value(XmlVersion::Implicit1_0, reader.decoder())
+            .map_err(|_| XmlMetadataError::MalformedXml)?;
         if attribute.key.as_namespace_binding().is_some() {
             continue;
         }
@@ -187,9 +191,6 @@ fn build_metadata(
         if !is_xsi_namespace {
             continue;
         }
-        let value = attribute
-            .decoded_and_normalized_value(XmlVersion::Implicit1_0, reader.decoder())
-            .map_err(|_| XmlMetadataError::MalformedXml)?;
         match local_name.as_ref() {
             b"schemaLocation" => {
                 let tokens: Vec<&str> = value.split_whitespace().collect();
@@ -223,9 +224,10 @@ fn starts_with_utf16_bom(bytes: &[u8]) -> bool {
 }
 
 fn map_xml_error(error: quick_xml::Error) -> XmlMetadataError {
-    if error.to_string().contains("namespace declarations") {
-        XmlMetadataError::NamespaceLimitExceeded
-    } else {
-        XmlMetadataError::MalformedXml
+    match error {
+        quick_xml::Error::Namespace(NamespaceError::TooManyDeclarations(_)) => {
+            XmlMetadataError::NamespaceLimitExceeded
+        }
+        _ => XmlMetadataError::MalformedXml,
     }
 }
