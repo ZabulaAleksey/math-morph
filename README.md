@@ -1,36 +1,30 @@
-# Платформа конвертации и parsing Mathcad — overlay AI Dev Team
+# MathMorph
 
-Этот пакет предназначен для компьютера, на котором **AI Dev Team Codex уже установлена**.
+MathMorph — monorepo расширяемой платформы parsing и конвертации Mathcad. Первый продуктовый путь: `.xmcd`/`.mcdx` → редактируемый DOCX/OMML.
 
-Он намеренно **не является** второй полной командой агентов. Пакет добавляет только специфичные для Mathcad правила, специалистов и workflows.
+## Состояние
 
-## Что активно по умолчанию
+Проект находится на этапе базового bootstrap. Предметная логика parser, math-engine, exporter, API и web ещё не реализована.
 
-- корневые и локальные правила проекта `AGENTS.md`;
-- специфичные для Mathcad субагенты в `.codex/agents/`;
-- специфичные для Mathcad Skills в `.agents/skills/`;
-- документация по архитектуре, безопасности и контексту.
+## Структура
 
-## Что намеренно неактивно по умолчанию
+- `crates/` — Rust core и exporters;
+- `services/api/` — Python package будущего FastAPI adapter;
+- `apps/web/` — минимальный Next.js App Router shell;
+- `specs/` — канонические требования;
+- `docs/` — архитектура, решения, план, статус и предметные контракты;
+- `tests/` — project-level проверки и будущие fixtures.
 
-- универсальные fallback-агенты QA, безопасности и frontend → `.codex/agents-optional/`;
-- проектные hooks → `.codex/hooks-optional/` + `.codex/hooks.optional.toml`;
-- проектные MCP-серверы → `.codex/mcp.optional.toml`;
-- fallback Skill полной release-проверки → `.agents/skills-optional/`.
+## Быстрая проверка
 
-Глобальная AI Dev Team должна продолжать отвечать за универсальную архитектуру, QA, безопасность, frontend/backend, Git, DevOps, CI и release workflows, если эти возможности уже существуют.
+```powershell
+python scripts/validate_project.py
+python -m unittest discover -s tests -p "test_*.py"
+uv build --project services/api
+pnpm.cmd install --frozen-lockfile
+pnpm.cmd --filter @math-morph/web typecheck
+pnpm.cmd --filter @math-morph/web build
+cargo check --workspace
+```
 
-Подробности установки и совместимости см. в `README_CONTEXT_PACK.md`.
-
-## Установка
-
-1. Скопируй пакет в репозиторий проекта.
-2. Не изменяй существующую глобальную или пользовательскую конфигурацию Codex.
-3. Перед включением любого необязательного agent, hook или MCP прочитай `docs/AI_DEV_TEAM_COMPATIBILITY.md`.
-4. Добавь канонические `SPECIFICATION.md`, `TECH_STACK.md`, `PROMPTS.md`, `ROADMAP.md`, если их ещё нет.
-5. Заполни `docs/DESIGN.md` отдельно; сейчас он намеренно пуст.
-6. Выполни `python scripts/validate_context_pack.py`.
-
-## Стратегия контекста
-
-Родительский поток должен получать только проектные дополнения. Не загружай повторно всю конфигурацию глобальной AI Dev Team, всех агентов, все Skills или всю дорожную карту. Делегируй только тогда, когда предметный специалист существенно улучшает выполнение задачи.
+Команда `cargo check` требует установленного Rust toolchain. Перед изменениями прочитай корневой и ближайший модульный `AGENTS.md`, затем выбери требования через `specs/README.md`.

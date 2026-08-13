@@ -6,7 +6,7 @@
 
 - **001** — `monorepo`
 - **002** — `canonical docs`
-- **003** — `empty design contract`
+- **003** — `minimal design contract`
 - **004** — `root AGENTS`
 - **005** — `parser AGENTS`
 - **006** — `math-engine AGENTS`

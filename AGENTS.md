@@ -4,7 +4,8 @@
 
 ## Маршрутизация контекста
 
-- Перед изменением проектных агентов, hooks, MCP или поведения контекста прочитай `docs/AI_DEV_TEAM_COMPATIBILITY.md`.
+- Перед изменением проектных agents, Skills, hooks, MCP или поведения контекста прочитай `docs/CONTEXT_COMPATIBILITY.md`.
+- Для существенной реализации выбери SPEC через `specs/README.md`, затем прочитай текущие `docs/AI_PLAN.md` и `docs/AI_STATUS.md`.
 - Работа с parser: `crates/mathcad-parser/AGENTS.md`.
 - Математическая семантика: `crates/math-engine/AGENTS.md`.
 - Экспорт DOCX/OMML: `crates/exporter-docx/AGENTS.md`.
@@ -20,4 +21,4 @@
 - При работе с загрузкой файлов, parsing, аутентификацией, хранением или криптографией прочитай соответствующий раздел `docs/SECURITY.md`.
 - Необязательные hooks и фрагменты MCP остаются отключёнными до явной проверки и включения.
 
-Проверяй изменения контекста командой `python scripts/validate_context_pack.py`. Загружай только относящийся к задаче документ или раздел SPEC; никогда не загружай заранее всю библиотеку prompts, дерево правил или `LEARNING_LOG.md`.
+Проверяй структуру и контекст командой `python scripts/validate_project.py`. Загружай только относящийся к задаче документ или раздел SPEC; никогда не загружай заранее всю библиотеку prompts, дерево правил или `LEARNING_LOG.md`.

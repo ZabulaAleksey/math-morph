@@ -9,6 +9,22 @@
 # Python
 .venv/
 __pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+
+# Rust
+target/
+
+# Node / Next.js
+node_modules/
+.pnpm-store/
+.next/
+out/
+*.tsbuildinfo
+
+# Project-local tool caches
+.cache/
 
 # Local Codex logs/temp
 .codex-log/

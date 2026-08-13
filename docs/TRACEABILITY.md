@@ -6,7 +6,7 @@
 
 Канонические источники:
 
-- требования продукта: `docs/SPECIFICATION.md`;
+- требования продукта: `specs/system.spec.md`;
 - порядок реализации и стабильные номера этапов: `docs/ROADMAP.md`;
 - исполняемые части этапов: соответствующий раздел `docs/PROMPTS.md`;
 - архитектурные ограничения и решения: `docs/ARCHITECTURE.md` и `docs/DECISIONS.md`;
@@ -20,7 +20,7 @@
 
 | Область требований | Этапы дорожной карты | Ожидаемая реализация / доказательства проверки | Статус |
 |---|---:|---|---|
-| SPEC-18 основа и границы проекта | 001–010 | структура monorepo, канонические документы контекста и проверка пакета контекста | planned |
+| NFR-FOUNDATION-001/002, NFR-CONTEXT-001/002 | 001–010 | workspace manifests/lockfiles, пустые каркасы, канонические документы, `scripts/validate_project.py` и `tests/test_validate_project.py`; `cargo check` ожидает Rust toolchain | in progress |
 | SPEC-02 входные форматы и безопасное определение | 011–035 | `crates/mathcad-parser/`, fixtures форматов, тесты повреждённых данных и контейнеров | planned |
 | SPEC-04 архитектура конвертации | 036–061, 143–147 | AST, семантические границы, Document IR, тесты контракта конвейера | planned |
 | SPEC-05 экспорт редактируемых формул | 062–094 | `crates/exporter-docx/`, тесты OMML и пакета, smoke-эталоны Word | planned |

@@ -1,4 +1,19 @@
-# Спецификация продукта — платформа конвертации и parsing Mathcad
+# Системная спецификация — платформа конвертации и parsing Mathcad
+
+## 0. Основа проекта
+
+- `NFR-FOUNDATION-001`: проект должен быть единым monorepo с независимыми workspace-областями для Rust core/exporters, Python API adapter и Next.js web app.
+- `NFR-FOUNDATION-002`: базовый каркас каждой области должен собираться без реализации функций следующих этапов.
+- `NFR-CONTEXT-001`: стабильные требования хранятся в `specs/`, текущая работа — в одном `docs/AI_PLAN.md`, фактическое состояние — в одном `docs/AI_STATUS.md`.
+- `NFR-CONTEXT-002`: project overlay не должен дублировать глобальные Git workflow, универсальные agents, hooks, MCP или release-процессы.
+
+Критерии приёмки основы:
+
+- `AC-FOUNDATION-001`: project validator подтверждает наличие канонических документов и отсутствие legacy `PROGRESS.md`, `SPECIFICATION.md` и context-pack inventory.
+- `AC-FOUNDATION-002`: `cargo check --workspace` проверяет три пустых Rust crates.
+- `AC-FOUNDATION-003`: `uv build --project services/api` создаёт Python sdist и wheel.
+- `AC-FOUNDATION-004`: web package проходит TypeScript typecheck и production build на поддерживаемой версии Node.js.
+- `AC-FOUNDATION-005`: repository-level regression включает успешный и негативный структурный сценарий.
 
 ## 1. Назначение
 

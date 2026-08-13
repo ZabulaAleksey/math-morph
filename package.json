@@ -1,0 +1,13 @@
+{
+  "name": "math-morph",
+  "private": true,
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "build:web": "pnpm --filter @math-morph/web build",
+    "dev:web": "pnpm --filter @math-morph/web dev",
+    "typecheck": "pnpm --filter @math-morph/web typecheck"
+  }
+}
