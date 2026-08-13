@@ -1,41 +1,38 @@
-# Текущий план AI — этап 001
+# Текущий план AI — этапы 002–026
 
-**Статус:** завершён и проверен 2026-08-14.
+**Статус:** выполняется с 2026-08-14.
 
 ## Цель
 
-Создать минимальный собираемый monorepo-каркас без бизнес-логики и одновременно привести project overlay к каноническому глобальному контракту.
+Формально проверить существующий context foundation этапов 002–010 и реализовать ограниченную границу недоверенного Mathcad input этапов 011–026. Содержательное чтение worksheet начинается только с этапа 027 и в этот план не входит.
 
-## Требования
+## Режим и источники
 
-- `NFR-FOUNDATION-001` — единый monorepo с изолированными Rust, Python и Next.js областями.
-- `NFR-CONTEXT-001` — один системный SPEC, один текущий план и один снимок состояния без дублирования глобального контекста.
-
-## Области файлов
-
-- workspace manifests в корне;
-- `crates/mathcad-parser`, `crates/math-engine`, `crates/exporter-docx`;
-- `services/api`;
-- `apps/web`;
-- `specs/`, канонические документы `docs/` и validator проекта.
+- сложность: `COMPLEX`;
+- режим: production;
+- SDLC: specification → architecture → implementation → testing → security/review;
+- домен/стек: document conversion, hostile XML/ZIP, Rust 1.88;
+- SPEC: `specs/system.spec.md` и `specs/features/input-formats-and-containers.spec.md`.
 
 ## Порядок
 
-1. Мигрировать устаревшие имена и убрать obsolete context-pack документы и fallback-автоматизацию.
-2. Добавить workspace manifests и минимальные собираемые каркасы без предметной логики.
-3. Добавить структурную проверку и негативный тест.
-4. Запустить доступные проверки, выполнить review и обновить `AI_STATUS`/traceability.
+1. **002–010:** расширить project validator каноническими документами и всеми локальными `AGENTS.md`; добавить отрицательные contract tests; провести review и отметить этапы только после доказательства.
+2. **011–014:** создать taxonomy, versioned fixture manifest, fail-closed validator и synthetic corrupted/security fixtures.
+3. **015–018:** реализовать content-based `InputFormat`/`FormatDetector`, XMCD/MCDX detection и `FILE_EXTENSION_MISMATCH`.
+4. **019–025:** реализовать ограниченную ZIP-инспекцию, path policy, лимиты, manifest и классификацию worksheet/resource/unknown.
+5. **026:** реализовать namespace/schema root metadata без worksheet parsing.
+6. Выполнить format/lint/test/build, project/fixture validators, security review, независимый code review и проверку соответствия SPEC.
+7. Обновить `AI_STATUS.md`, `TRACEABILITY.md`, затронутые архитектурные решения и зафиксировать завершённые логические блоки коммитами.
 
-## Критерии приёмки
+## Контрольные точки
 
-- `AC-FOUNDATION-001`: validator подтверждает канонические документы и отсутствие устаревших источников состояния.
-- `AC-FOUNDATION-002`: Rust manifests образуют workspace из трёх существующих crates.
-- `AC-FOUNDATION-003`: Python package собирается через `uv build`.
-- `AC-FOUNDATION-004`: Next.js app проходит typecheck и production build.
-- `AC-FOUNDATION-005`: в каркасах нет parser, conversion, API endpoint или UI-функций будущих этапов.
-
-Все критерии этапа выполнены. `cargo check --workspace --locked` подтверждён в официальном контейнере Rust 1.85; остальные проверки перечислены в `docs/AI_STATUS.md` и итоговом отчёте этапа.
+- context contracts verified;
+- fixtures verified;
+- detector verified;
+- safe container verified;
+- XML metadata verified;
+- итоговый security/reviewer verdict без существенных замечаний.
 
 ## Откат
 
-Изменение ограничено одним Git-коммитом; откат выполняется отменой этого коммита. Миграций данных и внешнего состояния нет.
+Каждый логический блок оформляется отдельным коммитом. Миграций данных и внешнего состояния нет; откат выполняется отменой соответствующего коммита. Повышение MSRV и выбор ZIP dependency фиксируются отдельным ADR.

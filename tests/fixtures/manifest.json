@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "id": "xmcd-minimal-worksheet30",
+      "path": "xmcd/minimal-worksheet30.xmcd",
+      "format": "xmcd",
+      "version": "worksheet30",
+      "features": [
+        "namespace",
+        "schema-location"
+      ],
+      "expected_status": "accepted"
+    },
+    {
+      "id": "corrupted-truncated-xmcd",
+      "path": "corrupted/truncated.xmcd",
+      "format": "xmcd",
+      "version": "unknown",
+      "features": [
+        "truncated-xml"
+      ],
+      "expected_status": "rejected"
+    },
+    {
+      "id": "security-doctype-xmcd",
+      "path": "security/doctype-external-entity.xmcd",
+      "format": "xmcd",
+      "version": "worksheet30",
+      "features": [
+        "doctype",
+        "external-entity"
+      ],
+      "expected_status": "rejected"
+    }
+  ]
+}

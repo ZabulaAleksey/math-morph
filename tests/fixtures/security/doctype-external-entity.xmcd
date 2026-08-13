@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE worksheet [<!ENTITY external SYSTEM "https://example.invalid/entity">]>
+<worksheet xmlns="http://schemas.mathsoft.com/worksheet30">&external;</worksheet>

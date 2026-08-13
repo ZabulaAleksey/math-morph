@@ -6,6 +6,8 @@ import sys
 import tomllib
 from pathlib import Path
 
+from validate_fixtures import validate_fixtures
+
 REQUIRED_FILES = (
     "AGENTS.md",
     "README.md",
@@ -41,6 +43,9 @@ REQUIRED_FILES = (
     "services/api/pyproject.toml",
     "services/api/uv.lock",
     "apps/web/package.json",
+    "scripts/validate_fixtures.py",
+    "tests/fixtures/README.md",
+    "tests/fixtures/manifest.json",
 )
 
 CONTEXT_CONTRACTS = {
@@ -277,6 +282,7 @@ def validate_project(root: Path) -> list[str]:
             errors.append("Python API package scaffold is incomplete")
 
     _validate_markdown_links(root, errors)
+    errors.extend(f"fixtures: {error}" for error in validate_fixtures(root))
     return errors
 
 
