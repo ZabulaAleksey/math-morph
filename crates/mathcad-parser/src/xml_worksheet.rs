@@ -479,6 +479,23 @@ fn parse_user_data(node: &Node) -> Result<WorksheetUserData, WorksheetError> {
             }
         }
     }
+    opaque_fragments.extend(
+        node.element_children()
+            .filter(|child| {
+                child.name.namespace_uri.as_deref() != Some(WS_NS)
+                    || !matches!(
+                        child.name.local_name.as_str(),
+                        "author"
+                            | "company"
+                            | "description"
+                            | "keywords"
+                            | "revisedBy"
+                            | "title"
+                            | "customValues"
+                    )
+            })
+            .map(Node::opaque),
+    );
     Ok(WorksheetUserData {
         author: value("author"),
         company: value("company"),

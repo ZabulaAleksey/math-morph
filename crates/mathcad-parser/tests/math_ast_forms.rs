@@ -295,6 +295,10 @@ fn rejects_wrong_eval_call_unary_grouping_and_index_forms() {
             r#"<m:apply><m:indexer/><m:id>A</m:id><m:sequence/></m:apply>"#,
             MathAstError::MalformedArrayIndex,
         ),
+        (
+            r#"<m:apply><m:indexer/><m:id>A</m:id><m:sequence><m:real>0</m:real></m:sequence></m:apply>"#,
+            MathAstError::MalformedArrayIndex,
+        ),
     ] {
         assert_eq!(outcome(xml), MathParseOutcome::Invalid(expected));
     }

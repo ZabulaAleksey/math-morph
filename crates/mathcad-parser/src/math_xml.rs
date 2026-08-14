@@ -367,7 +367,7 @@ impl MathParser {
                 return Err(MathAstError::MalformedArrayIndex.into());
             }
             let nodes: Vec<_> = index.element_children().collect();
-            if nodes.is_empty() {
+            if nodes.len() < 2 {
                 return Err(MathAstError::MalformedArrayIndex.into());
             }
             nodes

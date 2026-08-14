@@ -215,11 +215,8 @@ pub struct Region {
 
 impl Region {
     pub(crate) fn visual_cmp(&self, other: &Self) -> Ordering {
-        self.layout
-            .top
-            .value
-            .total_cmp(&other.layout.top.value)
-            .then_with(|| self.layout.left.value.total_cmp(&other.layout.left.value))
+        stable_layout_cmp(self.layout.top.value, other.layout.top.value)
+            .then_with(|| stable_layout_cmp(self.layout.left.value, other.layout.left.value))
             .then_with(|| self.source_ordinal.cmp(&other.source_ordinal))
     }
 
@@ -228,5 +225,13 @@ impl Region {
             .z_order
             .cmp(&other.layout.z_order)
             .then_with(|| self.source_ordinal.cmp(&other.source_ordinal))
+    }
+}
+
+fn stable_layout_cmp(left: f64, right: f64) -> Ordering {
+    if left == right {
+        Ordering::Equal
+    } else {
+        left.total_cmp(&right)
     }
 }

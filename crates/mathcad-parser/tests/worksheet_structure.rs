@@ -27,6 +27,7 @@ fn ac_027_parses_reordered_metadata_and_rejects_version_or_qname() {
         r#"<x:metadata>
           <x:userData><x:title>classified title</x:title><x:author>Ada</x:author>
             <x:customValues><x:customValue name="department" type="text">R&amp;D</x:customValue></x:customValues>
+            <x:futureUserData/>
           </x:userData>
           <x:futureMetadata/>
           <x:identityInfo><x:comment>opaque comment</x:comment><x:savedOn>2026-08-14</x:savedOn><x:documentID>doc-1</x:documentID></x:identityInfo>
@@ -46,6 +47,7 @@ fn ac_027_parses_reordered_metadata_and_rejects_version_or_qname() {
     );
     assert_eq!(metadata.user_data.custom_values[0].name, "department");
     assert_eq!(metadata.user_data.custom_values[0].value, "R&D");
+    assert_eq!(metadata.user_data.opaque_fragments.len(), 1);
     assert_eq!(metadata.opaque_fragments.len(), 1);
 
     let wrong_version = String::from_utf8(bytes.clone())
@@ -123,6 +125,23 @@ fn ac_028_to_030_discovers_nested_regions_and_keeps_three_orders_distinct() {
             .map(|region| region.id)
             .collect::<Vec<_>>(),
         [3, 4, 1, 2]
+    );
+
+    let signed_zero = worksheet(&format!(
+        "<x:regions>{}{}</x:regions>",
+        region(5, "0", "0", None, "<x:text/>"),
+        region(6, "-0", "0", None, "<x:text/>")
+    ));
+    let signed_zero = WorksheetParser::default()
+        .parse(&signed_zero)
+        .expect("signed zero layout");
+    assert_eq!(
+        signed_zero
+            .visual_order()
+            .iter()
+            .map(|region| region.id)
+            .collect::<Vec<_>>(),
+        [5, 6]
     );
 }
 
