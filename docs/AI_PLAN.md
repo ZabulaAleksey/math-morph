@@ -1,6 +1,6 @@
 # Текущий план AI — этапы 052–076
 
-**Статус:** выполняется с 2026-08-14.
+**Статус:** завершён 2026-08-14.
 **Ветка:** `feature/stages-052-076`.
 
 ## Маршрутизация
@@ -14,12 +14,12 @@
 
 ## План реализации
 
-1. **Контракт и архитектура:** принять feature-SPEC, dependency DAG, wire/version/security policies и acceptance criteria.
-2. **052–054:** выделить `math-model`, добавить boolean/unit/unsupported AST, typed errors, diagnostics и regressions.
-3. **055–061:** добавить `document-ir` V1, bounded JSON round-trip, blocks, provenance, fidelity, assets и integer layout.
-4. **062–069:** реализовать deterministic DOCX package, text/formatting/images/page и structural validator генерируемого subset.
-5. **070–076:** добавить `EquationExporter`, `WordEquationExporter` и bounded editable OMML для number/variable/add/subtract/multiply/fraction.
-6. **Проверка:** targeted/full tests, fmt, Clippy, validators, dependency/security review, documentation и Learning.
+1. **Контракт и архитектура — завершено:** приняты feature-SPEC, dependency DAG, wire/version/security policies и acceptance criteria.
+2. **052–054 — завершено:** выделен `math-model`, добавлены boolean/unit/unsupported AST, typed errors, diagnostics и regressions.
+3. **055–061 — завершено:** добавлен `document-ir` V1, bounded JSON round-trip, blocks, provenance, fidelity, assets и integer layout.
+4. **062–069 — завершено:** реализованы deterministic DOCX package, text/formatting/images/page и structural validator генерируемого subset.
+5. **070–076 — завершено:** добавлены `EquationExporter`, `WordEquationExporter` и bounded editable OMML для number/variable/add/subtract/multiply/fraction.
+6. **Проверка — завершено:** targeted/full tests, fmt, Clippy, validators, independent review, security review и документация.
 
 ## Инварианты
 

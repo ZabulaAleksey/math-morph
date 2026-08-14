@@ -243,3 +243,71 @@ Code review нашёл три семантических края: direct extens
 3. Сравнить `id@subscript` с `apply/indexer/sequence` в тестах этапа 044.
 4. Запустить `cargo test -p mathcad-parser --test math_ast_advanced --locked`.
 5. Затем запустить полный `cargo test --workspace --locked` и Clippy.
+
+## 2026-08-14 — Shared AST, Document IR и первый DOCX/OMML, этапы 052–076
+
+### Зачем AST вынесен в `math-model`
+
+Parser раньше владел всеми math types. Если бы `exporter-docx` зависел прямо от parser, Word-specific слой получил бы доступ к Mathcad XML и мог бы обойти pipeline. Поэтому source-neutral AST вынесен в `math-model`, а parser сохранил compatibility re-exports.
+
+```text
+Mathcad bytes -> mathcad-parser -> math-model AST
+                                      |
+                                      v
+                                document-ir
+                                      |
+                                      v
+                                exporter-docx
+```
+
+Boolean AST хранит binary `and/or/xor` отдельно от unary `not`. Unit powers используют `NonZeroI64` для denominator: невозможное состояние `0` отклоняется уже при XML/JSON parsing, а не проверяется случайным `if` в каждом consumer. Unknown nested math становится `UnsupportedNode` + diagnostic, а не исчезает.
+
+### Почему Document IR — отдельный versioned contract
+
+Document IR отделяет смысл документа от конкретного входного и выходного формата. V1 JSON имеет обязательный `schema_version = 1`, strict unknown-field rejection и bounded serialization. Physical lengths — integer micrometres, поэтому wire format не зависит от floating-point, locale или платформы.
+
+`FormulaIr` различает:
+
+- `original` — исходное выражение для provenance/audit;
+- `display` — выражение, которое разрешено показывать после будущих transformations.
+
+Exporter читает только `display`. Images содержат только `AssetRefIr`; bytes, paths и URLs не попадают в JSON. Это делает resolver явной trust boundary.
+
+### Из чего состоит минимальный DOCX
+
+DOCX — ZIP/OPC package, а не один XML-файл. Минимальный artifact содержит:
+
+```text
+[Content_Types].xml
+_rels/.rels
+word/document.xml
+```
+
+При images добавляются `word/_rels/document.xml.rels` и `word/media/imageN.png|jpg`. Relationship всегда internal. Порядок parts, `rId`, drawing IDs, compression и timestamps фиксированы, поэтому одинаковый IR и assets дают одинаковые bytes.
+
+Text превращается в `w:p/w:r/w:t`; leading/trailing или repeated whitespace получает `xml:space="preserve"`. Page size/margins переводятся из micrometres в twips checked integer arithmetic, image size — по точному правилу `1 µm = 36 EMU`.
+
+### Почему validator нужен даже собственному exporter
+
+Writer и validator ловят разные классы ошибок. Writer отвечает за безопасное построение. Validator заново открывает ZIP как недоверенный и проверяет parts, content types, relationships, XML namespaces и структуру. Это позволяет тестировать package contract независимо и позже применять тот же строгий subset к передаче artifact между слоями.
+
+Security review нашёл показательный asymmetry bug: generation соблюдал equation limits, validator — только более широкие XML limits. Исправление хранит exact source span XML-node и отдельно считает OMML semantic nodes/fraction depth. Три regression tests проверяют byte, node и depth budgets на недоверенном DOCX.
+
+### Как OMML остаётся редактируемым
+
+`WordEquationExporter` создаёт структурный `m:oMath`, а не screenshot:
+
+- number и identifier → `m:r/m:t`;
+- identifier получает italic math style;
+- add/subtract/multiply → ordered runs и operator glyph;
+- divide → `m:f` с `m:num` и `m:den`.
+
+`OmmlFragment` имеет private field, поэтому внешний caller не может внедрить raw XML. Unsupported power/subscript/function и выражение, которому нужны ещё не реализованные brackets, дают typed error вместо тихого изменения смысла.
+
+### Что можно повторить самостоятельно
+
+1. Запустить `cargo test -p document-ir --locked` и открыть golden `crates/document-ir/tests/golden/document-ir-v1.json`.
+2. Запустить `cargo test -p exporter-docx --test docx_foundation --locked` и сопоставить ZIP parts с тестом `minimal_docx_is_deterministic_and_valid`.
+3. Запустить `cargo test -p exporter-docx --test omml --locked` и прочитать snapshots от number до nested fraction.
+4. Запустить `cargo test -p exporter-docx --test docx_equations --locked` и увидеть, что exporter использует `display`, а не `original`.
+5. Завершить полным `cargo fmt --all -- --check`, `cargo test --workspace --locked` и `cargo clippy --workspace --all-targets --locked -- -D warnings`.

@@ -80,6 +80,15 @@
 
 Snapshot renderer существует только в tests и выдаёт канонический S-expression. Production serialization dependency для этапа 037 не добавлялась.
 
+## Текущее покрытие Document IR и DOCX/OMML
+
+- `crates/document-ir/tests/document_ir.rs`: V1 golden и deterministic round-trip, unknown version/field/size rejection, все block types, original/display separation, geometry/provenance и fake backend-neutral ports.
+- `crates/exporter-docx/tests/docx_foundation.rs`: минимальный OPC package, deterministic bytes, WordprocessingML text/styles/whitespace, PNG/JPEG, relationships, EMU/twips, page section и ZIP/XML/active-content attacks.
+- `crates/exporter-docx/tests/omml.rs`: structural snapshots number/identifier/add/subtract/multiplication/fraction, semantic grouping, invalid/unsupported nodes, depth/node/output limits и redacted errors.
+- `crates/exporter-docx/tests/docx_equations.rs`: `FormulaIr.display` boundary, inline/display wrappers, OMML validator allowlist и отдельные validator equation byte/node/depth limits.
+
+Текущий `DocxValidator` доказывает только строгий subset, который генерирует `exporter-docx`. Полная schema conformance и ручное открытие/редактирование в Word остаются отдельным smoke gate; green subset validator не заменяет Microsoft Word/Open XML SDK validation.
+
 ## Правило эталонных данных
 
 Не обновляй эталонный fixture только потому, что после изменения реализации тест упал. Сначала докажи, что желаемое поведение изменилось намеренно.

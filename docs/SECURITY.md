@@ -201,6 +201,12 @@ Controls:
 
 Parser не извлекает файлы, не загружает schema/URI, не декодирует binary references и не выполняет `ml:program` или формулы. Opaque content хранится как span в immutable source buffer. `Debug`, diagnostics и typed errors не включают text/formula payload, пользовательское имя файла или абсолютные пути; явный доступ к source bytes возможен только через возвращённый `SourceDocument` и проверенный `SourceSpan`.
 
+Этапы 052–076 продолжают эту границу на выходе. Document IR V1 не сериализует binary bytes, paths или URLs; assets доступны DOCX adapter только через `AssetResolver`. `DocxExporter` создаёт deterministic stored ZIP с фиксированным порядком и timestamps, только internal relationships и allowlisted PNG/JPEG. Изображения проверяются по signature, structure, CRC/markers, dimensions, pixel count и metadata policy до записи; SVG, OLE, HTML, macros и external relationships не допускаются.
+
+`DocxValidator` повторно рассматривает созданный или полученный DOCX как недоверенный: проверяет размер/count/ratio ZIP, unsafe/duplicate/case-colliding part names, encryption/symlinks, required content types/relationships, UTF-8 XML 1.0, DTD, expanded QName allowlist, image targets и drawing IDs. Namespace URI интернируются, чтобы повторное имя не усиливало память. Для каждого `m:oMath` отдельно применяются exact source-byte, semantic node и fraction-depth limits; security regression закрывает обход более строгих equation limits через validator.
+
+`OmmlFragment` нельзя сконструировать извне с raw XML: публичный `WordEquationExporter` создаёт его только из проверенного AST, экранирует text и отклоняет unsupported/ambiguous grouping. Typed errors и custom `Debug` не включают document text, formulas, asset IDs, paths или payload bytes.
+
 ## Обязательные проверки безопасности по типу изменения
 
 | Изменение | Минимальные проверки |

@@ -28,8 +28,12 @@
 | SPEC-02 XML root metadata | 026 | `crates/mathcad-parser/src/xml_metadata.rs`, UTF-8/DTD/namespace/schema/limits tests в `tests/input_boundary.rs` | verified |
 | FR-WS-001..004, FR-REG-001..005 | 027–035 | `source.rs`, `worksheet.rs`, `region.rs`, `xml_worksheet.rs`; `tests/worksheet_structure.rs`; security/code review | verified |
 | FR-AST-001..016, NFR-PARSE-001..003 | 036–051 | `ast.rs`, `math_xml.rs`; `tests/math_ast.rs`, `math_ast_forms.rs`, `math_ast_advanced.rs`; security/code review | verified |
-| SPEC-04 архитектура конвертации | 052–061, 143–147 | дальнейший AST, семантические границы, Document IR и тесты контракта конвейера | planned |
-| SPEC-05 экспорт редактируемых формул | 062–094 | `crates/exporter-docx/`, тесты OMML и пакета, smoke-эталоны Word | planned |
+| FR-AST completion / SPEC-04 | 052–054 | `crates/math-model/`, boolean/unit/unsupported AST, parser regressions в `math_ast_completion.rs`, Serde/privacy tests | verified |
+| FR-IR-001..007 / SPEC-04 | 055–061 | `crates/document-ir/`, V1 golden/round-trip/validation и backend-neutral ports в `tests/document_ir.rs` | verified |
+| FR-DOCX-001..006 | 062–069 | `crates/exporter-docx/src/{package,image,validator,xml}.rs`, 11 package/text/image/page/attack integration tests | verified |
+| FR-OMML-001..003 | 070–076 | `document-ir::ports::EquationExporter`, `exporter-docx/src/omml.rs`, 7 OMML snapshots и 3 equation-in-DOCX tests; independent/security review | verified |
+| SPEC-05 расширенный экспорт формул | 077–094 | powers/roots/subscripts/functions/brackets/matrices/calculus, manual Word smoke и optional MathType adapter | planned |
+| SPEC-04 единый конвейер | 143–147 | producer Document IR, diagnostics collector, fidelity report и partial conversion policy | planned |
 | SPEC-06 преобразования и точность | 095–111 | `crates/math-engine/`, тесты сохранения семантики и trace | planned |
 | SPEC-07 комплексные числа | 112–122 | round-trip проверки алгебраического и полярного представления и граничные тесты | planned |
 | SPEC-08 графики | 123–132 | PlotIR/ChartIR, fallback предпросмотра и fixtures восстановления | planned |

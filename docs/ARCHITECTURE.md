@@ -92,11 +92,29 @@ bytes
   -> structural Math AST (без evaluator)
 ```
 
+### Shared model и Document IR
+
+Этапы 052–061 выделили две нейтральные границы:
+
+- `math-model` владеет source-neutral `MathExpression`, `SourceSpan`, boolean/unit/unsupported nodes и стабильным Serde contract;
+- `document-ir` владеет versioned wire envelope V1, pages/blocks/layout/provenance/fidelity и портами `EquationExporter`/`AssetResolver`.
+
+Dependency DAG не допускает обратной связи exporter → parser:
+
+```text
+math-model <--- mathcad-parser
+     ^
+     +------ document-ir <--- exporter-docx
+```
+
+`FormulaIr` хранит immutable optional `original` и обязательный `display`; exporter читает только `display`. Binary assets, filesystem paths и URLs не входят в Document IR JSON и выдаются адаптеру только через `AssetResolver`.
+
 ### Exporters
 
-- `WordEquationExporter`: AST/Display AST → уравнение OMML/Word.
+- `WordEquationExporter`: `MathExpression` → bounded editable OMML subset для numbers, identifiers, add/subtract, multiplication и fractions.
 - `MathTypeExporter`: отдельный adapter, потенциально через MathML.
-- `DOCXExporter`: Document IR → DOCX/OOXML.
+- `DocxExporter`: validated Document IR → deterministic single-page DOCX/OOXML с text/styles, internal PNG/JPEG и equations.
+- `DocxValidator`: fail-closed validator только генерируемого subset, а не универсальный validator произвольного DOCX.
 - В будущем: Markdown, LaTeX, PDF, HTML, JSON, Typst.
 - `ChartExporter`: текущий растровый путь + будущий путь Excel.
 - `DiagramExporter`: текущий растровый путь + будущий путь VSDX.

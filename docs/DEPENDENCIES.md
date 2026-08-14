@@ -3,7 +3,7 @@
 ## Основной стек
 
 - Frontend: Next.js, React, TypeScript, Tailwind, shadcn/ui, TanStack Query, Zustand, React Hook Form, Zod, next-intl.
-- Core: Rust 1.88+, `quick-xml = 0.41.0`, `zip = 8.6.0`, Serde, num/num-complex, nalgebra, WASM.
+- Core: Rust 1.88+, `quick-xml = 0.41.0`, `zip = 8.6.0`, `serde = 1.0.229`, `serde_json = 1.0.151`, `thiserror = 2.0.17`.
 - Backend: Python, FastAPI, Pydantic, SQLAlchemy, Alembic, HTTPX, `uv`.
 - Данные и асинхронность: PostgreSQL, RabbitMQ, Celery, Redis, S3-совместимое хранилище/MinIO.
 - Аутентификация: Keycloak/OIDC/OAuth2/WebAuthn/TOTP; Telegram Bot API только для явно связанных flows и восстановления.
@@ -48,5 +48,8 @@
 - `quick-xml = 0.41.0`: потоковый namespace-aware XML reader без optional features; выбранная версия закрывает известные DoS-проблемы более ранних releases.
 - `zip = 8.6.0`: поддерживаемая upstream ветка, default features отключены, включён только Rust Deflate backend; решение и повышение MSRV описаны в ADR-0006.
 - `thiserror = 2.0.17`: typed domain errors без включения payload в публичный `Display`.
+- `serde = 1.0.229` и `serde_json = 1.0.151`: строгий versioned JSON contract для `math-model`/`document-ir`; unknown fields отклоняются, а input/output ограничиваются до и во время сериализации.
 
-Все три версии и транзитивный граф закреплены в `Cargo.lock`. ZIP и XML readers не получают сетевой доступ и не выполняют postinstall scripts.
+Все версии и транзитивный граф закреплены в `Cargo.lock`. ZIP/XML/Serde libraries не получают сетевой или файловый доступ и не выполняют postinstall scripts.
+
+На 2026-08-14 локальный `cargo-audit` не установлен, поэтому полный автоматический advisory scan `Cargo.lock` не заявляется выполненным. Direct dependency review выполнен вручную; `quick-xml = 0.41.0` удовлетворяет patched boundary `>= 0.41.0` для [RUSTSEC-2026-0195](https://rustsec.org/advisories/RUSTSEC-2026-0195.html). Автоматизация audit остаётся этапом 242.
