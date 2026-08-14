@@ -9,6 +9,7 @@ publish.workspace = true
 path = "src/lib.rs"
 
 [dependencies]
+math-model = { path = "../math-model" }
 quick-xml = { version = "=0.41.0", default-features = false }
 thiserror = "=2.0.17"
 zip = { version = "=8.6.0", default-features = false, features = ["deflate-flate2-zlib-rs"] }

@@ -3,16 +3,24 @@ use crate::ast::{
     ComparisonExpression, ComparisonOperator, Definition, DefinitionKind, DefinitionStyle,
     Derivative, DerivativeStyle, Evaluation, FunctionCall, FunctionDefinition, Grouping,
     Identifier, Integral, IntegralAlgorithm, MathAstError, MathExpression, MathExpressionKind,
-    Matrix, NumericBase, RangeExpression, RealLiteral, UnaryExpression, UnaryOperator, Vector,
-    VectorOrientation,
+    Matrix, MultiplicationStyle, NumericBase, RangeExpression, RealLiteral, UnaryExpression,
+    UnaryOperator, Vector, VectorOrientation,
 };
 use crate::xml_worksheet::{Child, Node};
+use crate::{
+    BooleanExpression, BooleanOperator, Diagnostic, DiagnosticCode, ExpressionOrigin, LogicalNot,
+    UnitMonomial, UnitReference, UnitedValue, UnsupportedNode, UnsupportedReason,
+};
+use std::num::NonZeroI64;
 
 const MATH_NS: &str = "http://schemas.mathsoft.com/math30";
+const UNITS_NS: &str = "http://schemas.mathsoft.com/units10";
 
 pub(crate) enum MathXmlOutcome {
-    Parsed(MathExpression),
-    Unsupported,
+    Parsed {
+        expression: MathExpression,
+        diagnostics: Vec<Diagnostic>,
+    },
     Invalid(MathAstError),
 }
 
@@ -20,15 +28,24 @@ pub(crate) fn parse_math_expression(
     node: &Node,
     max_nodes: usize,
     max_matrix_elements: usize,
+    max_unit_factors: usize,
 ) -> MathXmlOutcome {
     let mut parser = MathParser {
         max_nodes,
         nodes: 0,
         max_matrix_elements,
+        max_unit_factors,
+        diagnostics: Vec::new(),
     };
     match parser.expression(node) {
-        Ok(expression) => MathXmlOutcome::Parsed(expression),
-        Err(Failure::Unsupported) => MathXmlOutcome::Unsupported,
+        Ok(expression) => MathXmlOutcome::Parsed {
+            expression,
+            diagnostics: parser.diagnostics,
+        },
+        Err(Failure::Unsupported) => MathXmlOutcome::Parsed {
+            expression: parser.unsupported(node, None, UnsupportedReason::UnknownExpression),
+            diagnostics: parser.diagnostics,
+        },
         Err(Failure::Invalid(error)) => MathXmlOutcome::Invalid(error),
     }
 }
@@ -48,19 +65,15 @@ struct MathParser {
     max_nodes: usize,
     nodes: usize,
     max_matrix_elements: usize,
+    max_unit_factors: usize,
+    diagnostics: Vec<Diagnostic>,
 }
 
 impl MathParser {
     fn expression(&mut self, node: &Node) -> Result<MathExpression, Failure> {
-        self.nodes = self
-            .nodes
-            .checked_add(1)
-            .ok_or(MathAstError::NodeLimitExceeded)?;
-        if self.nodes > self.max_nodes {
-            return Err(MathAstError::NodeLimitExceeded.into());
-        }
+        self.consume_node()?;
         if node.name.namespace_uri.as_deref() != Some(MATH_NS) {
-            return Err(Failure::Unsupported);
+            return Ok(self.unsupported(node, None, UnsupportedReason::UnknownExpression));
         }
         let kind = match node.name.local_name.as_str() {
             "real" => MathExpressionKind::Real(self.real(node)?),
@@ -73,11 +86,12 @@ impl MathParser {
             "parens" => MathExpressionKind::Grouping(self.grouping(node)?),
             "matrix" => self.matrix(node)?,
             "range" => MathExpressionKind::Range(self.range(node)?),
-            _ => return Err(Failure::Unsupported),
+            "unitedValue" => MathExpressionKind::UnitedValue(self.united_value(node)?),
+            _ => return Ok(self.unsupported(node, None, UnsupportedReason::UnknownExpression)),
         };
         Ok(MathExpression {
             kind,
-            span: node.span,
+            origin: ExpressionOrigin::Source(node.span),
         })
     }
 
@@ -113,10 +127,21 @@ impl MathParser {
         }
         let children: Vec<_> = node.element_children().collect();
         let Some(head) = children.first() else {
-            return Err(Failure::Unsupported);
+            return Ok(self
+                .unsupported(node, None, UnsupportedReason::UnknownOperator)
+                .kind);
         };
         if head.name.namespace_uri.as_deref() != Some(MATH_NS) {
-            return Err(Failure::Unsupported);
+            if matches!(head.name.local_name.as_str(), "and" | "or" | "xor" | "not") {
+                return Err(MathAstError::InvalidBooleanOperatorQName.into());
+            }
+            return Ok(self
+                .unsupported(
+                    node,
+                    Some(head.name.clone()),
+                    UnsupportedReason::UnknownOperator,
+                )
+                .kind);
         }
         let kind = match head.name.local_name.as_str() {
             "plus" | "minus" | "mult" | "div" | "pow" => {
@@ -135,11 +160,20 @@ impl MathParser {
             }
             "equal" | "notEqual" | "greaterOrEqual" | "greaterThan" | "lessOrEqual"
             | "lessThan" => MathExpressionKind::Comparison(self.comparison(node)?),
-            "not" => return Err(Failure::Unsupported),
+            "and" | "or" | "xor" => MathExpressionKind::Boolean(self.boolean(node, head)?),
+            "not" => MathExpressionKind::LogicalNot(self.logical_not(node, head)?),
             local if is_supported_expression_form(local) => {
                 MathExpressionKind::FunctionCall(self.function_call(node)?)
             }
-            _ => return Err(Failure::Unsupported),
+            _ => {
+                return Ok(self
+                    .unsupported(
+                        node,
+                        Some(head.name.clone()),
+                        UnsupportedReason::UnknownOperator,
+                    )
+                    .kind);
+            }
         };
         Ok(kind)
     }
@@ -168,6 +202,11 @@ impl MathParser {
         let right = self.expression(children[2])?;
         Ok(BinaryExpression {
             operator,
+            multiplication_style: if operator == BinaryOperator::Multiply {
+                Some(multiplication_style(operator_node.attribute("style"))?)
+            } else {
+                None
+            },
             left: Box::new(left),
             right: Box::new(right),
         })
@@ -591,6 +630,170 @@ impl MathParser {
             right: Box::new(self.expression(children[2])?),
         })
     }
+
+    fn boolean(&mut self, node: &Node, marker: &Node) -> Result<BooleanExpression, Failure> {
+        let operator = match marker.name.local_name.as_str() {
+            "and" => BooleanOperator::And,
+            "or" => BooleanOperator::Or,
+            "xor" => BooleanOperator::Xor,
+            _ => return Err(MathAstError::InvalidBooleanOperatorQName.into()),
+        };
+        if marker.has_attributes() || !marker.children.is_empty() {
+            return Err(MathAstError::NonEmptyBooleanMarker.into());
+        }
+        let children: Vec<_> = node.element_children().collect();
+        let actual = children.len().saturating_sub(1);
+        if actual != 2 {
+            return Err(MathAstError::WrongBooleanArity { operator, actual }.into());
+        }
+        Ok(BooleanExpression {
+            operator,
+            left: Box::new(self.expression(children[1])?),
+            right: Box::new(self.expression(children[2])?),
+        })
+    }
+
+    fn logical_not(&mut self, node: &Node, marker: &Node) -> Result<LogicalNot, Failure> {
+        if marker.name.local_name != "not" || marker.has_attributes() || !marker.children.is_empty()
+        {
+            return Err(MathAstError::NonEmptyBooleanMarker.into());
+        }
+        let children: Vec<_> = node.element_children().collect();
+        let actual = children.len().saturating_sub(1);
+        if actual != 1 {
+            return Err(MathAstError::WrongLogicalNotArity { actual }.into());
+        }
+        Ok(LogicalNot {
+            operand: Box::new(self.expression(children[1])?),
+        })
+    }
+
+    fn united_value(&mut self, node: &Node) -> Result<UnitedValue, Failure> {
+        if has_non_whitespace_text(node) {
+            return Err(MathAstError::MalformedUnitedValue.into());
+        }
+        let children: Vec<_> = node.element_children().collect();
+        if children.len() != 2 {
+            return Err(MathAstError::MalformedUnitedValue.into());
+        }
+        let base = children[0];
+        if base.name.namespace_uri.as_deref() != Some(MATH_NS) {
+            return Err(MathAstError::MalformedUnitedValue.into());
+        }
+        let value = match base.name.local_name.as_str() {
+            "real" | "matrix" => self.expression(base)?,
+            "imag" | "complex" | "str" | "placeholder" => {
+                self.consume_node()?;
+                self.unsupported(base, None, UnsupportedReason::UnsupportedBaseValue)
+            }
+            _ => return Err(MathAstError::MalformedUnitedValue.into()),
+        };
+        Ok(UnitedValue {
+            value: Box::new(value),
+            units: self.unit_monomial(children[1])?,
+        })
+    }
+
+    fn unit_monomial(&mut self, node: &Node) -> Result<UnitMonomial, Failure> {
+        self.consume_node()?;
+        if !node.is(UNITS_NS, "unitMonomial") {
+            return Err(MathAstError::InvalidUnitQName.into());
+        }
+        if has_non_whitespace_text(node) {
+            return Err(MathAstError::MalformedUnitMonomial.into());
+        }
+        let factors: Vec<_> = node.element_children().collect();
+        if factors.is_empty() {
+            return Err(MathAstError::MalformedUnitMonomial.into());
+        }
+        if factors.len() > self.max_unit_factors {
+            return Err(MathAstError::UnitFactorLimitExceeded.into());
+        }
+        let factors = factors
+            .into_iter()
+            .map(|factor| self.unit_reference(factor))
+            .collect::<Result<_, _>>()?;
+        Ok(UnitMonomial {
+            system: node.attribute("system").map(str::to_owned),
+            factors,
+        })
+    }
+
+    fn unit_reference(&mut self, node: &Node) -> Result<UnitReference, Failure> {
+        self.consume_node()?;
+        if !node.is(UNITS_NS, "unitReference") {
+            return Err(MathAstError::InvalidUnitQName.into());
+        }
+        if !node.children.is_empty() {
+            return Err(MathAstError::MalformedUnitMonomial.into());
+        }
+        let unit = node
+            .attribute("unit")
+            .filter(|unit| !unit.is_empty())
+            .ok_or(MathAstError::MissingUnitName)?
+            .to_owned();
+        let power_numerator = signed_power(node.attribute("power-numerator"))?;
+        let power_denominator = NonZeroI64::new(signed_power(node.attribute("power-denominator"))?)
+            .ok_or(MathAstError::ZeroUnitPowerDenominator)?;
+        Ok(UnitReference {
+            unit,
+            power_numerator,
+            power_denominator,
+        })
+    }
+
+    fn consume_node(&mut self) -> Result<(), Failure> {
+        self.nodes = self
+            .nodes
+            .checked_add(1)
+            .ok_or(MathAstError::NodeLimitExceeded)?;
+        if self.nodes > self.max_nodes {
+            return Err(MathAstError::NodeLimitExceeded.into());
+        }
+        Ok(())
+    }
+
+    fn unsupported(
+        &mut self,
+        node: &Node,
+        feature: Option<crate::ExpandedName>,
+        reason: UnsupportedReason,
+    ) -> MathExpression {
+        self.diagnostics.push(Diagnostic::warning(
+            DiagnosticCode::UnsupportedMathNode,
+            None,
+        ));
+        MathExpression {
+            kind: MathExpressionKind::Unsupported(UnsupportedNode {
+                name: node.name.clone(),
+                feature,
+                span: node.span,
+                reason,
+            }),
+            origin: ExpressionOrigin::Source(node.span),
+        }
+    }
+}
+
+fn signed_power(value: Option<&str>) -> Result<i64, Failure> {
+    value
+        .unwrap_or("1")
+        .parse::<i64>()
+        .map_err(|_| MathAstError::InvalidUnitPower.into())
+}
+
+fn multiplication_style(value: Option<&str>) -> Result<MultiplicationStyle, Failure> {
+    match value.unwrap_or("default") {
+        "default" => Ok(MultiplicationStyle::Default),
+        "auto-select" => Ok(MultiplicationStyle::AutoSelect),
+        "dot" => Ok(MultiplicationStyle::Dot),
+        "narrow-dot" => Ok(MultiplicationStyle::NarrowDot),
+        "large-dot" => Ok(MultiplicationStyle::LargeDot),
+        "x" => Ok(MultiplicationStyle::X),
+        "thin-space" => Ok(MultiplicationStyle::ThinSpace),
+        "no-space" => Ok(MultiplicationStyle::NoSpace),
+        _ => Err(MathAstError::InvalidMultiplicationStyle.into()),
+    }
 }
 
 fn positive_dimension(value: Option<&str>) -> Result<usize, Failure> {
@@ -668,6 +871,7 @@ fn is_supported_expression_form(local: &str) -> bool {
             | "parens"
             | "matrix"
             | "range"
+            | "unitedValue"
     )
 }
 

@@ -124,10 +124,11 @@ pub struct ResultFormat {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum MathParseOutcome {
-    Parsed(MathExpression),
+    Parsed {
+        expression: MathExpression,
+        diagnostics: Vec<Diagnostic>,
+    },
     Invalid(MathAstError),
-    /// The node is intentionally outside the implemented AST subset.
-    Unsupported(Diagnostic),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

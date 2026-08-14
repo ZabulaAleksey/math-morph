@@ -19,6 +19,7 @@ pub struct WorksheetLimits {
     pub max_retained_text_bytes: usize,
     pub max_ast_nodes: usize,
     pub max_matrix_elements: usize,
+    pub max_unit_factors: usize,
 }
 
 impl Default for WorksheetLimits {
@@ -35,6 +36,7 @@ impl Default for WorksheetLimits {
             max_retained_text_bytes: 8 * MIB,
             max_ast_nodes: 100_000,
             max_matrix_elements: 100_000,
+            max_unit_factors: 1_024,
         }
     }
 }

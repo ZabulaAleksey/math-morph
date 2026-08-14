@@ -13,6 +13,19 @@ from validate_project import validate_project  # noqa: E402
 
 
 class ProjectValidatorTests(unittest.TestCase):
+    def test_math_model_is_a_required_workspace_crate(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            (root / "Cargo.toml").write_text(
+                '[workspace]\nmembers = ["crates/mathcad-parser", "crates/math-engine", "crates/exporter-docx"]\n'
+                '[workspace.package]\nrust-version = "1.88"\n',
+                encoding="utf-8",
+            )
+
+            errors = validate_project(root)
+
+        self.assertIn("unexpected Cargo workspace members: ['crates/math-model']", errors)
+
     def test_current_repository_is_valid(self) -> None:
         self.assertEqual(validate_project(PROJECT_ROOT), [])
 
@@ -41,6 +54,7 @@ class ProjectValidatorTests(unittest.TestCase):
         contracts = (
             "AGENTS.md",
             "docs/DESIGN.md",
+            "crates/math-model/AGENTS.md",
             "crates/mathcad-parser/AGENTS.md",
             "crates/math-engine/AGENTS.md",
             "crates/exporter-docx/AGENTS.md",

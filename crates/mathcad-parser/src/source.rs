@@ -1,30 +1,7 @@
 use std::fmt;
 use std::sync::Arc;
 
-/// Half-open byte range in the immutable source XML buffer.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct SourceSpan {
-    pub start: usize,
-    pub end: usize,
-}
-
-impl SourceSpan {
-    pub const fn new(start: usize, end: usize) -> Option<Self> {
-        if start <= end {
-            Some(Self { start, end })
-        } else {
-            None
-        }
-    }
-
-    pub const fn len(self) -> usize {
-        self.end.saturating_sub(self.start)
-    }
-
-    pub const fn is_empty(self) -> bool {
-        self.start == self.end
-    }
-}
+pub use math_model::{ExpandedName, SourceSpan};
 
 /// Shared immutable source backing all spans and opaque fragments.
 #[derive(Clone, Eq, PartialEq)]
@@ -54,22 +31,6 @@ impl fmt::Debug for SourceDocument {
             .debug_struct("SourceDocument")
             .field("byte_len", &self.0.len())
             .finish_non_exhaustive()
-    }
-}
-
-#[derive(Clone, Eq, Hash, PartialEq)]
-pub struct ExpandedName {
-    pub namespace_uri: Option<Arc<str>>,
-    pub local_name: String,
-}
-
-impl fmt::Debug for ExpandedName {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter
-            .debug_struct("ExpandedName")
-            .field("has_namespace", &self.namespace_uri.is_some())
-            .field("local_name_bytes", &self.local_name.len())
-            .finish()
     }
 }
 

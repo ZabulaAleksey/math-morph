@@ -67,7 +67,7 @@ fn sexpr(expression: &MathExpression) -> String {
 
 fn parsed(expression: &str) -> MathExpression {
     match outcome(expression) {
-        MathParseOutcome::Parsed(expression) => expression,
+        MathParseOutcome::Parsed { expression, .. } => expression,
         other => panic!("parsed expression expected, got {other:?}"),
     }
 }
@@ -122,12 +122,13 @@ fn ac_036_preserves_a_source_span_on_every_ast_expression() {
         r#"<m:apply><m:pow/><m:id>x</m:id><m:apply><m:plus/><m:real>2</m:real><m:real>3</m:real></m:apply></m:apply>"#,
     );
     fn assert_spans(expression: &MathExpression) {
-        assert!(expression.span.start < expression.span.end);
+        let span = expression.source_span().expect("source origin");
+        assert!(span.start < span.end);
         if let MathExpressionKind::Binary(binary) = &expression.kind {
             assert_spans(&binary.left);
             assert_spans(&binary.right);
-            assert!(expression.span.start <= binary.left.span.start);
-            assert!(binary.right.span.end <= expression.span.end);
+            assert!(span.start <= binary.left.source_span().unwrap().start);
+            assert!(binary.right.source_span().unwrap().end <= span.end);
         }
     }
     assert_spans(&expression);
@@ -200,16 +201,24 @@ fn validates_binary_arity_and_expression_node_limit() {
 }
 
 #[test]
-fn later_or_unknown_math_nodes_remain_diagnostic_fallbacks_not_ast_nodes() {
+fn later_or_unknown_math_nodes_are_preserved_with_diagnostics() {
     for xml in [
         r#"<m:program><m:real>1</m:real></m:program>"#,
         r#"<m:future secret="payload"/>"#,
     ] {
-        let MathParseOutcome::Unsupported(diagnostic) = outcome(xml) else {
-            panic!("unsupported outcome expected")
+        let MathParseOutcome::Parsed {
+            expression,
+            diagnostics,
+        } = outcome(xml)
+        else {
+            panic!("parsed unsupported node expected")
         };
-        assert_eq!(diagnostic.code, DiagnosticCode::UnsupportedMathNode);
-        assert!(!format!("{diagnostic:?}").contains("payload"));
+        assert!(matches!(
+            expression.kind,
+            MathExpressionKind::Unsupported(_)
+        ));
+        assert_eq!(diagnostics[0].code, DiagnosticCode::UnsupportedMathNode);
+        assert!(!format!("{expression:?} {diagnostics:?}").contains("payload"));
     }
 }
 

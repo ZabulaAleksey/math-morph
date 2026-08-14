@@ -1,5 +1,5 @@
 use mathcad_parser::{
-    BinaryOperator, DefinitionKind, DefinitionStyle, DiagnosticCode, MathAstError, MathExpression,
+    BinaryOperator, DefinitionKind, DefinitionStyle, MathAstError, MathExpression,
     MathExpressionKind, MathParseOutcome, RegionContent, UnaryOperator, WorksheetLimits,
     WorksheetParser,
 };
@@ -32,7 +32,7 @@ fn outcome(expression: &str) -> MathParseOutcome {
 
 fn parsed(expression: &str) -> MathExpression {
     match outcome(expression) {
-        MathParseOutcome::Parsed(expression) => expression,
+        MathParseOutcome::Parsed { expression, .. } => expression,
         other => panic!("parsed expression expected, got {other:?}"),
     }
 }
@@ -157,7 +157,8 @@ fn ac_038_parses_three_definition_kinds_and_scoped_styles() {
             panic!("definition expected")
         };
         assert_eq!((definition.kind, definition.style), (kind, style));
-        assert!(definition.target.span.start < definition.target.span.end);
+        let span = definition.target.source_span().expect("source origin");
+        assert!(span.start < span.end);
     }
 }
 
@@ -205,12 +206,15 @@ fn ac_042_parses_every_scoped_non_boolean_unary_operator() {
         assert_eq!(unary.operator, operator);
     }
 
-    let MathParseOutcome::Unsupported(diagnostic) =
-        outcome(r#"<m:apply><m:not/><m:id>x</m:id></m:apply>"#)
+    let MathParseOutcome::Parsed {
+        expression,
+        diagnostics,
+    } = outcome(r#"<m:apply><m:not/><m:id>x</m:id></m:apply>"#)
     else {
-        panic!("boolean not must stay unsupported")
+        panic!("boolean not must parse")
     };
-    assert_eq!(diagnostic.code, DiagnosticCode::UnsupportedMathNode);
+    assert!(matches!(expression.kind, MathExpressionKind::LogicalNot(_)));
+    assert!(diagnostics.is_empty());
 }
 
 #[test]

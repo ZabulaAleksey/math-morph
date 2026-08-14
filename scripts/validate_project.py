@@ -35,6 +35,7 @@ REQUIRED_FILES = (
     "docs/TESTING.md",
     "docs/TRACEABILITY.md",
     "docs/CONTEXT_COMPATIBILITY.md",
+    "crates/math-model/AGENTS.md",
     "crates/mathcad-parser/AGENTS.md",
     "crates/math-engine/AGENTS.md",
     "crates/exporter-docx/AGENTS.md",
@@ -55,6 +56,7 @@ CONTEXT_CONTRACTS = {
         "Пользовательский интерфейс ещё не реализован",
         "визуальная система владельцем продукта не утверждена",
     ),
+    "crates/math-model/AGENTS.md": ("source-neutral Math AST",),
     "crates/mathcad-parser/AGENTS.md": ("Parser знает формат",),
     "crates/math-engine/AGENTS.md": ("Вычисление и представление разделены",),
     "crates/exporter-docx/AGENTS.md": ("редактируемыми структурами Word/OMML",),
@@ -96,6 +98,7 @@ EXPECTED_SKILLS = {
 }
 
 EXPECTED_CRATES = {
+    "crates/math-model": "math-model",
     "crates/mathcad-parser": "mathcad-parser",
     "crates/math-engine": "math-engine",
     "crates/exporter-docx": "exporter-docx",

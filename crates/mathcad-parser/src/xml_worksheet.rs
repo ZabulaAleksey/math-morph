@@ -53,6 +53,10 @@ impl Node {
             .map(|attribute| attribute.value.as_str())
     }
 
+    pub(crate) fn has_attributes(&self) -> bool {
+        !self.attributes.is_empty()
+    }
+
     fn child(&self, namespace: &str, local: &str) -> Option<&Node> {
         self.children.iter().find_map(|child| match child {
             Child::Node(node) if node.is(namespace, local) => Some(node),
@@ -595,6 +599,7 @@ fn parse_region(
             content_node,
             limits.max_ast_nodes,
             limits.max_matrix_elements,
+            limits.max_unit_factors,
             diagnostics,
         )?)
     } else if content_node.is(WS_NS, "plot") {
@@ -727,6 +732,7 @@ fn parse_math(
     node: &Node,
     max_ast_nodes: usize,
     max_matrix_elements: usize,
+    max_unit_factors: usize,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Result<MathRegion, WorksheetError> {
     let result_format = node
@@ -748,14 +754,19 @@ fn parse_math(
         expression,
         max_ast_nodes,
         max_matrix_elements,
+        max_unit_factors,
     ) {
-        crate::math_xml::MathXmlOutcome::Parsed(expression) => MathParseOutcome::Parsed(expression),
-        crate::math_xml::MathXmlOutcome::Invalid(error) => MathParseOutcome::Invalid(error),
-        crate::math_xml::MathXmlOutcome::Unsupported => {
-            let diagnostic = Diagnostic::warning(DiagnosticCode::UnsupportedMathNode, None);
-            diagnostics.push(diagnostic);
-            MathParseOutcome::Unsupported(diagnostic)
+        crate::math_xml::MathXmlOutcome::Parsed {
+            expression,
+            diagnostics: math_diagnostics,
+        } => {
+            diagnostics.extend(math_diagnostics.iter().copied());
+            MathParseOutcome::Parsed {
+                expression,
+                diagnostics: math_diagnostics,
+            }
         }
+        crate::math_xml::MathXmlOutcome::Invalid(error) => MathParseOutcome::Invalid(error),
     };
     Ok(MathRegion {
         disable_calc: boolean_attribute(node, "disable-calc")?,

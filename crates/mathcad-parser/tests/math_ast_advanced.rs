@@ -26,7 +26,7 @@ fn outcome(expression: &str) -> MathParseOutcome {
 
 fn parsed(expression: &str) -> MathExpression {
     match outcome(expression) {
-        MathParseOutcome::Parsed(expression) => expression,
+        MathParseOutcome::Parsed { expression, .. } => expression,
         other => panic!("parsed expression expected, got {other:?}"),
     }
 }
@@ -110,6 +110,10 @@ impl TestKindName for MathExpression {
             MathExpressionKind::Derivative(_) => "derivative",
             MathExpressionKind::Aggregate(_) => "aggregate",
             MathExpressionKind::Comparison(_) => "comparison",
+            MathExpressionKind::Boolean(_) => "boolean",
+            MathExpressionKind::LogicalNot(_) => "logical-not",
+            MathExpressionKind::UnitedValue(_) => "united-value",
+            MathExpressionKind::Unsupported(_) => "unsupported",
         }
     }
 }
@@ -130,7 +134,7 @@ fn ac_045_and_046_parse_matrix_shape_and_vector_specialization() {
         matrix
             .elements
             .iter()
-            .all(|item| item.span.start < item.span.end)
+            .all(|item| item.source_span().is_some_and(|span| span.start < span.end))
     );
 
     for (xml, orientation) in [
@@ -245,7 +249,10 @@ fn ac_051_parses_six_strict_binary_comparisons() {
             panic!("comparison")
         };
         assert_eq!(comparison.operator, operator);
-        assert!(comparison.left.span.start < comparison.right.span.end);
+        assert!(
+            comparison.left.source_span().unwrap().start
+                < comparison.right.source_span().unwrap().end
+        );
     }
 }
 
@@ -277,12 +284,17 @@ fn rejects_matrix_shape_limit_and_foreign_qname() {
         ),
         MathParseOutcome::Invalid(MathAstError::MatrixElementLimitExceeded)
     );
-    let MathParseOutcome::Unsupported(diagnostic) = outcome(
+    let MathParseOutcome::Parsed {
+        expression,
+        diagnostics,
+    } = outcome(
         r#"<m:matrix xmlns:x="urn:foreign" rows="1" cols="1"><x:real>1</x:real></m:matrix>"#,
-    ) else {
-        panic!("unsupported")
+    )
+    else {
+        panic!("parsed unsupported child expected")
     };
-    assert_eq!(diagnostic.code, DiagnosticCode::UnsupportedMathNode);
+    assert!(matches!(expression.kind, MathExpressionKind::Matrix(_)));
+    assert_eq!(diagnostics[0].code, DiagnosticCode::UnsupportedMathNode);
 }
 
 #[test]
