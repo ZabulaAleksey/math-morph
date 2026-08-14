@@ -119,6 +119,7 @@ fn sexpr(expression: &MathExpression) -> String {
                 .collect::<Vec<_>>()
                 .join(" ")
         ),
+        _ => "(later-stage-expression)".to_owned(),
     }
 }
 

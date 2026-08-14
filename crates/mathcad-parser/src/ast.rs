@@ -141,6 +141,126 @@ pub struct ArrayIndex {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Matrix {
+    pub rows: usize,
+    pub columns: usize,
+    pub elements: Vec<MathExpression>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum VectorOrientation {
+    Row,
+    Column,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Vector {
+    pub orientation: VectorOrientation,
+    pub elements: Vec<MathExpression>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RangeExpression {
+    pub start: Box<MathExpression>,
+    pub next: Option<Box<MathExpression>>,
+    pub end: Box<MathExpression>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Bounds {
+    pub lower: Box<MathExpression>,
+    pub upper: Box<MathExpression>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum IntegralAlgorithm {
+    EqualInterval,
+    Adaptive,
+    Infinite,
+    Oscillating,
+    LimitEndPoints,
+    Romberg,
+}
+
+#[derive(Clone, Eq, PartialEq)]
+pub struct Integral {
+    pub bound_variable: Box<MathExpression>,
+    pub integrand: Box<MathExpression>,
+    pub bounds: Option<Bounds>,
+    pub algorithm: Option<IntegralAlgorithm>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DerivativeStyle {
+    Default,
+    Derivative,
+    Partial,
+}
+
+impl fmt::Debug for Integral {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("Integral")
+            .field("bound_variable", &self.bound_variable)
+            .field("integrand", &self.integrand)
+            .field("bounds", &self.bounds)
+            .field("has_algorithm", &self.algorithm.is_some())
+            .finish()
+    }
+}
+
+#[derive(Clone, Eq, PartialEq)]
+pub struct Derivative {
+    pub bound_variable: Box<MathExpression>,
+    pub expression: Box<MathExpression>,
+    pub degree: Option<Box<MathExpression>>,
+    pub style: DerivativeStyle,
+}
+
+impl fmt::Debug for Derivative {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("Derivative")
+            .field("bound_variable", &self.bound_variable)
+            .field("expression", &self.expression)
+            .field("degree", &self.degree)
+            .field("style", &self.style)
+            .finish()
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AggregateOperator {
+    Summation,
+    Product,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AggregateExpression {
+    pub operator: AggregateOperator,
+    pub bound_variable: Box<MathExpression>,
+    pub body: Box<MathExpression>,
+    pub bounds: Option<Bounds>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ComparisonOperator {
+    Equal,
+    NotEqual,
+    GreaterOrEqual,
+    GreaterThan,
+    LessOrEqual,
+    LessThan,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ComparisonExpression {
+    pub operator: ComparisonOperator,
+    pub left: Box<MathExpression>,
+    pub right: Box<MathExpression>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BinaryExpression {
     pub operator: BinaryOperator,
     pub left: Box<MathExpression>,
@@ -159,6 +279,13 @@ pub enum MathExpressionKind {
     Unary(UnaryExpression),
     Grouping(Grouping),
     ArrayIndex(ArrayIndex),
+    Matrix(Matrix),
+    Vector(Vector),
+    Range(RangeExpression),
+    Integral(Integral),
+    Derivative(Derivative),
+    Aggregate(AggregateExpression),
+    Comparison(ComparisonExpression),
 }
 
 #[derive(Clone, Eq, PartialEq)]
@@ -180,6 +307,13 @@ impl fmt::Debug for MathExpression {
             MathExpressionKind::Unary(_) => "Unary",
             MathExpressionKind::Grouping(_) => "Grouping",
             MathExpressionKind::ArrayIndex(_) => "ArrayIndex",
+            MathExpressionKind::Matrix(_) => "Matrix",
+            MathExpressionKind::Vector(_) => "Vector",
+            MathExpressionKind::Range(_) => "Range",
+            MathExpressionKind::Integral(_) => "Integral",
+            MathExpressionKind::Derivative(_) => "Derivative",
+            MathExpressionKind::Aggregate(_) => "Aggregate",
+            MathExpressionKind::Comparison(_) => "Comparison",
         };
         formatter
             .debug_struct("MathExpression")
@@ -231,4 +365,25 @@ pub enum MathAstError {
     InvalidBooleanAttribute,
     #[error("math array index structure is malformed")]
     MalformedArrayIndex,
+    #[error("math matrix dimensions are malformed")]
+    InvalidMatrixDimensions,
+    #[error("math matrix element count does not match its dimensions")]
+    MatrixElementCountMismatch { expected: usize, actual: usize },
+    #[error("math matrix element limit exceeded")]
+    MatrixElementLimitExceeded,
+    #[error("math range structure is malformed")]
+    MalformedRange,
+    #[error("math calculus structure is malformed")]
+    MalformedCalculus,
+    #[error("math integral algorithm is invalid")]
+    InvalidIntegralAlgorithm,
+    #[error("math derivative style is invalid")]
+    InvalidDerivativeStyle,
+    #[error("math bound variable is invalid")]
+    InvalidBoundVariable,
+    #[error("math comparison has invalid arity")]
+    WrongComparisonArity {
+        operator: ComparisonOperator,
+        actual: usize,
+    },
 }

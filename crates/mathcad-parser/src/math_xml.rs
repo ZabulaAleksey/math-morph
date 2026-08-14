@@ -1,7 +1,10 @@
 use crate::ast::{
-    ArrayIndex, BinaryExpression, BinaryOperator, Definition, DefinitionKind, DefinitionStyle,
-    Evaluation, FunctionCall, FunctionDefinition, Grouping, Identifier, MathAstError,
-    MathExpression, MathExpressionKind, NumericBase, RealLiteral, UnaryExpression, UnaryOperator,
+    AggregateExpression, AggregateOperator, ArrayIndex, BinaryExpression, BinaryOperator, Bounds,
+    ComparisonExpression, ComparisonOperator, Definition, DefinitionKind, DefinitionStyle,
+    Derivative, DerivativeStyle, Evaluation, FunctionCall, FunctionDefinition, Grouping,
+    Identifier, Integral, IntegralAlgorithm, MathAstError, MathExpression, MathExpressionKind,
+    Matrix, NumericBase, RangeExpression, RealLiteral, UnaryExpression, UnaryOperator, Vector,
+    VectorOrientation,
 };
 use crate::xml_worksheet::{Child, Node};
 
@@ -13,10 +16,15 @@ pub(crate) enum MathXmlOutcome {
     Invalid(MathAstError),
 }
 
-pub(crate) fn parse_math_expression(node: &Node, max_nodes: usize) -> MathXmlOutcome {
+pub(crate) fn parse_math_expression(
+    node: &Node,
+    max_nodes: usize,
+    max_matrix_elements: usize,
+) -> MathXmlOutcome {
     let mut parser = MathParser {
         max_nodes,
         nodes: 0,
+        max_matrix_elements,
     };
     match parser.expression(node) {
         Ok(expression) => MathXmlOutcome::Parsed(expression),
@@ -39,6 +47,7 @@ impl From<MathAstError> for Failure {
 struct MathParser {
     max_nodes: usize,
     nodes: usize,
+    max_matrix_elements: usize,
 }
 
 impl MathParser {
@@ -62,6 +71,8 @@ impl MathParser {
             "localDefine" => self.definition(node, DefinitionKind::LocalDefine)?,
             "eval" => MathExpressionKind::Evaluation(self.evaluation(node)?),
             "parens" => MathExpressionKind::Grouping(self.grouping(node)?),
+            "matrix" => self.matrix(node)?,
+            "range" => MathExpressionKind::Range(self.range(node)?),
             _ => return Err(Failure::Unsupported),
         };
         Ok(MathExpression {
@@ -114,6 +125,16 @@ impl MathParser {
             "absval" | "conjugate" | "factorial" | "neg" | "sqrt" | "transpose" | "vectorize"
             | "vectorSum" | "determinant" => MathExpressionKind::Unary(self.unary(node)?),
             "indexer" => MathExpressionKind::ArrayIndex(self.array_index(node)?),
+            "integral" => MathExpressionKind::Integral(self.integral(node, head)?),
+            "derivative" => MathExpressionKind::Derivative(self.derivative(node, head)?),
+            "summation" => {
+                MathExpressionKind::Aggregate(self.aggregate(node, AggregateOperator::Summation)?)
+            }
+            "product" => {
+                MathExpressionKind::Aggregate(self.aggregate(node, AggregateOperator::Product)?)
+            }
+            "equal" | "notEqual" | "greaterOrEqual" | "greaterThan" | "lessOrEqual"
+            | "lessThan" => MathExpressionKind::Comparison(self.comparison(node)?),
             "not" => return Err(Failure::Unsupported),
             local if is_supported_expression_form(local) => {
                 MathExpressionKind::FunctionCall(self.function_call(node)?)
@@ -376,6 +397,232 @@ impl MathParser {
         }
         self.expression(children[0])
     }
+
+    fn matrix(&mut self, node: &Node) -> Result<MathExpressionKind, Failure> {
+        if has_non_whitespace_text(node) {
+            return Err(MathAstError::InvalidMatrixDimensions.into());
+        }
+        let rows = positive_dimension(node.attribute("rows"))?;
+        let columns = positive_dimension(node.attribute("cols"))?;
+        let expected = rows
+            .checked_mul(columns)
+            .ok_or(MathAstError::InvalidMatrixDimensions)?;
+        if expected > self.max_matrix_elements {
+            return Err(MathAstError::MatrixElementLimitExceeded.into());
+        }
+        let children: Vec<_> = node.element_children().collect();
+        if children.len() != expected {
+            return Err(MathAstError::MatrixElementCountMismatch {
+                expected,
+                actual: children.len(),
+            }
+            .into());
+        }
+        let elements = children
+            .iter()
+            .map(|element| self.expression(element))
+            .collect::<Result<Vec<_>, _>>()?;
+        if rows == 1 && columns > 1 {
+            Ok(MathExpressionKind::Vector(Vector {
+                orientation: VectorOrientation::Row,
+                elements,
+            }))
+        } else if columns == 1 && rows > 1 {
+            Ok(MathExpressionKind::Vector(Vector {
+                orientation: VectorOrientation::Column,
+                elements,
+            }))
+        } else {
+            Ok(MathExpressionKind::Matrix(Matrix {
+                rows,
+                columns,
+                elements,
+            }))
+        }
+    }
+
+    fn range(&mut self, node: &Node) -> Result<RangeExpression, Failure> {
+        if has_non_whitespace_text(node) {
+            return Err(MathAstError::MalformedRange.into());
+        }
+        let children: Vec<_> = node.element_children().collect();
+        if children.len() != 2 {
+            return Err(MathAstError::MalformedRange.into());
+        }
+        let (start, next) = if children[0].is(MATH_NS, "sequence") {
+            if has_non_whitespace_text(children[0]) {
+                return Err(MathAstError::MalformedRange.into());
+            }
+            let sequence: Vec<_> = children[0].element_children().collect();
+            if sequence.len() != 2 {
+                return Err(MathAstError::MalformedRange.into());
+            }
+            (
+                self.expression(sequence[0])?,
+                Some(Box::new(self.expression(sequence[1])?)),
+            )
+        } else {
+            (self.expression(children[0])?, None)
+        };
+        Ok(RangeExpression {
+            start: Box::new(start),
+            next,
+            end: Box::new(self.expression(children[1])?),
+        })
+    }
+
+    fn integral(&mut self, node: &Node, head: &Node) -> Result<Integral, Failure> {
+        let (bound_variable, integrand, bounds) = self.lambda_with_optional_bounds(node)?;
+        let algorithm = head
+            .attribute("algorithm")
+            .map(integral_algorithm)
+            .transpose()?;
+        Ok(Integral {
+            bound_variable: Box::new(bound_variable),
+            integrand: Box::new(integrand),
+            bounds,
+            algorithm,
+        })
+    }
+
+    fn derivative(&mut self, node: &Node, head: &Node) -> Result<Derivative, Failure> {
+        let children: Vec<_> = node.element_children().collect();
+        if children.len() < 2 || children.len() > 3 || !children[1].is(MATH_NS, "lambda") {
+            return Err(MathAstError::MalformedCalculus.into());
+        }
+        let (bound_variable, expression) = self.lambda(children[1])?;
+        let degree = match children.get(2) {
+            Some(wrapper) if wrapper.is(MATH_NS, "degree") => Some(Box::new(
+                self.single_wrapper_expression(wrapper, MathAstError::MalformedCalculus)?,
+            )),
+            Some(_) => return Err(MathAstError::MalformedCalculus.into()),
+            None => None,
+        };
+        Ok(Derivative {
+            bound_variable: Box::new(bound_variable),
+            expression: Box::new(expression),
+            degree,
+            style: derivative_style(head.attribute("style"))?,
+        })
+    }
+
+    fn aggregate(
+        &mut self,
+        node: &Node,
+        operator: AggregateOperator,
+    ) -> Result<AggregateExpression, Failure> {
+        let (bound_variable, body, bounds) = self.lambda_with_optional_bounds(node)?;
+        Ok(AggregateExpression {
+            operator,
+            bound_variable: Box::new(bound_variable),
+            body: Box::new(body),
+            bounds,
+        })
+    }
+
+    fn lambda_with_optional_bounds(
+        &mut self,
+        node: &Node,
+    ) -> Result<(MathExpression, MathExpression, Option<Bounds>), Failure> {
+        let children: Vec<_> = node.element_children().collect();
+        if children.len() < 2 || children.len() > 3 || !children[1].is(MATH_NS, "lambda") {
+            return Err(MathAstError::MalformedCalculus.into());
+        }
+        let (bound_variable, body) = self.lambda(children[1])?;
+        let bounds = match children.get(2) {
+            Some(wrapper) if wrapper.is(MATH_NS, "bounds") => Some(self.bounds(wrapper)?),
+            Some(_) => return Err(MathAstError::MalformedCalculus.into()),
+            None => None,
+        };
+        Ok((bound_variable, body, bounds))
+    }
+
+    fn lambda(&mut self, node: &Node) -> Result<(MathExpression, MathExpression), Failure> {
+        if has_non_whitespace_text(node) {
+            return Err(MathAstError::MalformedCalculus.into());
+        }
+        let children: Vec<_> = node.element_children().collect();
+        if children.len() != 2 || !children[0].is(MATH_NS, "boundVars") {
+            return Err(MathAstError::MalformedCalculus.into());
+        }
+        let variables: Vec<_> = children[0].element_children().collect();
+        if has_non_whitespace_text(children[0]) || variables.len() != 1 {
+            return Err(MathAstError::InvalidBoundVariable.into());
+        }
+        let variable = self.expression(variables[0])?;
+        if !matches!(variable.kind, MathExpressionKind::Identifier(_)) {
+            return Err(MathAstError::InvalidBoundVariable.into());
+        }
+        Ok((variable, self.expression(children[1])?))
+    }
+
+    fn bounds(&mut self, node: &Node) -> Result<Bounds, Failure> {
+        if has_non_whitespace_text(node) {
+            return Err(MathAstError::MalformedCalculus.into());
+        }
+        let children: Vec<_> = node.element_children().collect();
+        if children.len() != 2 {
+            return Err(MathAstError::MalformedCalculus.into());
+        }
+        Ok(Bounds {
+            lower: Box::new(self.expression(children[0])?),
+            upper: Box::new(self.expression(children[1])?),
+        })
+    }
+
+    fn comparison(&mut self, node: &Node) -> Result<ComparisonExpression, Failure> {
+        let children: Vec<_> = node.element_children().collect();
+        let operator = match children[0].name.local_name.as_str() {
+            "equal" => ComparisonOperator::Equal,
+            "notEqual" => ComparisonOperator::NotEqual,
+            "greaterOrEqual" => ComparisonOperator::GreaterOrEqual,
+            "greaterThan" => ComparisonOperator::GreaterThan,
+            "lessOrEqual" => ComparisonOperator::LessOrEqual,
+            "lessThan" => ComparisonOperator::LessThan,
+            _ => return Err(Failure::Unsupported),
+        };
+        let actual = children.len().saturating_sub(1);
+        if actual != 2 {
+            return Err(MathAstError::WrongComparisonArity { operator, actual }.into());
+        }
+        Ok(ComparisonExpression {
+            operator,
+            left: Box::new(self.expression(children[1])?),
+            right: Box::new(self.expression(children[2])?),
+        })
+    }
+}
+
+fn positive_dimension(value: Option<&str>) -> Result<usize, Failure> {
+    let value = value.ok_or(MathAstError::InvalidMatrixDimensions)?;
+    let value = value
+        .parse::<usize>()
+        .map_err(|_| MathAstError::InvalidMatrixDimensions)?;
+    if value == 0 {
+        return Err(MathAstError::InvalidMatrixDimensions.into());
+    }
+    Ok(value)
+}
+
+fn integral_algorithm(value: &str) -> Result<IntegralAlgorithm, Failure> {
+    match value {
+        "equal-interval" => Ok(IntegralAlgorithm::EqualInterval),
+        "adaptive" => Ok(IntegralAlgorithm::Adaptive),
+        "infinite" => Ok(IntegralAlgorithm::Infinite),
+        "oscillating" => Ok(IntegralAlgorithm::Oscillating),
+        "limit-end-points" => Ok(IntegralAlgorithm::LimitEndPoints),
+        "romberg" => Ok(IntegralAlgorithm::Romberg),
+        _ => Err(MathAstError::InvalidIntegralAlgorithm.into()),
+    }
+}
+
+fn derivative_style(value: Option<&str>) -> Result<DerivativeStyle, Failure> {
+    match value.unwrap_or("default") {
+        "default" => Ok(DerivativeStyle::Default),
+        "derivative" => Ok(DerivativeStyle::Derivative),
+        "partial" => Ok(DerivativeStyle::Partial),
+        _ => Err(MathAstError::InvalidDerivativeStyle.into()),
+    }
 }
 
 fn definition_style(value: Option<&str>, kind: DefinitionKind) -> Result<DefinitionStyle, Failure> {
@@ -411,7 +658,16 @@ fn has_non_whitespace_text(node: &Node) -> bool {
 fn is_supported_expression_form(local: &str) -> bool {
     matches!(
         local,
-        "real" | "id" | "apply" | "define" | "globalDefine" | "localDefine" | "eval" | "parens"
+        "real"
+            | "id"
+            | "apply"
+            | "define"
+            | "globalDefine"
+            | "localDefine"
+            | "eval"
+            | "parens"
+            | "matrix"
+            | "range"
     )
 }
 

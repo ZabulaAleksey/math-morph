@@ -511,7 +511,7 @@ fn discover_regions(
             if regions.len() >= limits.max_regions {
                 return Err(WorksheetError::LimitExceeded(WorksheetLimit::Regions));
             }
-            let region = parse_region(child, regions.len(), limits.max_ast_nodes, diagnostics)?;
+            let region = parse_region(child, regions.len(), limits, diagnostics)?;
             if !identifiers.insert(region.id) {
                 return Err(WorksheetError::DuplicateRegionId);
             }
@@ -532,7 +532,7 @@ fn discover_regions(
 fn parse_region(
     node: &Node,
     source_ordinal: usize,
-    max_ast_nodes: usize,
+    limits: WorksheetLimits,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Result<Region, WorksheetError> {
     let id = node
@@ -559,7 +559,12 @@ fn parse_region(
     let content = if content_node.is(WS_NS, "text") {
         RegionContent::Text(parse_text(content_node, diagnostics)?)
     } else if content_node.is(WS_NS, "math") {
-        RegionContent::Math(parse_math(content_node, max_ast_nodes, diagnostics)?)
+        RegionContent::Math(parse_math(
+            content_node,
+            limits.max_ast_nodes,
+            limits.max_matrix_elements,
+            diagnostics,
+        )?)
     } else if content_node.is(WS_NS, "plot") {
         RegionContent::Plot(parse_plot(content_node)?)
     } else if content_node.is(WS_NS, "picture") {
@@ -689,6 +694,7 @@ fn inline_kind(node: &Node) -> Option<InlineKind> {
 fn parse_math(
     node: &Node,
     max_ast_nodes: usize,
+    max_matrix_elements: usize,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Result<MathRegion, WorksheetError> {
     let result_format = node
@@ -706,7 +712,11 @@ fn parse_math(
     if expression.name.namespace_uri.as_deref() != Some(MATH_NS) {
         return Err(WorksheetError::UnsupportedMathNamespace);
     }
-    let outcome = match crate::math_xml::parse_math_expression(expression, max_ast_nodes) {
+    let outcome = match crate::math_xml::parse_math_expression(
+        expression,
+        max_ast_nodes,
+        max_matrix_elements,
+    ) {
         crate::math_xml::MathXmlOutcome::Parsed(expression) => MathParseOutcome::Parsed(expression),
         crate::math_xml::MathXmlOutcome::Invalid(error) => MathParseOutcome::Invalid(error),
         crate::math_xml::MathXmlOutcome::Unsupported => {
