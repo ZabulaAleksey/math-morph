@@ -1,7 +1,9 @@
 //! Безопасная граница входных форматов Mathcad.
 
+mod ast;
 mod diagnostic;
 mod format;
+mod math_xml;
 mod mcdx;
 mod region;
 mod source;
@@ -9,6 +11,10 @@ mod worksheet;
 mod xml_metadata;
 mod xml_worksheet;
 
+pub use ast::{
+    BinaryExpression, BinaryOperator, Identifier, MathAstError, MathExpression, MathExpressionKind,
+    NumericBase, RealLiteral,
+};
 pub use diagnostic::{Diagnostic, DiagnosticCode, Severity};
 pub use format::{FormatDetection, FormatDetector, FormatError, InputFormat};
 pub use mcdx::{

@@ -25,17 +25,17 @@ struct Attribute {
 }
 
 #[derive(Debug)]
-enum Child {
+pub(crate) enum Child {
     Node(Node),
     Text { value: String, span: SourceSpan },
 }
 
 #[derive(Debug)]
-struct Node {
-    name: ExpandedName,
+pub(crate) struct Node {
+    pub(crate) name: ExpandedName,
     attributes: Vec<Attribute>,
-    children: Vec<Child>,
-    span: SourceSpan,
+    pub(crate) children: Vec<Child>,
+    pub(crate) span: SourceSpan,
 }
 
 impl Node {
@@ -43,7 +43,7 @@ impl Node {
         self.name.namespace_uri.as_deref() == Some(namespace) && self.name.local_name == local
     }
 
-    fn attribute(&self, local: &str) -> Option<&str> {
+    pub(crate) fn attribute(&self, local: &str) -> Option<&str> {
         self.attributes
             .iter()
             .find(|attribute| {
@@ -59,7 +59,7 @@ impl Node {
         })
     }
 
-    fn element_children(&self) -> impl Iterator<Item = &Node> {
+    pub(crate) fn element_children(&self) -> impl Iterator<Item = &Node> {
         self.children.iter().filter_map(|child| match child {
             Child::Node(node) => Some(node),
             Child::Text { .. } => None,
@@ -511,7 +511,7 @@ fn discover_regions(
             if regions.len() >= limits.max_regions {
                 return Err(WorksheetError::LimitExceeded(WorksheetLimit::Regions));
             }
-            let region = parse_region(child, regions.len(), diagnostics)?;
+            let region = parse_region(child, regions.len(), limits.max_ast_nodes, diagnostics)?;
             if !identifiers.insert(region.id) {
                 return Err(WorksheetError::DuplicateRegionId);
             }
@@ -532,6 +532,7 @@ fn discover_regions(
 fn parse_region(
     node: &Node,
     source_ordinal: usize,
+    max_ast_nodes: usize,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Result<Region, WorksheetError> {
     let id = node
@@ -558,7 +559,7 @@ fn parse_region(
     let content = if content_node.is(WS_NS, "text") {
         RegionContent::Text(parse_text(content_node, diagnostics)?)
     } else if content_node.is(WS_NS, "math") {
-        RegionContent::Math(parse_math(content_node, diagnostics)?)
+        RegionContent::Math(parse_math(content_node, max_ast_nodes, diagnostics)?)
     } else if content_node.is(WS_NS, "plot") {
         RegionContent::Plot(parse_plot(content_node)?)
     } else if content_node.is(WS_NS, "picture") {
@@ -687,6 +688,7 @@ fn inline_kind(node: &Node) -> Option<InlineKind> {
 
 fn parse_math(
     node: &Node,
+    max_ast_nodes: usize,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Result<MathRegion, WorksheetError> {
     let result_format = node
@@ -704,12 +706,14 @@ fn parse_math(
     if expression.name.namespace_uri.as_deref() != Some(MATH_NS) {
         return Err(WorksheetError::UnsupportedMathNamespace);
     }
-    let outcome = if expression.name.local_name == "program" {
-        let diagnostic = Diagnostic::warning(DiagnosticCode::UnsupportedMathNode, None);
-        diagnostics.push(diagnostic);
-        MathParseOutcome::Unsupported(diagnostic)
-    } else {
-        MathParseOutcome::Pending
+    let outcome = match crate::math_xml::parse_math_expression(expression, max_ast_nodes) {
+        crate::math_xml::MathXmlOutcome::Parsed(expression) => MathParseOutcome::Parsed(expression),
+        crate::math_xml::MathXmlOutcome::Invalid(error) => MathParseOutcome::Invalid(error),
+        crate::math_xml::MathXmlOutcome::Unsupported => {
+            let diagnostic = Diagnostic::warning(DiagnosticCode::UnsupportedMathNode, None);
+            diagnostics.push(diagnostic);
+            MathParseOutcome::Unsupported(diagnostic)
+        }
     };
     Ok(MathRegion {
         disable_calc: boolean_attribute(node, "disable-calc")?,

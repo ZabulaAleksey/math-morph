@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt;
 
-use crate::{Diagnostic, ExpandedName, OpaqueFragment, SourceSpan};
+use crate::{Diagnostic, ExpandedName, MathAstError, MathExpression, OpaqueFragment, SourceSpan};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct SourceNumber {
@@ -114,9 +114,9 @@ pub struct ResultFormat {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum MathParseOutcome {
-    /// The raw math node is valid at worksheet level and awaits the AST stage.
-    Pending,
-    /// The node is intentionally outside stages 027--035 (for example `ml:program`).
+    Parsed(MathExpression),
+    Invalid(MathAstError),
+    /// The node is intentionally outside the implemented AST subset.
     Unsupported(Diagnostic),
 }
 

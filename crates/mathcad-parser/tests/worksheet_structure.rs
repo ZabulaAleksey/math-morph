@@ -248,7 +248,7 @@ fn ac_032_to_035_classifies_math_plot_picture_table_program_and_unknown() {
         panic!("math expected")
     };
     assert!(math.disable_calc && math.optimize);
-    assert!(matches!(math.outcome, MathParseOutcome::Pending));
+    assert!(matches!(math.outcome, MathParseOutcome::Parsed(_)));
     assert!(math.expression_span.start < math.expression_span.end);
     let table = math
         .result_format
