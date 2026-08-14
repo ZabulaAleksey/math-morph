@@ -3,6 +3,9 @@
 pub enum DiagnosticCode {
     FileExtensionMismatch,
     UnknownContainerPart,
+    UnknownRegionContent,
+    UnknownInlineNode,
+    UnsupportedMathNode,
 }
 
 impl DiagnosticCode {
@@ -10,6 +13,9 @@ impl DiagnosticCode {
         match self {
             Self::FileExtensionMismatch => "FILE_EXTENSION_MISMATCH",
             Self::UnknownContainerPart => "UNKNOWN_CONTAINER_PART",
+            Self::UnknownRegionContent => "UNKNOWN_REGION_CONTENT",
+            Self::UnknownInlineNode => "UNKNOWN_INLINE_NODE",
+            Self::UnsupportedMathNode => "UNSUPPORTED_MATH_NODE",
         }
     }
 }
