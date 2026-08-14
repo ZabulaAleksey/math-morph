@@ -64,6 +64,82 @@ pub enum BinaryOperator {
     Power,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DefinitionKind {
+    Define,
+    GlobalDefine,
+    LocalDefine,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DefinitionStyle {
+    Default,
+    ColonEqual,
+    Equal,
+    TripleEqual,
+    LeftArrow,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Definition {
+    pub kind: DefinitionKind,
+    pub style: DefinitionStyle,
+    pub target: Box<MathExpression>,
+    pub value: Box<MathExpression>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Evaluation {
+    pub expression: Box<MathExpression>,
+    pub unit_override: Option<Box<MathExpression>>,
+    pub saved_result: Option<Box<MathExpression>>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct FunctionCall {
+    pub callee: Box<MathExpression>,
+    pub arguments: Vec<MathExpression>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct FunctionDefinition {
+    pub style: DefinitionStyle,
+    pub name: Box<MathExpression>,
+    pub parameters: Vec<MathExpression>,
+    pub body: Box<MathExpression>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum UnaryOperator {
+    AbsoluteValue,
+    Conjugate,
+    Factorial,
+    Negate,
+    SquareRoot,
+    Transpose,
+    Vectorize,
+    VectorSum,
+    Determinant,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct UnaryExpression {
+    pub operator: UnaryOperator,
+    pub operand: Box<MathExpression>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Grouping {
+    pub expression: Box<MathExpression>,
+    pub unpaired: bool,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ArrayIndex {
+    pub target: Box<MathExpression>,
+    pub indices: Vec<MathExpression>,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BinaryExpression {
     pub operator: BinaryOperator,
@@ -76,6 +152,13 @@ pub enum MathExpressionKind {
     Real(RealLiteral),
     Identifier(Identifier),
     Binary(BinaryExpression),
+    Definition(Definition),
+    Evaluation(Evaluation),
+    FunctionCall(FunctionCall),
+    FunctionDefinition(FunctionDefinition),
+    Unary(UnaryExpression),
+    Grouping(Grouping),
+    ArrayIndex(ArrayIndex),
 }
 
 #[derive(Clone, Eq, PartialEq)]
@@ -90,6 +173,13 @@ impl fmt::Debug for MathExpression {
             MathExpressionKind::Real(_) => "Real",
             MathExpressionKind::Identifier(_) => "Identifier",
             MathExpressionKind::Binary(_) => "Binary",
+            MathExpressionKind::Definition(_) => "Definition",
+            MathExpressionKind::Evaluation(_) => "Evaluation",
+            MathExpressionKind::FunctionCall(_) => "FunctionCall",
+            MathExpressionKind::FunctionDefinition(_) => "FunctionDefinition",
+            MathExpressionKind::Unary(_) => "Unary",
+            MathExpressionKind::Grouping(_) => "Grouping",
+            MathExpressionKind::ArrayIndex(_) => "ArrayIndex",
         };
         formatter
             .debug_struct("MathExpression")
@@ -114,4 +204,31 @@ pub enum MathAstError {
         operator: BinaryOperator,
         actual: usize,
     },
+    #[error("math definition target is invalid")]
+    InvalidDefinitionTarget,
+    #[error("math definition style is invalid")]
+    InvalidDefinitionStyle,
+    #[error("math evaluation structure is malformed")]
+    MalformedEvaluation,
+    #[error("math function call has invalid arity")]
+    WrongFunctionArity { actual: usize },
+    #[error("math function name is invalid")]
+    InvalidFunctionName,
+    #[error("math function parameter is invalid")]
+    InvalidFunctionParameter,
+    #[error("math function definition structure is malformed")]
+    MalformedFunctionDefinition,
+    #[error("math unary operation has invalid arity")]
+    WrongUnaryArity {
+        operator: UnaryOperator,
+        actual: usize,
+    },
+    #[error("math array index has invalid arity")]
+    WrongArrayIndexArity { actual: usize },
+    #[error("math grouping structure is malformed")]
+    MalformedGrouping,
+    #[error("math boolean attribute is malformed")]
+    InvalidBooleanAttribute,
+    #[error("math array index structure is malformed")]
+    MalformedArrayIndex,
 }

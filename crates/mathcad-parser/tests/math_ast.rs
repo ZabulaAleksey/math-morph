@@ -61,6 +61,7 @@ fn sexpr(expression: &MathExpression) -> String {
             sexpr(&binary.left),
             sexpr(&binary.right)
         ),
+        other => format!("({other:?})"),
     }
 }
 
@@ -201,7 +202,7 @@ fn validates_binary_arity_and_expression_node_limit() {
 #[test]
 fn later_or_unknown_math_nodes_remain_diagnostic_fallbacks_not_ast_nodes() {
     for xml in [
-        r#"<m:define><m:id>x</m:id><m:real>1</m:real></m:define>"#,
+        r#"<m:matrix><m:real>1</m:real></m:matrix>"#,
         r#"<m:future secret="payload"/>"#,
     ] {
         let MathParseOutcome::Unsupported(diagnostic) = outcome(xml) else {

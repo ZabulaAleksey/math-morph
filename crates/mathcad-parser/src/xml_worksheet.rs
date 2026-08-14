@@ -39,7 +39,7 @@ pub(crate) struct Node {
 }
 
 impl Node {
-    fn is(&self, namespace: &str, local: &str) -> bool {
+    pub(crate) fn is(&self, namespace: &str, local: &str) -> bool {
         self.name.namespace_uri.as_deref() == Some(namespace) && self.name.local_name == local
     }
 

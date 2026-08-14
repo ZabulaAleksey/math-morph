@@ -12,8 +12,9 @@ mod xml_metadata;
 mod xml_worksheet;
 
 pub use ast::{
-    BinaryExpression, BinaryOperator, Identifier, MathAstError, MathExpression, MathExpressionKind,
-    NumericBase, RealLiteral,
+    ArrayIndex, BinaryExpression, BinaryOperator, Definition, DefinitionKind, DefinitionStyle,
+    Evaluation, FunctionCall, FunctionDefinition, Grouping, Identifier, MathAstError,
+    MathExpression, MathExpressionKind, NumericBase, RealLiteral, UnaryExpression, UnaryOperator,
 };
 pub use diagnostic::{Diagnostic, DiagnosticCode, Severity};
 pub use format::{FormatDetection, FormatDetector, FormatError, InputFormat};
