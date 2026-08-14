@@ -207,6 +207,14 @@ Parser не извлекает файлы, не загружает schema/URI, �
 
 `OmmlFragment` нельзя сконструировать извне с raw XML: публичный `WordEquationExporter` создаёт его только из проверенного AST, экранирует text и отклоняет unsupported/ambiguous grouping. Typed errors и custom `Debug` не включают document text, formulas, asset IDs, paths или payload bytes.
 
+### Точная граница декодеров и equation resource budgets
+
+Для недоверенного JSON публичный путь `VersionedDocumentIr::from_json_with_limit` сначала ограничивает число входных bytes, затем использует `serde_json::from_slice` с его default recursion limit для probe и полного envelope, а после декодирования вызывает IR validation с ограничениями глубины таблиц/выражений и числа узлов. Это последовательные, разные controls: IR depth validation не заменяет decoder recursion guard.
+
+Прямой Rust `Deserialize` для `VersionedDocumentIr` и derive/custom deserializers математической модели не являются bounded entry point сами по себе: caller, который вызывает их напрямую, владеет reader/input limit, decoder configuration и обязательным вызовом model validation. Такой путь не рекламируется как безопасный boundary для недоверенного JSON.
+
+XML paths используют explicit stack depth limits (`quick-xml` reader + bounded parser/validator state); DTD/entities и invalid XML 1.0 characters отклоняются. OMML renderer и `DocxValidator` используют согласованные equation byte/node/depth quotas. Renderer дополнительно учитывает `linear_work_items`: left-associated linear expressions обходятся итеративно, а work budget не даёт стоимости обхода превысить node budget и не полагается на unbounded recursive descent.
+
 ## Обязательные проверки безопасности по типу изменения
 
 | Изменение | Минимальные проверки |

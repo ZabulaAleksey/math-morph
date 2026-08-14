@@ -60,6 +60,8 @@ pub enum DocxError {
     PackageWrite,
     #[error("generated DOCX package failed structural validation")]
     GeneratedPackageInvalid,
+    #[error("the selected equation backend is unavailable")]
+    EquationBackendUnavailable,
     #[error("equation export failed: {0}")]
     Equation(#[from] OmmlError),
 }

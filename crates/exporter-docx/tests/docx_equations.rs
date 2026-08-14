@@ -190,11 +190,7 @@ fn docx_equation_limits_and_unsupported_nodes_remain_typed_and_redacted() {
         binary(BinaryOperator::Power, identifier("secret"), real("2")),
         FormulaDisplayModeIr::Inline,
     )]);
-    let error = DocxExporter::default()
-        .export(&power, &NoAssets)
-        .unwrap_err();
-    assert_eq!(error, DocxError::Equation(OmmlError::UnsupportedExpression));
-    assert!(!format!("{error:?} {error}").contains("secret"));
+    assert!(DocxExporter::default().export(&power, &NoAssets).is_ok());
 }
 
 #[test]
@@ -281,5 +277,31 @@ fn validator_enforces_equation_depth_node_and_output_limits() {
         Err(DocxValidationError::LimitExceeded(
             DocxLimit::EquationOutputBytes
         ))
+    );
+}
+
+#[test]
+fn validator_rejects_new_equation_attributes_and_child_order() {
+    let power = document(vec![formula_block(
+        "power",
+        None,
+        binary(BinaryOperator::Power, identifier("x"), real("2")),
+        FormulaDisplayModeIr::Inline,
+    )]);
+    let valid = DocxExporter::default().export(&power, &NoAssets).unwrap();
+    let xml = document_xml(&valid);
+    let invalid_attribute = xml.replace("<m:sSup>", "<m:sSup m:val=\"unexpected\">");
+    assert_eq!(
+        DocxValidator::default()
+            .validate(&replace_document_xml(&valid, invalid_attribute.as_bytes())),
+        Err(DocxValidationError::InvalidEquation)
+    );
+    let invalid_order = xml.replace(
+        "<m:sSup><m:e><m:r><m:rPr><m:sty m:val=\"i\"/></m:rPr><m:t>x</m:t></m:r></m:e><m:sup><m:r><m:t>2</m:t></m:r></m:sup></m:sSup>",
+        "<m:sSup><m:sup><m:r><m:t>2</m:t></m:r></m:sup><m:e><m:r><m:rPr><m:sty m:val=\"i\"/></m:rPr><m:t>x</m:t></m:r></m:e></m:sSup>",
+    );
+    assert_eq!(
+        DocxValidator::default().validate(&replace_document_xml(&valid, invalid_order.as_bytes())),
+        Err(DocxValidationError::InvalidEquation)
     );
 }

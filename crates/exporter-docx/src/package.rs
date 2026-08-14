@@ -93,18 +93,44 @@ impl Seek for LimitedCursor {
     }
 }
 
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum EquationBackend {
+    #[default]
+    WordOmml,
+    MathType,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct DocxExportConfig {
+    pub equation_backend: EquationBackend,
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct DocxExporter {
     limits: DocxLimits,
+    config: DocxExportConfig,
 }
 
 impl DocxExporter {
     pub const fn new(limits: DocxLimits) -> Self {
-        Self { limits }
+        Self::with_config(
+            limits,
+            DocxExportConfig {
+                equation_backend: EquationBackend::WordOmml,
+            },
+        )
+    }
+
+    pub const fn with_config(limits: DocxLimits, config: DocxExportConfig) -> Self {
+        Self { limits, config }
     }
 
     pub const fn limits(&self) -> &DocxLimits {
         &self.limits
+    }
+
+    pub const fn config(&self) -> &DocxExportConfig {
+        &self.config
     }
 
     pub fn export<R: AssetResolver + ?Sized>(
@@ -295,6 +321,9 @@ impl DocxExporter {
     }
 
     fn render_equation(&self, formula: &FormulaIr, output: &mut String) -> Result<(), DocxError> {
+        if self.config.equation_backend == EquationBackend::MathType {
+            return Err(DocxError::EquationBackendUnavailable);
+        }
         let exporter = WordEquationExporter::new(OmmlLimits {
             max_depth: self.limits.max_equation_depth,
             max_nodes: self.limits.max_equation_nodes,

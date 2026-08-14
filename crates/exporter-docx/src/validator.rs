@@ -591,6 +591,29 @@ fn allowed_document_element(node: &XmlNode) -> bool {
                 | "type"
                 | "num"
                 | "den"
+                | "sSup"
+                | "sup"
+                | "sSub"
+                | "sub"
+                | "sSubSup"
+                | "rad"
+                | "radPr"
+                | "degHide"
+                | "deg"
+                | "func"
+                | "funcPr"
+                | "fName"
+                | "d"
+                | "dPr"
+                | "begChr"
+                | "sepChr"
+                | "endChr"
+                | "m"
+                | "mr"
+                | "nary"
+                | "naryPr"
+                | "chr"
+                | "e"
         ),
         _ => false,
     }
@@ -666,6 +689,20 @@ fn validate_math_sequence(
             validate_math_run(child)?;
         } else if child.is(OFFICE_MATH_NS, "f") {
             validate_fraction(child, depth, state)?;
+        } else if child.is(OFFICE_MATH_NS, "sSup") {
+            validate_script(child, depth, state, Script::Sup)?;
+        } else if child.is(OFFICE_MATH_NS, "sSub") {
+            validate_script(child, depth, state, Script::Sub)?;
+        } else if child.is(OFFICE_MATH_NS, "sSubSup") {
+            validate_script(child, depth, state, Script::SubSup)?;
+        } else if child.is(OFFICE_MATH_NS, "rad") {
+            validate_radical(child, depth, state)?;
+        } else if child.is(OFFICE_MATH_NS, "func") {
+            validate_function(child, depth, state)?;
+        } else if child.is(OFFICE_MATH_NS, "d") {
+            validate_delimiter(child, depth, state)?;
+        } else if child.is(OFFICE_MATH_NS, "nary") {
+            validate_nary(child, depth, state)?;
         } else {
             return Err(DocxValidationError::InvalidEquation);
         }
@@ -755,6 +792,297 @@ fn validate_fraction(
         .ok_or(DocxValidationError::LimitExceeded(DocxLimit::EquationDepth))?;
     validate_math_sequence(&numerator.children, next_depth, state)?;
     validate_math_sequence(&denominator.children, next_depth, state)
+}
+
+#[derive(Clone, Copy)]
+enum Script {
+    Sup,
+    Sub,
+    SubSup,
+}
+
+fn next_equation_depth(depth: usize) -> Result<usize, DocxValidationError> {
+    depth
+        .checked_add(1)
+        .ok_or(DocxValidationError::LimitExceeded(DocxLimit::EquationDepth))
+}
+
+fn plain_math_container<'a>(
+    node: &'a XmlNode,
+    local: &str,
+) -> Result<&'a [XmlNode], DocxValidationError> {
+    if !node.is(OFFICE_MATH_NS, local)
+        || !node.attributes.is_empty()
+        || !node.text.trim().is_empty()
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    Ok(&node.children)
+}
+
+fn validate_script(
+    node: &XmlNode,
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+    kind: Script,
+) -> Result<(), DocxValidationError> {
+    let expected: &[&str] = match kind {
+        Script::Sup => &["e", "sup"],
+        Script::Sub => &["e", "sub"],
+        Script::SubSup => &["e", "sub", "sup"],
+    };
+    if !node.attributes.is_empty()
+        || !node.text.trim().is_empty()
+        || node.children.len() != expected.len()
+        || node.children.iter().zip(expected).any(|(child, local)| {
+            !child.is(OFFICE_MATH_NS, local)
+                || !child.attributes.is_empty()
+                || !child.text.trim().is_empty()
+        })
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let next = next_equation_depth(depth)?;
+    for child in &node.children {
+        validate_math_sequence(&child.children, next, state)?;
+    }
+    Ok(())
+}
+
+fn validate_radical(
+    node: &XmlNode,
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+) -> Result<(), DocxValidationError> {
+    if !node.attributes.is_empty() || !node.text.trim().is_empty() || node.children.len() != 3 {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let properties = &node.children[0];
+    let degree = &node.children[1];
+    let expression = &node.children[2];
+    if !properties.is(OFFICE_MATH_NS, "radPr")
+        || !properties.attributes.is_empty()
+        || !properties.text.trim().is_empty()
+        || properties.children.len() != 1
+        || !properties.children[0].is(OFFICE_MATH_NS, "degHide")
+        || properties.children[0].attributes.len() != 1
+        || properties.children[0].attribute(Some(OFFICE_MATH_NS), "val") != Some("1")
+        || !properties.children[0].children.is_empty()
+        || !properties.children[0].text.trim().is_empty()
+        || !degree.is(OFFICE_MATH_NS, "deg")
+        || !degree.attributes.is_empty()
+        || !degree.children.is_empty()
+        || !degree.text.is_empty()
+        || !expression.is(OFFICE_MATH_NS, "e")
+        || !expression.attributes.is_empty()
+        || !expression.text.trim().is_empty()
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    validate_math_sequence(&expression.children, next_equation_depth(depth)?, state)
+}
+
+fn validate_function(
+    node: &XmlNode,
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+) -> Result<(), DocxValidationError> {
+    if !node.attributes.is_empty()
+        || !node.text.trim().is_empty()
+        || !(2..=3).contains(&node.children.len())
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let (name_index, expression_index) = if node.children[0].is(OFFICE_MATH_NS, "funcPr") {
+        if node.children[0].attributes.is_empty()
+            && node.children[0].children.is_empty()
+            && node.children[0].text.trim().is_empty()
+        {
+            (1, 2)
+        } else {
+            return Err(DocxValidationError::InvalidEquation);
+        }
+    } else {
+        (0, 1)
+    };
+    if node.children.len() != expression_index + 1
+        || !node.children[name_index].is(OFFICE_MATH_NS, "fName")
+        || !node.children[expression_index].is(OFFICE_MATH_NS, "e")
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let name = &node.children[name_index];
+    let expression = &node.children[expression_index];
+    if !name.attributes.is_empty()
+        || !name.text.trim().is_empty()
+        || !identifier_shape(&name.children)
+        || !expression.attributes.is_empty()
+        || !expression.text.trim().is_empty()
+        || expression.children.len() != 1
+        || !expression.children[0].is(OFFICE_MATH_NS, "d")
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let next = next_equation_depth(depth)?;
+    validate_math_sequence(&name.children, next, state)?;
+    state.count_node(next)?;
+    validate_delimiter(&expression.children[0], next, state)
+}
+
+fn identifier_shape(children: &[XmlNode]) -> bool {
+    matches!(children, [node] if node.is(OFFICE_MATH_NS, "r") || node.is(OFFICE_MATH_NS, "sSub"))
+}
+
+fn validate_delimiter(
+    node: &XmlNode,
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+) -> Result<(), DocxValidationError> {
+    if !node.attributes.is_empty()
+        || !node.text.trim().is_empty()
+        || node.children.len() < 2
+        || !node.children[0].is(OFFICE_MATH_NS, "dPr")
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let properties = &node.children[0];
+    if !properties.attributes.is_empty() || !properties.text.trim().is_empty() {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let values: Vec<(&str, &str)> = properties
+        .children
+        .iter()
+        .map(|child| {
+            (
+                child.local.as_str(),
+                child
+                    .attribute(Some(OFFICE_MATH_NS), "val")
+                    .unwrap_or_default(),
+            )
+        })
+        .collect();
+    let arguments = &node.children[1..];
+    if arguments.iter().any(|child| {
+        !child.is(OFFICE_MATH_NS, "e")
+            || !child.attributes.is_empty()
+            || !child.text.trim().is_empty()
+    }) {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let valid_properties = values == [("begChr", "("), ("endChr", ")")]
+        || values == [("begChr", "("), ("sepChr", ","), ("endChr", ")")]
+        || values == [("begChr", "["), ("endChr", "]")];
+    if !valid_properties
+        || properties.children.iter().any(|child| {
+            child.attributes.len() != 1
+                || !child.children.is_empty()
+                || !child.text.trim().is_empty()
+        })
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let next = next_equation_depth(depth)?;
+    if values == [("begChr", "["), ("endChr", "]")] {
+        if arguments.len() != 1
+            || arguments[0].children.len() != 1
+            || !arguments[0].children[0].is(OFFICE_MATH_NS, "m")
+        {
+            return Err(DocxValidationError::InvalidEquation);
+        }
+        return validate_matrix(&arguments[0].children[0], next, state);
+    }
+    if values == [("begChr", "("), ("endChr", ")")] && arguments.len() != 1 {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    for argument in arguments {
+        validate_math_sequence(&argument.children, next, state)?;
+    }
+    Ok(())
+}
+
+fn validate_matrix(
+    node: &XmlNode,
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+) -> Result<(), DocxValidationError> {
+    plain_math_container(node, "m")?;
+    if node.children.is_empty() {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    state.count_node(depth)?;
+    let row_depth = next_equation_depth(depth)?;
+    let cell_depth = next_equation_depth(row_depth)?;
+    let mut columns = None;
+    for row in &node.children {
+        plain_math_container(row, "mr")?;
+        if row.children.is_empty()
+            || row.children.iter().any(|cell| {
+                !cell.is(OFFICE_MATH_NS, "e")
+                    || !cell.attributes.is_empty()
+                    || !cell.text.trim().is_empty()
+            })
+        {
+            return Err(DocxValidationError::InvalidEquation);
+        }
+        state.count_node(row_depth)?;
+        match columns {
+            None => columns = Some(row.children.len()),
+            Some(width) if width == row.children.len() => {}
+            Some(_) => return Err(DocxValidationError::InvalidEquation),
+        }
+        for cell in &row.children {
+            validate_math_sequence(&cell.children, cell_depth, state)?;
+        }
+    }
+    Ok(())
+}
+
+fn validate_nary(
+    node: &XmlNode,
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+) -> Result<(), DocxValidationError> {
+    if !node.attributes.is_empty()
+        || !node.text.trim().is_empty()
+        || !(2..=4).contains(&node.children.len())
+        || !node.children[0].is(OFFICE_MATH_NS, "naryPr")
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let properties = &node.children[0];
+    if !properties.attributes.is_empty()
+        || !properties.text.trim().is_empty()
+        || properties.children.len() != 1
+        || !properties.children[0].is(OFFICE_MATH_NS, "chr")
+        || properties.children[0].attributes.len() != 1
+        || !matches!(
+            properties.children[0].attribute(Some(OFFICE_MATH_NS), "val"),
+            Some("∫" | "∑" | "∏")
+        )
+        || !properties.children[0].children.is_empty()
+        || !properties.children[0].text.trim().is_empty()
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let remaining = &node.children[1..];
+    if !remaining.last().is_some_and(|child| {
+        child.is(OFFICE_MATH_NS, "e") && child.attributes.is_empty() && child.text.trim().is_empty()
+    }) || remaining[..remaining.len() - 1]
+        .iter()
+        .enumerate()
+        .any(|(index, child)| {
+            !child.is(OFFICE_MATH_NS, if index == 0 { "sub" } else { "sup" })
+                || !child.attributes.is_empty()
+                || !child.text.trim().is_empty()
+        })
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let next = next_equation_depth(depth)?;
+    for child in remaining {
+        validate_math_sequence(&child.children, next, state)?;
+    }
+    Ok(())
 }
 
 fn required_attribute<'a>(node: &'a XmlNode, local: &str) -> Option<&'a str> {

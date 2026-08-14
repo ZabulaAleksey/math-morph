@@ -84,10 +84,12 @@ Snapshot renderer существует только в tests и выдаёт к�
 
 - `crates/document-ir/tests/document_ir.rs`: V1 golden и deterministic round-trip, unknown version/field/size rejection, все block types, original/display separation, geometry/provenance и fake backend-neutral ports.
 - `crates/exporter-docx/tests/docx_foundation.rs`: минимальный OPC package, deterministic bytes, WordprocessingML text/styles/whitespace, PNG/JPEG, relationships, EMU/twips, page section и ZIP/XML/active-content attacks.
-- `crates/exporter-docx/tests/omml.rs`: structural snapshots number/identifier/add/subtract/multiplication/fraction, semantic grouping, invalid/unsupported nodes, depth/node/output limits и redacted errors.
+- `crates/exporter-docx/tests/omml.rs`: structural snapshots number/identifier/add/subtract/multiplication/fraction, semantic grouping, invalid/unsupported nodes, depth/node/output limits, iterative linear traversal и redacted errors.
 - `crates/exporter-docx/tests/docx_equations.rs`: `FormulaIr.display` boundary, inline/display wrappers, OMML validator allowlist и отдельные validator equation byte/node/depth limits.
+- `crates/exporter-docx/tests/advanced_omml.rs`: AC-077..089 для scripts/roots/functions/grouping/vector/matrix/calculus, canonical shape allowlist, backend selection, shared renderer/validator budgets и fail-closed `MathType`.
+- `crates/exporter-docx/examples/advanced_omml_reference.rs`: воспроизводимый generator артефакта `advanced_omml_reference.docx`; запускать `cargo run -p exporter-docx --example advanced_omml_reference`.
 
-Текущий `DocxValidator` доказывает только строгий subset, который генерирует `exporter-docx`. Полная schema conformance и ручное открытие/редактирование в Word остаются отдельным smoke gate; green subset validator не заменяет Microsoft Word/Open XML SDK validation.
+Текущий `DocxValidator` доказывает только строгий subset, который генерирует `exporter-docx`. Для reference artifact подтверждено Word 16.0 open/enumerate/edit: Word открыл DOCX, exposed 1 `OMath`, а `Linearize→BuildUp` сохранил 1 `OMath`. Microsoft Open XML SDK 2.5.4728 validator сообщил 0 errors. Это evidence конкретного artifact, а не обещание полной schema conformance для произвольных DOCX.
 
 ## Правило эталонных данных
 

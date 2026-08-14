@@ -144,6 +144,26 @@
 
 **Связанные требования:** FR-DOCX-001..006, FR-OMML-001..003, SPEC-05.
 
+## ADR-0011 — Расширенный OMML остаётся каноническим Word backend
+
+**Статус:** принято 2026-08-14.
+
+**Контекст:** этапы 077–089 добавляют редактируемые powers, roots, scripts, function calls, grouping, vector/matrix и calculus shapes, а публичному DOCX API нужен явный выбор backend. MathType/MathML/OLE в текущем scope не реализуются.
+
+**Варианты:** продолжить неявный выбор exporter; сделать `WordOmml` и резервный MathType fallback; ввести typed backend config с fail-closed для недоступных backend.
+
+**Решение:** `EquationBackend::WordOmml` является default через `DocxExportConfig`. `WordEquationExporter` строит только bounded canonical OMML и делит equation byte/node/depth quotas с `DocxValidator`. `EquationBackend::MathType` остаётся зарезервированным и возвращает `EquationBackendUnavailable` без текстового, MathML или OLE fallback.
+
+**Причина:** сохраняется редактируемая семантика Word, deterministic output и явная граница доверия; недоступность backend не скрывает потерю структуры.
+
+**Последствия:** новые формы проходят snapshot/negative tests и Word/Open XML SDK evidence; MathML/MathType потребуют отдельной SPEC, dependency и compatibility review начиная с этапа 090.
+
+**Fallback / rollback:** выбрать `WordOmml` или отклонить export typed error; не добавлять скрытую картинку или внешний backend.
+
+**Проверка:** `cargo test --workspace --locked` (92 Rust tests), `cargo clippy --workspace --all-targets --locked -- -D warnings`, structural validator, Word 16.0 open/edit smoke, Open XML SDK 2.5.4728 (0 errors), independent review и security review.
+
+**Связанные требования:** AC-077..AC-089, SPEC-05.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

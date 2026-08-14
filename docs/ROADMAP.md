@@ -2,7 +2,7 @@
 
 > Каждый этап должен допускать независимое тестирование. Исполняемый текст prompts находится в `docs/PROMPTS.md`.
 
-**Текущий статус:** этапы 001–076 реализованы и проверены на ветке `feature/stages-052-076`. Следующий ещё не начатый этап — 077 (`powers`). Подробные доказательства и статус `verified` находятся только в `docs/TRACEABILITY.md`.
+**Текущий статус:** этапы 001–089 реализованы и проверены на ветке `feature/stages-077-089`; работы нет. Следующий ещё не начатый этап — 090 (`MathML renderer`). Подробные доказательства и статус `verified` находятся только в `docs/TRACEABILITY.md`.
 
 ## Основа — 001–010
 
@@ -97,7 +97,7 @@
 - **068** — `page dimensions`
 - **069** — `DOCX structural validator`
 
-## Уравнения Word — 070–088
+## Уравнения Word — 070–089
 
 - **070** — `EquationExporter`
 - **071** — `WordEquationExporter`
@@ -106,27 +106,27 @@
 - **074** — `add/subtract`
 - **075** — `multiply`
 - **076** — `fraction`
-- **077** — `powers`
-- **078** — `roots`
-- **079** — `subscripts`
-- **080** — `sub+sup`
-- **081** — `functions`
-- **082** — `brackets`
-- **083** — `matrices`
-- **084** — `integrals`
-- **085** — `derivatives`
-- **086** — `sum/product`
-- **087** — `nested equations regression`
-- **088** — `manual Word reference validation`
+- **077** — `powers` — `verified`
+- **078** — `roots` — `verified`
+- **079** — `subscripts` — `verified`
+- **080** — `sub+sup` — `verified`
+- **081** — `functions` — `verified`
+- **082** — `brackets` — `verified`
+- **083** — `matrices` — `verified`
+- **084** — `integrals` — `verified`
+- **085** — `derivatives` — `verified`
+- **086** — `sum/product` — `verified`
+- **087** — `nested equations regression` — `verified`
+- **088** — `manual Word reference validation` — `verified`
 
 ## Подготовка MathType — 089–094
 
-- **089** — `backend enum/config`
-- **090** — `MathML renderer`
-- **091** — `MathML snapshots`
-- **092** — `experimental MathType adapter`
-- **093** — `compatibility doc`
-- **094** — `feature-gated backend selection`
+- **089** — `backend enum/config` — `verified`
+- **090** — `MathML renderer` — `planned`
+- **091** — `MathML snapshots` — `planned`
+- **092** — `experimental MathType adapter` — `planned`
+- **093** — `compatibility doc` — `planned`
+- **094** — `feature-gated backend selection` — `planned`
 
 ## Преобразование нотации — 095–099
 

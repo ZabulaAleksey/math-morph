@@ -11,5 +11,5 @@ mod xml;
 pub use error::{DocxError, DocxLimit, DocxValidationError, OmmlError, OmmlLimit};
 pub use limits::DocxLimits;
 pub use omml::{OmmlFragment, OmmlLimits, WordEquationExporter};
-pub use package::DocxExporter;
+pub use package::{DocxExportConfig, DocxExporter, EquationBackend};
 pub use validator::DocxValidator;

@@ -52,6 +52,19 @@ fn multiply(
     }))
 }
 
+fn drop_left_linear_tree(expression: MathExpression) {
+    let mut current = Some(expression);
+    while let Some(MathExpression { kind, origin: _ }) = current.take() {
+        match kind {
+            MathExpressionKind::Binary(BinaryExpression { left, right, .. }) => {
+                drop(right);
+                current = Some(*left);
+            }
+            kind => drop(kind),
+        }
+    }
+}
+
 fn render(expression: &MathExpression) -> String {
     WordEquationExporter::default()
         .export(expression)
@@ -166,32 +179,23 @@ fn trait_output_is_bounded_and_fragment_debug_is_redacted() {
 }
 
 #[test]
-fn unsupported_invalid_and_semantically_ambiguous_forms_fail_closed() {
+fn invalid_and_semantically_ambiguous_forms_fail_closed() {
     let subscript = expression(MathExpressionKind::Identifier(Identifier {
         name: "x".to_owned(),
         subscript: Some("secret".to_owned()),
     }));
-    assert_eq!(
-        WordEquationExporter::default().export(&subscript),
-        Err(OmmlError::IdentifierSubscriptUnsupported)
-    );
+    assert!(WordEquationExporter::default().export(&subscript).is_ok());
     assert_eq!(
         WordEquationExporter::default().export(&real("not-a-number")),
         Err(OmmlError::InvalidLiteral)
     );
     let power = binary(BinaryOperator::Power, real("2"), real("3"));
-    assert_eq!(
-        WordEquationExporter::default().export(&power),
-        Err(OmmlError::UnsupportedExpression)
-    );
+    assert!(WordEquationExporter::default().export(&power).is_ok());
     let grouped = expression(MathExpressionKind::Grouping(Grouping {
         expression: Box::new(identifier("x")),
         unpaired: false,
     }));
-    assert_eq!(
-        WordEquationExporter::default().export(&grouped),
-        Err(OmmlError::UnsupportedExpression)
-    );
+    assert!(WordEquationExporter::default().export(&grouped).is_ok());
     let needs_parentheses = multiply(
         MultiplicationStyle::Dot,
         binary(BinaryOperator::Add, identifier("a"), identifier("b")),
@@ -215,17 +219,18 @@ fn unsupported_invalid_and_semantically_ambiguous_forms_fail_closed() {
 #[test]
 fn depth_node_and_structure_limits_are_total() {
     let sum = binary(BinaryOperator::Add, real("1"), real("2"));
+    let fraction = binary(BinaryOperator::Divide, real("1"), real("2"));
     assert_eq!(
         WordEquationExporter::new(OmmlLimits {
             max_depth: 0,
             ..OmmlLimits::default()
         })
-        .export(&sum),
+        .export(&fraction),
         Err(OmmlError::LimitExceeded(OmmlLimit::Depth))
     );
     assert_eq!(
         WordEquationExporter::new(OmmlLimits {
-            max_nodes: 1,
+            max_nodes: 0,
             ..OmmlLimits::default()
         })
         .export(&sum),
@@ -241,4 +246,47 @@ fn depth_node_and_structure_limits_are_total() {
         WordEquationExporter::default().export(&inconsistent_style),
         Err(OmmlError::InvalidExpression)
     );
+}
+
+#[test]
+fn deeply_left_associated_linear_forms_are_iterative_and_limit_checked() {
+    let mut stress = real("0");
+    for _ in 0..50_000 {
+        stress = binary(BinaryOperator::Add, stress, real("1"));
+    }
+    assert_eq!(
+        WordEquationExporter::new(OmmlLimits {
+            max_nodes: 1,
+            ..OmmlLimits::default()
+        })
+        .export(&stress),
+        Err(OmmlError::LimitExceeded(OmmlLimit::Nodes))
+    );
+    drop_left_linear_tree(stress);
+
+    let mut no_space_stress = real("1");
+    for _ in 0..50_000 {
+        no_space_stress = multiply(
+            MultiplicationStyle::NoSpace,
+            no_space_stress,
+            identifier("x"),
+        );
+    }
+    assert_eq!(
+        WordEquationExporter::new(OmmlLimits {
+            max_nodes: 0,
+            ..OmmlLimits::default()
+        })
+        .export(&no_space_stress),
+        Err(OmmlError::LimitExceeded(OmmlLimit::Nodes))
+    );
+    drop_left_linear_tree(no_space_stress);
+
+    let mut allowed = real("1");
+    for _ in 0..2_000 {
+        allowed = multiply(MultiplicationStyle::NoSpace, allowed, identifier("x"));
+    }
+    let fragment = WordEquationExporter::default().export(&allowed).unwrap();
+    assert!(fragment.byte_len() > 2_000);
+    drop_left_linear_tree(allowed);
 }

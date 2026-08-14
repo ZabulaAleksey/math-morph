@@ -311,3 +311,47 @@ Security review нашёл показательный asymmetry bug: generation 
 3. Запустить `cargo test -p exporter-docx --test omml --locked` и прочитать snapshots от number до nested fraction.
 4. Запустить `cargo test -p exporter-docx --test docx_equations --locked` и увидеть, что exporter использует `display`, а не `original`.
 5. Завершить полным `cargo fmt --all -- --check`, `cargo test --workspace --locked` и `cargo clippy --workspace --all-targets --locked -- -D warnings`.
+
+## 2026-08-14 — Этапы 077–089: расширенный OMML, лимиты и проверка Word
+
+### Что изменилось
+
+В `exporter-docx` расширен только Word-specific слой: `WordEquationExporter` теперь строит канонические редактируемые OMML для powers, roots, literal subscripts, canonical sub+sup, typed function calls, парной grouping, vector/matrix и non-presentational integral/derivative/sum/product. Новые shapes проходят через строгий `DocxValidator`; неподдержанные и неоднозначные формы завершаются typed fail-closed error. `EquationBackend::WordOmml` выбран default через `DocxExportConfig`, а `MathType` зарезервирован без MathML, OLE, dependency или скрытого fallback. В `math-model` и `mathcad-parser` в итоговом scope этой работы изменений нет.
+
+### Почему resource limits должны быть симметричными
+
+Один writer не является достаточной защитой: полученный DOCX может быть создан другим producer или изменён между генерацией и проверкой. Поэтому renderer и validator считают одинаковые content-bearing equation nodes, equation depth и exact source bytes. Для длинных left-associated linear expressions используется итеративный обход с отдельным `linear_work_items` budget. Это отделяет две ошибки:
+
+1. рекурсивная форма превышает допустимую OMML depth;
+2. плоская, но очень длинная форма превышает node/work budget.
+
+Практический вывод: «нет рекурсии в одном месте» не означает «нет DoS-риска». Нужно ограничивать и глубину, и количество работы, а writer и validator должны применять одинаковую модель счёта.
+
+### Как читать decoder trust boundary
+
+`VersionedDocumentIr::from_json_with_limit` ограничивает bytes, затем дважды проходит через `serde_json::from_slice` с default recursion limit и только после этого вызывает IR validation глубины/узлов. Это не следует смешивать в одну абстрактную «защиту JSON»: decoder recursion и semantic depth — разные рубежи. Прямой Rust/custom `Deserialize` не является bounded public input path: caller сам отвечает за ограниченный reader, конфигурацию decoder и последующую validation. XML path отдельно использует explicit parser stack depth.
+
+### Word/Open XML evidence и troubleshooting
+
+Команда `cargo run -p exporter-docx --example advanced_omml_reference` создаёт воспроизводимый reference artifact. Word 16.0 открыл его и exposed 1 `OMath`; изолированный `Linearize→BuildUp` edit check сохранил 1 `OMath`. Локальный Microsoft Open XML SDK 2.5.4728 validator сообщил 0 errors.
+
+Первоначальная объединённая попытка «открыть → перечислить → сохранить» превысила timeout; созданный процесс Word был остановлен. Это было свойством сценария автоматизации, а не ограничением продукта. Последующие изолированные open/enumerate/edit checks прошли, поэтому в документации фиксируется именно evidence успешных проверок и кратко — способ диагностики timeout.
+
+### Проверки
+
+- `python -B scripts/validate_project.py` — PASS;
+- `python -B scripts/validate_fixtures.py` — PASS;
+- `python -B -m unittest discover -s tests -p "test_*.py" -v` — PASS, 15/15;
+- `cargo fmt --all -- --check` — PASS;
+- `cargo test --workspace --locked` — PASS, 92 Rust tests;
+- `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS;
+- automated review и security review — PASS после исправлений;
+- `git diff --check` — PASS.
+
+### Что можно повторить самостоятельно
+
+1. Запустить `cargo test -p exporter-docx --test advanced_omml --locked` и сопоставить каждый новый OMML shape с проверкой allowlist.
+2. Запустить `cargo test -p exporter-docx --test omml --locked` и найти regression для iterative linear traversal/work budget.
+3. Запустить `cargo run -p exporter-docx --example advanced_omml_reference`, открыть полученный DOCX в Word и проверить, что в нём остаётся один редактируемый `OMath`.
+4. Запустить `python -B scripts/validate_project.py` и `python -B -m unittest discover -s tests -p "test_*.py" -v`, чтобы отделить project gates от Rust gates.
+5. Запустить `cargo test --workspace --locked`, затем `cargo clippy --workspace --all-targets --locked -- -D warnings` и проверить `git diff --check`.
