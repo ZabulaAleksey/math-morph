@@ -35,6 +35,7 @@ REQUIRED_FILES = (
     "docs/TESTING.md",
     "docs/TRACEABILITY.md",
     "docs/CONTEXT_COMPATIBILITY.md",
+    "crates/document-ir/AGENTS.md",
     "crates/math-model/AGENTS.md",
     "crates/mathcad-parser/AGENTS.md",
     "crates/math-engine/AGENTS.md",
@@ -56,6 +57,7 @@ CONTEXT_CONTRACTS = {
         "Пользовательский интерфейс ещё не реализован",
         "визуальная система владельцем продукта не утверждена",
     ),
+    "crates/document-ir/AGENTS.md": ("backend-neutral Document IR",),
     "crates/math-model/AGENTS.md": ("source-neutral Math AST",),
     "crates/mathcad-parser/AGENTS.md": ("Parser знает формат",),
     "crates/math-engine/AGENTS.md": ("Вычисление и представление разделены",),
@@ -98,6 +100,7 @@ EXPECTED_SKILLS = {
 }
 
 EXPECTED_CRATES = {
+    "crates/document-ir": "document-ir",
     "crates/math-model": "math-model",
     "crates/mathcad-parser": "mathcad-parser",
     "crates/math-engine": "math-engine",
