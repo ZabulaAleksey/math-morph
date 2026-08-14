@@ -59,7 +59,7 @@ impl fmt::Debug for SourceDocument {
 
 #[derive(Clone, Eq, Hash, PartialEq)]
 pub struct ExpandedName {
-    pub namespace_uri: Option<String>,
+    pub namespace_uri: Option<Arc<str>>,
     pub local_name: String,
 }
 

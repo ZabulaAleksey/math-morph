@@ -3,10 +3,20 @@ use std::fmt;
 
 use crate::{Diagnostic, ExpandedName, MathAstError, MathExpression, OpaqueFragment, SourceSpan};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct SourceNumber {
     pub value: f64,
     pub lexeme: String,
+}
+
+impl fmt::Debug for SourceNumber {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("SourceNumber")
+            .field("is_finite", &self.value.is_finite())
+            .field("lexeme_bytes", &self.lexeme.len())
+            .finish()
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]

@@ -535,3 +535,39 @@ fn all_worksheet_resource_limits_fail_closed() {
         ))
     );
 }
+
+#[test]
+fn namespace_uris_are_interned_qname_prefixes_are_bounded_and_numbers_are_redacted() {
+    let long_namespace = format!("urn:test:{}", "n".repeat(4_096));
+    let first = region(1, "12345.678901", "0", None, "<n:future/>");
+    let second = region(2, "1", "0", None, "<n:future/>");
+    let bytes = format!(
+        r#"<x:worksheet xmlns:x="{WS}" xmlns:n="{long_namespace}" version="3.0.3"><x:regions>{first}{second}</x:regions></x:worksheet>"#
+    );
+    let parsed = WorksheetParser::default()
+        .parse(bytes.as_bytes())
+        .expect("interned namespaces");
+    let RegionContent::Opaque(first) = &parsed.regions[0].content else {
+        panic!("opaque content")
+    };
+    let RegionContent::Opaque(second) = &parsed.regions[1].content else {
+        panic!("opaque content")
+    };
+    let first_namespace = first.name.namespace_uri.as_ref().expect("namespace");
+    let second_namespace = second.name.namespace_uri.as_ref().expect("namespace");
+    assert!(std::sync::Arc::ptr_eq(first_namespace, second_namespace));
+    assert!(!format!("{parsed:?}").contains("12345.678901"));
+
+    let long_prefix = "p".repeat(64);
+    let prefixed = format!(
+        r#"<{long_prefix}:worksheet xmlns:{long_prefix}="{WS}" version="3.0.3"><{long_prefix}:regions/></{long_prefix}:worksheet>"#
+    );
+    let limits = WorksheetLimits {
+        max_token_bytes: 32,
+        ..WorksheetLimits::default()
+    };
+    assert_eq!(
+        WorksheetParser::new(limits).parse(prefixed.as_bytes()),
+        Err(WorksheetError::LimitExceeded(WorksheetLimit::TokenBytes))
+    );
+}

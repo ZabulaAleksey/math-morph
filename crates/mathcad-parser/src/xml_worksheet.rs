@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::str;
+use std::sync::Arc;
 
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::name::ResolveResult;
@@ -92,6 +93,7 @@ struct TreeBuilder {
     limits: WorksheetLimits,
     node_count: usize,
     retained_text_bytes: usize,
+    namespace_uris: HashSet<Arc<str>>,
 }
 
 impl TreeBuilder {
@@ -117,7 +119,7 @@ impl TreeBuilder {
             let (resolution, event) = reader
                 .read_resolved_event_into(&mut buffer)
                 .map_err(map_xml_error)?;
-            let element_namespace = resolved_namespace(resolution)?;
+            let element_namespace = self.resolved_namespace(resolution)?;
             let event_end = reader.buffer_position() as usize;
             match event {
                 Event::Decl(declaration) => {
@@ -226,7 +228,7 @@ impl TreeBuilder {
     fn start_node(
         &mut self,
         reader: &NsReader<&[u8]>,
-        namespace_uri: Option<String>,
+        namespace_uri: Option<Arc<str>>,
         start: &BytesStart<'_>,
         span: SourceSpan,
     ) -> Result<Node, WorksheetError> {
@@ -237,6 +239,7 @@ impl TreeBuilder {
         if self.node_count > self.limits.max_xml_nodes {
             return Err(WorksheetError::LimitExceeded(WorksheetLimit::XmlNodes));
         }
+        validate_utf8_token(start.name().as_ref(), self.limits.max_token_bytes)?;
         let local = bounded_utf8(start.local_name().as_ref(), self.limits.max_token_bytes)?;
         let name = ExpandedName {
             namespace_uri,
@@ -245,6 +248,7 @@ impl TreeBuilder {
         let mut attributes = Vec::new();
         for raw_attribute in start.attributes() {
             let raw_attribute = raw_attribute.map_err(|_| WorksheetError::MalformedXml)?;
+            validate_utf8_token(raw_attribute.key.as_ref(), self.limits.max_token_bytes)?;
             if raw_attribute.value.len() > self.limits.max_attribute_value_bytes {
                 return Err(WorksheetError::LimitExceeded(
                     WorksheetLimit::AttributeValueBytes,
@@ -264,7 +268,7 @@ impl TreeBuilder {
             let local = bounded_utf8(local.as_ref(), self.limits.max_token_bytes)?;
             attributes.push(Attribute {
                 name: ExpandedName {
-                    namespace_uri: resolved_namespace(namespace)?,
+                    namespace_uri: self.resolved_namespace(namespace)?,
                     local_name: local,
                 },
                 value,
@@ -276,6 +280,26 @@ impl TreeBuilder {
             children: Vec::new(),
             span,
         })
+    }
+
+    fn resolved_namespace(
+        &mut self,
+        resolution: ResolveResult<'_>,
+    ) -> Result<Option<Arc<str>>, WorksheetError> {
+        match resolution {
+            ResolveResult::Bound(namespace) => {
+                let namespace =
+                    str::from_utf8(namespace.as_ref()).map_err(|_| WorksheetError::MalformedXml)?;
+                if let Some(existing) = self.namespace_uris.get(namespace) {
+                    return Ok(Some(Arc::clone(existing)));
+                }
+                let interned: Arc<str> = Arc::from(namespace);
+                self.namespace_uris.insert(Arc::clone(&interned));
+                Ok(Some(interned))
+            }
+            ResolveResult::Unbound => Ok(None),
+            ResolveResult::Unknown(_) => Err(WorksheetError::UnknownNamespacePrefix),
+        }
     }
 
     fn push_text(
@@ -324,25 +348,15 @@ fn push_node(
     Ok(())
 }
 
-fn resolved_namespace(resolution: ResolveResult<'_>) -> Result<Option<String>, WorksheetError> {
-    match resolution {
-        ResolveResult::Bound(namespace) => Ok(Some(
-            str::from_utf8(namespace.as_ref())
-                .map_err(|_| WorksheetError::MalformedXml)?
-                .to_owned(),
-        )),
-        ResolveResult::Unbound => Ok(None),
-        ResolveResult::Unknown(_) => Err(WorksheetError::UnknownNamespacePrefix),
-    }
+fn bounded_utf8(bytes: &[u8], limit: usize) -> Result<String, WorksheetError> {
+    Ok(validate_utf8_token(bytes, limit)?.to_owned())
 }
 
-fn bounded_utf8(bytes: &[u8], limit: usize) -> Result<String, WorksheetError> {
+fn validate_utf8_token(bytes: &[u8], limit: usize) -> Result<&str, WorksheetError> {
     if bytes.len() > limit {
         return Err(WorksheetError::LimitExceeded(WorksheetLimit::TokenBytes));
     }
-    Ok(str::from_utf8(bytes)
-        .map_err(|_| WorksheetError::MalformedXml)?
-        .to_owned())
+    str::from_utf8(bytes).map_err(|_| WorksheetError::MalformedXml)
 }
 
 fn map_xml_error(error: quick_xml::Error) -> WorksheetError {
@@ -364,6 +378,7 @@ pub(crate) fn parse_worksheet(
         limits,
         node_count: 0,
         retained_text_bytes: 0,
+        namespace_uris: HashSet::new(),
     }
     .parse(bytes)?;
     if !root.is(WS_NS, "worksheet") {
