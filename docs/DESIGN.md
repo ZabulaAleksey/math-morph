@@ -22,6 +22,26 @@ colors:
   info: "#4767F5"
   overlay: "#0909097A"
   focus: "#4767F552"
+  dark-primary: "#9BAEFF"
+  dark-primary-hover: "#B3C0FF"
+  dark-primary-pressed: "#7F95FF"
+  dark-primary-soft: "#202A52"
+  dark-on-primary: "#101631"
+  dark-secondary: "#B2BAC9"
+  dark-on-surface: "#F4F6FB"
+  dark-surface: "#171B24"
+  dark-surface-page: "#0F1218"
+  dark-surface-subtle: "#202631"
+  dark-surface-elevated: "#252C39"
+  dark-border: "#303847"
+  dark-border-strong: "#4A566A"
+  dark-disabled: "#737D8E"
+  dark-success: "#4DD6A0"
+  dark-warning: "#F6B84A"
+  dark-error: "#FF8585"
+  dark-info: "#9BAEFF"
+  dark-overlay: "#000000B8"
+  dark-focus: "#9BAEFF66"
 typography:
   headline-display:
     fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
@@ -163,6 +183,79 @@ components:
     backgroundColor: "{colors.overlay}"
   focus-ring:
     backgroundColor: "{colors.focus}"
+  dark-page:
+    backgroundColor: "{colors.dark-surface-page}"
+    textColor: "{colors.dark-on-surface}"
+  dark-card:
+    backgroundColor: "{colors.dark-surface}"
+    textColor: "{colors.dark-on-surface}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.xl}"
+  dark-floating-surface:
+    backgroundColor: "{colors.dark-surface-elevated}"
+    textColor: "{colors.dark-on-surface}"
+    rounded: "{rounded.lg}"
+  dark-button-primary:
+    backgroundColor: "{colors.dark-primary}"
+    textColor: "{colors.dark-on-primary}"
+    typography: "{typography.label-lg}"
+    rounded: "{rounded.md}"
+    height: 48px
+    padding: "{spacing.md}"
+  dark-button-primary-hover:
+    backgroundColor: "{colors.dark-primary-hover}"
+    textColor: "{colors.dark-on-primary}"
+  dark-button-primary-pressed:
+    backgroundColor: "{colors.dark-primary-pressed}"
+    textColor: "{colors.dark-on-primary}"
+  dark-button-secondary:
+    backgroundColor: "{colors.dark-surface}"
+    textColor: "{colors.dark-primary}"
+    typography: "{typography.label-lg}"
+    rounded: "{rounded.md}"
+    height: 48px
+    padding: "{spacing.md}"
+  dark-input:
+    backgroundColor: "{colors.dark-surface}"
+    textColor: "{colors.dark-on-surface}"
+    typography: "{typography.body-md}"
+    rounded: "{rounded.md}"
+    height: 48px
+    padding: "{spacing.md}"
+  dark-selected-row:
+    backgroundColor: "{colors.dark-primary-soft}"
+    textColor: "{colors.dark-primary}"
+    rounded: "{rounded.md}"
+  dark-metadata:
+    textColor: "{colors.dark-secondary}"
+    typography: "{typography.body-sm}"
+  dark-disabled-label:
+    textColor: "{colors.dark-disabled}"
+  dark-surface-subtle:
+    backgroundColor: "{colors.dark-surface-subtle}"
+    textColor: "{colors.dark-on-surface}"
+  dark-divider:
+    backgroundColor: "{colors.dark-border}"
+    height: 1px
+  dark-divider-strong:
+    backgroundColor: "{colors.dark-border-strong}"
+    height: 1px
+  dark-status-success:
+    backgroundColor: "{colors.dark-success}"
+    textColor: "{colors.dark-on-primary}"
+  dark-status-warning:
+    backgroundColor: "{colors.dark-warning}"
+    textColor: "{colors.dark-on-primary}"
+  dark-status-error:
+    backgroundColor: "{colors.dark-error}"
+    textColor: "{colors.dark-on-primary}"
+  dark-status-info:
+    backgroundColor: "{colors.dark-info}"
+    textColor: "{colors.dark-on-primary}"
+  dark-overlay:
+    backgroundColor: "{colors.dark-overlay}"
+  dark-focus-ring:
+    backgroundColor: "{colors.dark-focus}"
 ---
 
 # MathMorph — Calm Blue UI
@@ -253,7 +346,7 @@ Landing использует компактную top navigation, а аутен�
 | Иконки | Один outline-набор; конкретная библиотека выбирается при UI-этапе |
 | Application shell | Top navigation для landing; sidebar для authenticated app |
 | Локаль | i18n: украинская, русская и английская |
-| Dark mode | Не входит в первый UI contract; добавляется отдельной темой |
+| Color theme | `light`, `dark`, `system`; `system` следует настройке OS |
 | Sensitive content | Никогда не использовать содержимое документов в telemetry или декоративных previews |
 
 ### Архитектура системы
@@ -306,12 +399,84 @@ Project adapter
 - **Overlay {colors.overlay}:** подложка modal и drawer.
 - **Focus {colors.focus}:** внешнее focus-ring.
 
+### Dark theme
+
+Тёмная тема использует холодные графитово-синие поверхности вместо чистого чёрного. Это снижает резкий контраст больших областей, сохраняя высокую читаемость текста, формул и статусов.
+
+- **Dark primary {colors.dark-primary}:** главное действие, активная навигация и ссылки.
+- **Dark primary hover {colors.dark-primary-hover}:** hover основного действия.
+- **Dark primary pressed {colors.dark-primary-pressed}:** pressed и active.
+- **Dark primary soft {colors.dark-primary-soft}:** выбранные строки и мягкие badges.
+- **Dark on primary {colors.dark-on-primary}:** тёмный текст поверх светлого accent.
+- **Dark on surface {colors.dark-on-surface}:** основной текст и формулы.
+- **Dark secondary {colors.dark-secondary}:** metadata и вторичные подписи.
+- **Dark surface {colors.dark-surface}:** карточки, sidebar и controls.
+- **Dark page {colors.dark-surface-page}:** основной фон страницы.
+- **Dark subtle {colors.dark-surface-subtle}:** вложенные нейтральные зоны.
+- **Dark elevated {colors.dark-surface-elevated}:** dropdown, popover, modal и drawer.
+- **Dark border {colors.dark-border}:** обычные границы и разделители.
+- **Dark strong border {colors.dark-border-strong}:** hover и усиленная граница.
+- **Dark success {colors.dark-success}:** подтверждённый успешный результат.
+- **Dark warning {colors.dark-warning}:** ограничения и неподдерживаемые элементы.
+- **Dark error {colors.dark-error}:** ошибка или разрушительное действие.
+- **Dark info {colors.dark-info}:** ход безопасно продолжающейся операции.
+- **Dark overlay {colors.dark-overlay}:** подложка modal и drawer.
+- **Dark focus {colors.dark-focus}:** внешнее focus-ring.
+
+В тёмной теме preview пользовательского документа может сохранять собственный светлый «бумажный» canvas, если это честно отражает экспортируемый DOCX. Такой canvas отделяется border и подписью, а не перекрашивается автоматически. Формулы, diagnostics и application chrome используют dark tokens.
+
+### Выбор темы и предотвращение flash
+
+```css
+[data-design-system="cbui"][data-theme="dark"] {
+  color-scheme: dark;
+  --cbui-color-primary: #9baeff;
+  --cbui-color-on-surface: #f4f6fb;
+  --cbui-color-surface: #171b24;
+  --cbui-color-surface-page: #0f1218;
+  --cbui-color-border: #303847;
+}
+```
+
+- Пользователю доступны `light`, `dark` и `system`; начальное значение — `system`.
+- `system` следует `prefers-color-scheme` и реагирует на его изменение без перезагрузки.
+- Явный выбор пользователя имеет приоритет над OS и сохраняется локально; для авторизованного пользователя он может синхронизироваться с account settings.
+- Theme attribute и `color-scheme` устанавливаются до первой отрисовки, чтобы не было flash неправильной темы.
+- Иконка переключателя дополняется текстом или accessible name и сообщает текущее состояние.
+- Переключение не сбрасывает форму, upload, conversion progress, filters или scroll position.
+- При первой загрузке цветовая смена не анимируется; последующее переключение использует только короткий transition и уважает reduced motion.
+
+### Дополнительные режимы вместо множества тем
+
+Цветовая тема — только одна ось персонализации. Более продуманная система использует независимые режимы, которые можно комбинировать:
+
+| Ось | Значения | Назначение |
+|---|---|---|
+| Color theme | `light`, `dark`, `system` | Цветовые поверхности и семантические роли |
+| Contrast | `normal`, `high`, OS `forced-colors` | Читаемость и различимость controls |
+| Density | `comfortable`, `compact` | Количество данных без изменения font scale |
+| Motion | `normal`, `reduced` | Интенсивность переходов и skeleton |
+| Workspace | `standard`, `focus` | Полный application chrome или сосредоточенная конвертация |
+| Output preview | `application`, `paper` | Интерфейсная поверхность или честный preview документа |
+
+Не создавать отдельные темы вроде «dark compact focus». Комбинация собирается из независимых attributes и media preferences:
+
+```text
+data-theme="dark"
+data-contrast="normal"
+data-density="compact"
+data-workspace-mode="focus"
+prefers-reduced-motion: reduce
+```
+
+Обязательный первый набор: `light` / `dark` / `system`, безопасное поведение в `forced-colors` и `prefers-reduced-motion`. `compact` полезен для history и API dashboard; `focus` — для converter flow. Эти режимы добавляются только после проверки реальной пользы и не должны менять business semantics.
+
 Правила использования:
 
 - Статус сопровождается текстом, иконкой или accessible name.
 - Белый текст на accent разрешён только после проверки contrast.
 - Brand color проекта может заменить `{colors.primary}`, если hover, pressed и focus пересчитаны вместе с ним.
-- Dark mode не создаётся простой инверсией; для него нужна отдельная семантическая таблица.
+- Dark mode использует отдельную семантическую таблицу и не создаётся простой инверсией.
 - Значения `error`, `overlay` и `focus` добавлены как системные, даже если не показаны на исходном референсе.
 - В MathMorph `success` означает завершённую операцию, `warning` — ограничения или неподдерживаемые элементы, `error` — неуспешную валидацию или конвертацию, а `info` — ход безопасно продолжающейся операции. Status всегда сопровождается стабильным кодом и локализованным текстом.
 
@@ -678,6 +843,8 @@ Recipe подходит специалистам, товарам, курсам, 
 - Выполнять визуальное сравнение с утверждённым проектным макетом.
 - Показывать неподдерживаемые элементы и partial conversion как явную диагностику.
 - Сохранять различие между upload, validation, conversion, result и retention states.
+- Проверять каждую семантическую пару отдельно в light и dark themes.
+- Уважать OS preferences для color scheme, contrast, forced colors и reduced motion.
 
 ### Don't
 
@@ -691,6 +858,8 @@ Recipe подходит специалистам, товарам, курсам, 
 - Не считать sidebar или каталог обязательной структурой любого проекта.
 - Не показывать partial conversion как безусловный success.
 - Не использовать preview содержимого пользовательского документа как фоновый или маркетинговый декор.
+- Не создавать отдельную именованную тему для каждой комбинации color, density и workspace mode.
+- Не затемнять screenshots или document previews CSS-фильтром, если это искажает результат.
 
 ### Проверка перед внедрением
 
@@ -698,7 +867,8 @@ Recipe подходит специалистам, товарам, курсам, 
 - [ ] Выбраны только нужные Patterns и Recipes.
 - [ ] Проверены существующие tokens и компоненты проекта.
 - [ ] Определён уникальный runtime namespace или token mapping.
-- [ ] Определены logo, font, icons, locale и dark-mode strategy.
+- [ ] Определены logo, font, icons и locale; проверены `light`, `dark` и `system`.
+- [ ] Проверены `forced-colors`, `prefers-reduced-motion` и theme flash до hydration.
 - [ ] Проверены viewport от `320px` до целевого desktop.
 - [ ] Проверены длинные строки, пустые данные и ошибки.
 - [ ] Нет глобальных style overrides, затрагивающих чужие экраны.
@@ -706,7 +876,7 @@ Recipe подходит специалистам, товарам, курсам, 
 
 ### Известные границы
 
-Документ самодостаточен как дизайн-контракт и основа реализации, но не заменяет уникальную бренд-айдентику, продуктовые требования, пользовательские исследования, точные макеты сложных экранов, отраслевые юридические требования, браузерную проверку и отдельные спецификации dark mode, email, native mobile или print.
+Документ самодостаточен как дизайн-контракт и основа реализации, но не заменяет уникальную бренд-айдентику, продуктовые требования, пользовательские исследования, точные макеты сложных экранов, отраслевые юридические требования, браузерную проверку и отдельные спецификации email, native mobile или print.
 
 Эти части добавляются в локальный дизайн-контракт выбранного проекта без изменения переносимого ядра, если в этом нет необходимости.
 
@@ -718,3 +888,4 @@ Recipe подходит специалистам, товарам, курсам, 
 | `1.0` | 2026-08-14 | Дизайн отделён от бренда и предметной области; добавлены Core, Patterns, Recipes и бесконфликтная интеграция |
 | `1.1` | 2026-08-14 | Добавлен нормативный YAML frontmatter и документ приведён к структуре Google Labs `design.md` specification `alpha` |
 | `1.2` | 2026-08-14 | Calm Blue UI принят для MathMorph; добавлены product flows, status semantics, безопасные upload/conversion patterns и проектная карта адаптации |
+| `1.3` | 2026-08-14 | Добавлена полноценная dark palette, выбор `light` / `dark` / `system` и независимые contrast, density, motion, workspace и preview modes |

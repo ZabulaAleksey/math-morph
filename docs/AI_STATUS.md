@@ -12,7 +12,7 @@
 
 - Воспроизводимый Cargo/uv/pnpm monorepo и минимальные Rust/Python/Next.js каркасы.
 - Project overlay, canonical docs, versioned fixture corpus и fail-closed validators.
-- Утверждён канонический MathMorph Calm Blue UI design contract; пользовательский UI flow ещё не реализован.
+- Утверждён канонический MathMorph Calm Blue UI design contract с `light`, `dark`, `system` и независимыми accessibility/density/workspace modes; пользовательский UI flow ещё не реализован.
 - Content-based XMCD/MCDX detection, `FILE_EXTENSION_MISMATCH` и безопасный MCDX container manifest без extraction.
 - UTF-8 XML root metadata inspection с запретом DTD/entities.
 - `WorksheetParser` для подтверждённого legacy contract worksheet30 3.0.3 + math30 3.0.2.
