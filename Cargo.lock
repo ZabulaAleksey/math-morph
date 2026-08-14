@@ -44,6 +44,7 @@ name = "exporter-docx"
 version = "0.0.0"
 dependencies = [
  "document-ir",
+ "math-model",
  "quick-xml",
  "thiserror",
  "zip",

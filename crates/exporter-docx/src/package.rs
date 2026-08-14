@@ -4,16 +4,16 @@ use std::io::{self, Cursor, Seek, SeekFrom, Write};
 use std::rc::Rc;
 
 use document_ir::{
-    BlockContentIr, DocumentIrV1, MediaTypeIr, PageOrientationIr, TextBlockIr, TextRunIr,
-    TextStyleIr, VersionedDocumentIr, VerticalAlignIr,
-    ports::{AssetResolveError, AssetResolver},
+    BlockContentIr, DocumentIrV1, FormulaDisplayModeIr, FormulaIr, MediaTypeIr, PageOrientationIr,
+    TextBlockIr, TextRunIr, TextStyleIr, VersionedDocumentIr, VerticalAlignIr,
+    ports::{AssetResolveError, AssetResolver, EquationExporter},
 };
 use zip::write::SimpleFileOptions;
 use zip::{CompressionMethod, DateTime, System, ZipWriter};
 
 use crate::image::validate_image;
 use crate::xml::{escape_attribute, escape_text};
-use crate::{DocxError, DocxLimit, DocxLimits, DocxValidator};
+use crate::{DocxError, DocxLimit, DocxLimits, DocxValidator, OmmlLimits, WordEquationExporter};
 
 const ROOT_RELS: &str = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"word/document.xml\"/></Relationships>";
 
@@ -119,7 +119,7 @@ impl DocxExporter {
         if document.pages[0].blocks.iter().any(|block| {
             !matches!(
                 block.content,
-                BlockContentIr::Text(_) | BlockContentIr::Image(_)
+                BlockContentIr::Text(_) | BlockContentIr::Image(_) | BlockContentIr::Equation(_)
             )
         }) {
             return Err(DocxError::UnsupportedContent);
@@ -214,6 +214,14 @@ impl DocxExporter {
                         .ok_or(DocxError::LimitExceeded(DocxLimit::Images))?;
                     self.render_image(image, &mut output)?;
                 }
+                BlockContentIr::Equation(formula) => {
+                    increment(
+                        &mut paragraphs,
+                        self.limits.max_paragraphs,
+                        DocxLimit::Paragraphs,
+                    )?;
+                    self.render_equation(formula, &mut output)?;
+                }
                 _ => return Err(DocxError::UnsupportedContent),
             }
             self.check_xml(&output)?;
@@ -284,6 +292,25 @@ impl DocxExporter {
         }
         output.push_str("</w:r>");
         Ok(())
+    }
+
+    fn render_equation(&self, formula: &FormulaIr, output: &mut String) -> Result<(), DocxError> {
+        let exporter = WordEquationExporter::new(OmmlLimits {
+            max_depth: self.limits.max_equation_depth,
+            max_nodes: self.limits.max_equation_nodes,
+            max_output_bytes: self.limits.max_equation_output_bytes,
+        });
+        let fragment = exporter.export(&formula.display)?;
+        output.push_str("<w:p>");
+        if formula.mode == FormulaDisplayModeIr::Display {
+            output.push_str("<m:oMathPara xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\">");
+        }
+        output.push_str(fragment.as_str());
+        if formula.mode == FormulaDisplayModeIr::Display {
+            output.push_str("</m:oMathPara>");
+        }
+        output.push_str("</w:p>");
+        self.check_xml(output)
     }
 
     fn prepare_images<R: AssetResolver + ?Sized>(

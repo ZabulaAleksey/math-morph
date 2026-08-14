@@ -21,6 +21,9 @@ pub enum DocxLimit {
     XmlDepth,
     XmlNodes,
     PartNameBytes,
+    EquationDepth,
+    EquationNodes,
+    EquationOutputBytes,
 }
 
 #[derive(Clone, Copy, Debug, Error, Eq, PartialEq)]
@@ -57,6 +60,33 @@ pub enum DocxError {
     PackageWrite,
     #[error("generated DOCX package failed structural validation")]
     GeneratedPackageInvalid,
+    #[error("equation export failed: {0}")]
+    Equation(#[from] OmmlError),
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum OmmlLimit {
+    Depth,
+    Nodes,
+    OutputBytes,
+}
+
+#[derive(Clone, Copy, Debug, Error, Eq, PartialEq)]
+pub enum OmmlError {
+    #[error("math expression is not supported by this OMML stage")]
+    UnsupportedExpression,
+    #[error("literal identifier subscripts are not supported by this OMML stage")]
+    IdentifierSubscriptUnsupported,
+    #[error("math literal is invalid")]
+    InvalidLiteral,
+    #[error("math expression is structurally invalid")]
+    InvalidExpression,
+    #[error("preserving expression semantics requires unsupported grouping")]
+    SemanticGroupingRequired,
+    #[error("math text is not valid XML 1.0 content")]
+    InvalidXmlText,
+    #[error("OMML limit exceeded: {0:?}")]
+    LimitExceeded(OmmlLimit),
 }
 
 impl From<DocumentIrValidationError> for DocxError {
@@ -103,4 +133,6 @@ pub enum DocxValidationError {
     ImageMismatch,
     #[error("DOCX contains a duplicate drawing identifier")]
     DuplicateDrawingId,
+    #[error("DOCX equation markup is invalid")]
+    InvalidEquation,
 }

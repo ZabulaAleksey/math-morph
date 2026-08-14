@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::fmt;
 use std::str;
 use std::sync::Arc;
 
@@ -8,19 +9,50 @@ use quick_xml::{NsReader, XmlVersion};
 
 use crate::{DocxLimit, DocxLimits, DocxValidationError};
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub(crate) struct XmlAttribute {
     pub(crate) namespace: Option<Arc<str>>,
     pub(crate) local: String,
     pub(crate) value: String,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+impl fmt::Debug for XmlAttribute {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("XmlAttribute")
+            .field("has_namespace", &self.namespace.is_some())
+            .field("local_bytes", &self.local.len())
+            .field("value_bytes", &self.value.len())
+            .finish()
+    }
+}
+
+#[derive(Clone, Eq, PartialEq)]
 pub(crate) struct XmlNode {
     pub(crate) namespace: Option<Arc<str>>,
     pub(crate) local: String,
     pub(crate) attributes: Vec<XmlAttribute>,
     pub(crate) children: Vec<XmlNode>,
+    pub(crate) text: String,
+    pub(crate) source_start: usize,
+    pub(crate) source_end: usize,
+}
+
+impl fmt::Debug for XmlNode {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("XmlNode")
+            .field("has_namespace", &self.namespace.is_some())
+            .field("local_bytes", &self.local.len())
+            .field("attribute_count", &self.attributes.len())
+            .field("child_count", &self.children.len())
+            .field("text_bytes", &self.text.len())
+            .field(
+                "source_bytes",
+                &self.source_end.saturating_sub(self.source_start),
+            )
+            .finish()
+    }
 }
 
 impl XmlNode {
@@ -57,10 +89,14 @@ pub(crate) fn parse_xml(bytes: &[u8], limits: &DocxLimits) -> Result<XmlNode, Do
     let mut nodes = 0_usize;
     let mut namespaces = BTreeSet::new();
     loop {
+        let event_start = usize::try_from(reader.buffer_position())
+            .map_err(|_| DocxValidationError::InvalidDocumentXml)?;
         let (resolution, event) = reader
             .read_resolved_event_into(&mut buffer)
             .map_err(|_| DocxValidationError::InvalidDocumentXml)?;
         let element_namespace = resolve_namespace(resolution, &mut namespaces)?;
+        let event_end = usize::try_from(reader.buffer_position())
+            .map_err(|_| DocxValidationError::InvalidDocumentXml)?;
         match event {
             Event::Decl(declaration) => {
                 if declaration
@@ -78,7 +114,14 @@ pub(crate) fn parse_xml(bytes: &[u8], limits: &DocxLimits) -> Result<XmlNode, Do
                     return Err(DocxValidationError::LimitExceeded(DocxLimit::XmlDepth));
                 }
                 count_node(&mut nodes, limits)?;
-                let node = start_node(&reader, element_namespace, &start, &mut namespaces)?;
+                let node = start_node(
+                    &reader,
+                    element_namespace,
+                    &start,
+                    &mut namespaces,
+                    event_start,
+                    event_end,
+                )?;
                 stack.push(node);
             }
             Event::Empty(start) => {
@@ -86,20 +129,32 @@ pub(crate) fn parse_xml(bytes: &[u8], limits: &DocxLimits) -> Result<XmlNode, Do
                     return Err(DocxValidationError::LimitExceeded(DocxLimit::XmlDepth));
                 }
                 count_node(&mut nodes, limits)?;
-                let node = start_node(&reader, element_namespace, &start, &mut namespaces)?;
+                let node = start_node(
+                    &reader,
+                    element_namespace,
+                    &start,
+                    &mut namespaces,
+                    event_start,
+                    event_end,
+                )?;
                 push_node(&mut stack, &mut root, node)?;
             }
             Event::End(_) => {
-                let node = stack.pop().ok_or(DocxValidationError::InvalidDocumentXml)?;
+                let mut node = stack.pop().ok_or(DocxValidationError::InvalidDocumentXml)?;
+                node.source_end = event_end;
                 push_node(&mut stack, &mut root, node)?;
             }
             Event::Text(text) => {
-                text.xml_content(XmlVersion::Implicit1_0)
+                let value = text
+                    .xml_content(XmlVersion::Implicit1_0)
                     .map_err(|_| DocxValidationError::InvalidDocumentXml)?;
+                push_text(&mut stack, &value)?;
             }
             Event::CData(text) => {
-                text.xml_content(XmlVersion::Implicit1_0)
+                let value = text
+                    .xml_content(XmlVersion::Implicit1_0)
                     .map_err(|_| DocxValidationError::InvalidDocumentXml)?;
+                push_text(&mut stack, &value)?;
             }
             Event::GeneralRef(reference) => {
                 let name = reference
@@ -110,6 +165,10 @@ pub(crate) fn parse_xml(bytes: &[u8], limits: &DocxLimits) -> Result<XmlNode, Do
                 {
                     return Err(DocxValidationError::InvalidDocumentXml);
                 }
+                let escaped = format!("&{name};");
+                let value = quick_xml::escape::unescape(&escaped)
+                    .map_err(|_| DocxValidationError::InvalidDocumentXml)?;
+                push_text(&mut stack, &value)?;
             }
             Event::Comment(_) => {}
             Event::PI(_) => return Err(DocxValidationError::InvalidDocumentXml),
@@ -138,6 +197,8 @@ fn start_node(
     namespace: Option<Arc<str>>,
     start: &BytesStart<'_>,
     namespaces: &mut BTreeSet<Arc<str>>,
+    source_start: usize,
+    source_end: usize,
 ) -> Result<XmlNode, DocxValidationError> {
     let local = str::from_utf8(start.local_name().as_ref())
         .map_err(|_| DocxValidationError::InvalidDocumentXml)?
@@ -150,6 +211,9 @@ fn start_node(
             .decoded_and_normalized_value(XmlVersion::Implicit1_0, reader.decoder())
             .map_err(|_| DocxValidationError::InvalidDocumentXml)?
             .into_owned();
+        if !value.chars().all(is_xml_10_char) {
+            return Err(DocxValidationError::InvalidDocumentXml);
+        }
         if attribute.key.as_namespace_binding().is_some() {
             continue;
         }
@@ -172,7 +236,24 @@ fn start_node(
         local,
         attributes,
         children: Vec::new(),
+        text: String::new(),
+        source_start,
+        source_end,
     })
+}
+
+fn push_text(stack: &mut [XmlNode], value: &str) -> Result<(), DocxValidationError> {
+    if !value.chars().all(is_xml_10_char) {
+        return Err(DocxValidationError::InvalidDocumentXml);
+    }
+    if let Some(parent) = stack.last_mut() {
+        parent.text.push_str(value);
+        Ok(())
+    } else if value.trim().is_empty() {
+        Ok(())
+    } else {
+        Err(DocxValidationError::InvalidDocumentXml)
+    }
 }
 
 fn resolve_namespace(
@@ -265,6 +346,12 @@ mod tests {
         let malformed = br#"<root xmlns:x="&undefined;"/>"#;
         assert_eq!(
             parse_xml(malformed, &DocxLimits::default()),
+            Err(DocxValidationError::InvalidDocumentXml)
+        );
+
+        let invalid_character = br#"<root value="&#1;">&#1;</root>"#;
+        assert_eq!(
+            parse_xml(invalid_character, &DocxLimits::default()),
             Err(DocxValidationError::InvalidDocumentXml)
         );
     }

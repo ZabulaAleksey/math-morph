@@ -22,6 +22,7 @@ const WORD_DRAWING_NS: &str =
     "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
 const DRAWING_NS: &str = "http://schemas.openxmlformats.org/drawingml/2006/main";
 const PICTURE_NS: &str = "http://schemas.openxmlformats.org/drawingml/2006/picture";
+const OFFICE_MATH_NS: &str = "http://schemas.openxmlformats.org/officeDocument/2006/math";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct DocxValidator {
@@ -414,18 +415,29 @@ fn validate_document(
         if !allowed_document_element(node) {
             return Err(DocxValidationError::InvalidDocumentXml);
         }
+        if !node.is(WORD_NS, "t") && !node.is(OFFICE_MATH_NS, "t") && !node.text.trim().is_empty() {
+            return Err(DocxValidationError::InvalidDocumentXml);
+        }
         if node.is(WORD_NS, "p") {
             paragraphs = paragraphs
                 .checked_add(1)
                 .ok_or(DocxValidationError::LimitExceeded(DocxLimit::Paragraphs))?;
-            if paragraphs > limits.max_paragraphs
-                || node.children.iter().any(|child| !child.is(WORD_NS, "r"))
-            {
+            if paragraphs > limits.max_paragraphs {
+                return Err(DocxValidationError::LimitExceeded(DocxLimit::Paragraphs));
+            }
+            if !valid_paragraph_children(node) {
                 return if paragraphs > limits.max_paragraphs {
                     Err(DocxValidationError::LimitExceeded(DocxLimit::Paragraphs))
                 } else {
                     Err(DocxValidationError::InvalidDocumentXml)
                 };
+            }
+            if let Some(math) = node.children.first().filter(|_| node.children.len() == 1) {
+                if math.is(OFFICE_MATH_NS, "oMath") {
+                    validate_o_math(math, limits)?;
+                } else if math.is(OFFICE_MATH_NS, "oMathPara") {
+                    validate_o_math_para(math, limits)?;
+                }
             }
         }
         if node.is(WORD_NS, "r") {
@@ -566,8 +578,183 @@ fn allowed_document_element(node: &XmlNode) -> bool {
             node.local.as_str(),
             "pic" | "nvPicPr" | "cNvPr" | "cNvPicPr" | "blipFill" | "spPr"
         ),
+        Some(OFFICE_MATH_NS) => matches!(
+            node.local.as_str(),
+            "oMath"
+                | "oMathPara"
+                | "r"
+                | "rPr"
+                | "sty"
+                | "t"
+                | "f"
+                | "fPr"
+                | "type"
+                | "num"
+                | "den"
+        ),
         _ => false,
     }
+}
+
+fn valid_paragraph_children(paragraph: &XmlNode) -> bool {
+    paragraph
+        .children
+        .iter()
+        .all(|child| child.is(WORD_NS, "r"))
+        || (paragraph.children.len() == 1
+            && (paragraph.children[0].is(OFFICE_MATH_NS, "oMath")
+                || paragraph.children[0].is(OFFICE_MATH_NS, "oMathPara")))
+}
+
+fn validate_o_math_para(node: &XmlNode, limits: &DocxLimits) -> Result<(), DocxValidationError> {
+    if !node.attributes.is_empty()
+        || !node.text.trim().is_empty()
+        || node.children.len() != 1
+        || !node.children[0].is(OFFICE_MATH_NS, "oMath")
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    validate_o_math(&node.children[0], limits)
+}
+
+fn validate_o_math(node: &XmlNode, limits: &DocxLimits) -> Result<(), DocxValidationError> {
+    if !node.attributes.is_empty() || !node.text.trim().is_empty() || node.children.is_empty() {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let source_bytes = node.source_end.saturating_sub(node.source_start);
+    if u64::try_from(source_bytes).unwrap_or(u64::MAX) > limits.max_equation_output_bytes {
+        return Err(DocxValidationError::LimitExceeded(
+            DocxLimit::EquationOutputBytes,
+        ));
+    }
+    let mut state = EquationValidationState { nodes: 0, limits };
+    validate_math_sequence(&node.children, 0, &mut state)
+}
+
+struct EquationValidationState<'a> {
+    nodes: usize,
+    limits: &'a DocxLimits,
+}
+
+impl EquationValidationState<'_> {
+    fn count_node(&mut self, depth: usize) -> Result<(), DocxValidationError> {
+        if depth > self.limits.max_equation_depth {
+            return Err(DocxValidationError::LimitExceeded(DocxLimit::EquationDepth));
+        }
+        self.nodes = self
+            .nodes
+            .checked_add(1)
+            .ok_or(DocxValidationError::LimitExceeded(DocxLimit::EquationNodes))?;
+        if self.nodes > self.limits.max_equation_nodes {
+            return Err(DocxValidationError::LimitExceeded(DocxLimit::EquationNodes));
+        }
+        Ok(())
+    }
+}
+
+fn validate_math_sequence(
+    children: &[XmlNode],
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+) -> Result<(), DocxValidationError> {
+    if children.is_empty() {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    for child in children {
+        state.count_node(depth)?;
+        if child.is(OFFICE_MATH_NS, "r") {
+            validate_math_run(child)?;
+        } else if child.is(OFFICE_MATH_NS, "f") {
+            validate_fraction(child, depth, state)?;
+        } else {
+            return Err(DocxValidationError::InvalidEquation);
+        }
+    }
+    Ok(())
+}
+
+fn validate_math_run(node: &XmlNode) -> Result<(), DocxValidationError> {
+    let valid_shape = match node.children.as_slice() {
+        [text] => text.is(OFFICE_MATH_NS, "t"),
+        [_, text] => text.is(OFFICE_MATH_NS, "t"),
+        _ => false,
+    };
+    if !node.attributes.is_empty() || !node.text.trim().is_empty() || !valid_shape {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    if node.children.len() == 2 {
+        let properties = &node.children[0];
+        if !properties.is(OFFICE_MATH_NS, "rPr")
+            || !properties.attributes.is_empty()
+            || !properties.text.trim().is_empty()
+            || properties.children.len() != 1
+        {
+            return Err(DocxValidationError::InvalidEquation);
+        }
+        let style = &properties.children[0];
+        if !style.is(OFFICE_MATH_NS, "sty")
+            || style.attributes.len() != 1
+            || style.attribute(Some(OFFICE_MATH_NS), "val") != Some("i")
+            || !style.children.is_empty()
+            || !style.text.trim().is_empty()
+        {
+            return Err(DocxValidationError::InvalidEquation);
+        }
+    }
+    let text = node
+        .children
+        .last()
+        .ok_or(DocxValidationError::InvalidEquation)?;
+    if !text.attributes.is_empty()
+        && (text.attributes.len() != 1
+            || text.attribute(Some("http://www.w3.org/XML/1998/namespace"), "space")
+                != Some("preserve"))
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    if !text.children.is_empty() {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    if text.text.is_empty() {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    Ok(())
+}
+
+fn validate_fraction(
+    node: &XmlNode,
+    depth: usize,
+    state: &mut EquationValidationState<'_>,
+) -> Result<(), DocxValidationError> {
+    if !node.attributes.is_empty() || !node.text.trim().is_empty() || node.children.len() != 3 {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let properties = &node.children[0];
+    let numerator = &node.children[1];
+    let denominator = &node.children[2];
+    if !properties.is(OFFICE_MATH_NS, "fPr")
+        || !properties.attributes.is_empty()
+        || !properties.text.trim().is_empty()
+        || properties.children.len() != 1
+        || !properties.children[0].is(OFFICE_MATH_NS, "type")
+        || properties.children[0].attributes.len() != 1
+        || properties.children[0].attribute(Some(OFFICE_MATH_NS), "val") != Some("bar")
+        || !properties.children[0].children.is_empty()
+        || !properties.children[0].text.trim().is_empty()
+        || !numerator.is(OFFICE_MATH_NS, "num")
+        || !numerator.attributes.is_empty()
+        || !numerator.text.trim().is_empty()
+        || !denominator.is(OFFICE_MATH_NS, "den")
+        || !denominator.attributes.is_empty()
+        || !denominator.text.trim().is_empty()
+    {
+        return Err(DocxValidationError::InvalidEquation);
+    }
+    let next_depth = depth
+        .checked_add(1)
+        .ok_or(DocxValidationError::LimitExceeded(DocxLimit::EquationDepth))?;
+    validate_math_sequence(&numerator.children, next_depth, state)?;
+    validate_math_sequence(&denominator.children, next_depth, state)
 }
 
 fn required_attribute<'a>(node: &'a XmlNode, local: &str) -> Option<&'a str> {

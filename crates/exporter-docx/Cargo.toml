@@ -10,6 +10,7 @@ path = "src/lib.rs"
 
 [dependencies]
 document-ir = { path = "../document-ir" }
+math-model = { path = "../math-model" }
 quick-xml.workspace = true
 thiserror.workspace = true
 zip.workspace = true
