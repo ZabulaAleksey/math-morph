@@ -2,29 +2,51 @@
 
 MathMorph — monorepo расширяемой платформы parsing и конвертации Mathcad. Первый продуктовый путь: `.xmcd`/`.mcdx` → редактируемый DOCX/OMML.
 
-## Состояние
+## Текущее состояние
 
-Проект находится на этапе базового bootstrap. Предметная логика parser, math-engine, exporter, API и web ещё не реализована.
+Уже реализована безопасная входная граница: определение XMCD/MCDX по содержимому, ограниченная ZIP-инспекция и XML root metadata. В работе — чтение структуры legacy XMCD worksheet и синтаксический Math AST этапов 027–051. Вычислитель, экспорт, API endpoints и пользовательский web-flow ещё не реализованы.
 
 ## Структура
 
-- `crates/` — Rust core и exporters;
+- `crates/mathcad-parser/` — Rust parser недоверенных Mathcad inputs;
+- `crates/math-engine/` — каркас будущей семантики и вычислений;
+- `crates/exporter-docx/` — каркас будущего DOCX/OMML exporter;
 - `services/api/` — Python package будущего FastAPI adapter;
 - `apps/web/` — минимальный Next.js App Router shell;
-- `specs/` — канонические требования;
-- `docs/` — архитектура, решения, план, статус и предметные контракты;
-- `tests/` — project-level проверки и будущие fixtures.
+- `specs/` — канонические проверяемые требования;
+- `docs/` — архитектура, решения, планы, статус и учебные записи;
+- `tests/fixtures/` — synthetic regression corpus и manifest.
 
-## Быстрая проверка
+## Подготовка Windows
+
+Нужны Git, Python, Node.js + pnpm, uv и Rust. Для Rust MSVC установите Visual Studio 2022 Build Tools с workload `Desktop development with C++`; VS Code сам по себе не содержит `link.exe`.
+
+Откройте PowerShell и перейдите именно в корень репозитория:
 
 ```powershell
-python scripts/validate_project.py
-python -m unittest discover -s tests -p "test_*.py"
+cd ~/codex-workspace/projects/math-morph
+Test-Path Cargo.toml
+rustup show active-toolchain
+cargo --version
+```
+
+`Test-Path` должен вернуть `True`. Файл `rust-toolchain.toml` автоматически выбирает Rust 1.88 для этого проекта.
+
+## Основные проверки
+
+```powershell
+python -B scripts/validate_project.py
+python -B scripts/validate_fixtures.py
+python -B -m unittest discover -s tests -p "test_*.py" -v
+cargo fmt --all -- --check
+cargo test --workspace --locked
+cargo clippy --workspace --all-targets --locked -- -D warnings
 uv build --project services/api
 pnpm.cmd install --frozen-lockfile
 pnpm.cmd --filter @math-morph/web typecheck
 pnpm.cmd --filter @math-morph/web build
-cargo check --workspace
 ```
 
-Команда `cargo check` требует установленного Rust toolchain. Перед изменениями прочитай корневой и ближайший модульный `AGENTS.md`, затем выбери требования через `specs/README.md`.
+`--locked` запрещает Cargo незаметно менять `Cargo.lock`. Если Cargo сообщает, что не найден `Cargo.toml`, команда запущена не из репозитория. Если не найден `link.exe`, установите C++ Build Tools и перезапустите терминал; подробнее — в `docs/LEARNING_LOG.md`.
+
+Перед изменениями прочитайте корневой и ближайший модульный `AGENTS.md`, затем выберите требования через `specs/README.md`.

@@ -1,47 +1,53 @@
-# Текущий план AI — этапы 002–026
+# Текущий план AI — этапы 027–051
 
-**Статус:** завершён и проверен 2026-08-14.
+**Статус:** выполняется с 2026-08-14.
+**Ветка:** `feature/stages-027-051`.
 
 ## Цель
 
-Формально проверить существующий context foundation этапов 002–010 и реализовать ограниченную границу недоверенного Mathcad input этапов 011–026. Содержательное чтение worksheet начинается только с этапа 027 и в этот план не входит.
+Реализовать XSD-backed чтение структуры legacy XMCD worksheet и синтаксический Math AST от базовых выражений до сравнений. Не выполнять формулы, не декодировать binary payload и не начинать этап 052.
 
-## Режим и источники
+## Маршрутизация задачи
 
 - сложность: `COMPLEX`;
 - режим: production;
-- SDLC: specification → architecture → implementation → testing → security/review;
-- домен/стек: document conversion, hostile XML/ZIP, Rust 1.88;
-- SPEC: `specs/system.spec.md` и `specs/features/input-formats-and-containers.spec.md`.
+- SDLC: requirements/specification → architecture → implementation → testing → security/review;
+- домен: hostile document/XML parsing и scientific math syntax;
+- стек: Rust 1.88, `quick-xml`;
+- SPEC: `specs/system.spec.md`, `specs/features/worksheet-structure-and-ast.spec.md`.
 
-## Порядок
+## Подтверждённый источник формата
 
-1. **002–010:** расширить project validator каноническими документами и всеми локальными `AGENTS.md`; добавить отрицательные contract tests; провести review и отметить этапы только после доказательства.
-2. **011–014:** создать taxonomy, versioned fixture manifest, fail-closed validator и synthetic corrupted/security fixtures.
-3. **015–018:** реализовать content-based `InputFormat`/`FormatDetector`, XMCD/MCDX detection и `FILE_EXTENSION_MISMATCH`.
-4. **019–025:** реализовать ограниченную ZIP-инспекцию, path policy, лимиты, manifest и классификацию worksheet/resource/unknown.
-5. **026:** реализовать namespace/schema root metadata без worksheet parsing.
-6. Выполнить format/lint/test/build, project/fixture validators, security review, независимый code review и проверку соответствия SPEC.
-7. Обновить `AI_STATUS.md`, `TRACEABILITY.md`, затронутые архитектурные решения и зафиксировать завершённые логические блоки коммитами.
+Контракт сверен с официальными `worksheet30.xsd` 3.0.3 и `math30.xsd` 3.0.2 из локальной установки Mathcad 15. Vendor-файлы и содержимое официальных worksheets в репозиторий не копируются; тестовые данные синтетические.
 
-## Контрольные точки
+## Логические блоки
 
-- context contracts — verified;
-- fixtures — verified;
-- detector — verified;
-- safe container — verified;
-- XML metadata — verified;
-- итоговые security/reviewer verdict — PASS без открытых существенных замечаний.
+1. **Контракт и архитектура:** зафиксировать namespaces, реальные уровни table/program/vector, limits, source provenance и диагностику; обновить учебный контекст.
+2. **027–035 — worksheet:** metadata, recursive regions, layout/order, text, math, plot, picture и opaque fallbacks.
+3. **036–037 — ядро AST:** real/id/arithmetic и детерминированные snapshot tests.
+4. **038–044 — определения и формы:** Definition, Evaluation, FunctionCall, FunctionDefinition, unary, grouping, index/subscript.
+5. **045–051 — составные выражения:** matrix/vector, range, integral, derivative, sum/product, comparisons.
+6. **Проверка:** negative/limit/security regressions, fmt/test/clippy, validators, независимые security/code reviews.
+7. **Завершение:** обновить архитектуру, форматы, status, traceability и learning log; сделать отдельные коммиты для проверенных блоков.
 
-## Результат
+## Инварианты
 
-- Этапы 002–010 подтверждены validator и отрицательными contract tests.
-- Этапы 011–026 реализованы в пределах `specs/features/input-formats-and-containers.spec.md`; worksheet parsing этапа 027+ не начат.
-- Python validators и 14 unit-тестов прошли.
-- На Rust 1.88 прошли format, 17 integration tests и Clippy с запретом warnings.
-- `Cargo.lock` просканирован `cargo-audit 0.22.2` по актуальной RustSec advisory DB: уязвимости не найдены.
-- Code review и security review завершены; найденные обходы path/XML validation и расхождения manifest/typed-error contract закрыты regression-тестами.
+- Сравниваются expanded QName, не XML prefixes.
+- Source order, visual order и z-order остаются разными понятиями.
+- Неизвестное содержимое сохраняется source-backed и диагностируется, а не исполняется.
+- DTD/entities, сеть, filesystem extraction и evaluator отсутствуют.
+- `ml:program` — math expression; table — result-format reference; vector — специализация matrix.
+- MCDX Prime worksheet parsing не заявляется без отдельного подтверждённого schema contract.
+
+## Контрольные точки и коммиты
+
+- contract/docs;
+- worksheet 027–035;
+- AST 036–037;
+- AST 038–044;
+- AST 045–051;
+- review hardening и verified docs.
 
 ## Откат
 
-Каждый логический блок оформляется отдельным коммитом. Миграций данных и внешнего состояния нет; откат выполняется отменой соответствующего коммита. Повышение MSRV и выбор ZIP dependency фиксируются отдельным ADR.
+Каждый логический блок оформляется отдельным коммитом. Миграций данных и внешнего состояния нет; откат выполняется отменой соответствующего коммита. Изменение public API после публикации требует отдельного решения.

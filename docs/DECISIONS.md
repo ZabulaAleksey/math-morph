@@ -62,6 +62,28 @@
 
 **Связанные требования:** FR-ZIP-001..007, раздел 10 feature-SPEC входных форматов.
 
+## ADR-0007 — Worksheet parser следует подтверждённому XSD-подмножеству
+
+**Статус:** принято 2026-08-14.
+
+**Контекст:** этапы 027–051 требуют содержательного чтения legacy XMCD, но короткие формулировки ROADMAP не задают QName, arity и реальную вложенность table/program/vector. Попытка вывести их из названий этапов создала бы несовместимый выдуманный формат.
+
+**Варианты:** угадывать XML mapping по дорожной карте; копировать vendor XSD и выполнять runtime validation; реализовать ограниченный streaming parser по подтверждённым XSD-формам с synthetic fixtures.
+
+**Решение:** поддержать явно заявленное подмножество `worksheet30` 3.0.3 и `math30` 3.0.2, сверенное с официальной локальной установкой Mathcad 15. Сравнивать expanded QName, хранить source spans/opaque fragments, строго проверять arity и limits. Vendor XSD и содержимое официальных worksheet в репозиторий не копировать; runtime XSD resolver не добавлять.
+
+`ws:resultFormat/ws:table` остаётся opaque table reference, `ml:program` — неподдержанное math expression, vector — семантическая специализация `ml:matrix`. Prime MCDX worksheet parsing не заявляется без отдельного schema contract.
+
+**Причина:** подход даёт проверяемую совместимость и безопасную границу без copyright, filesystem resolver, case-sensitivity и supply-chain рисков runtime XSD validation.
+
+**Последствия:** новые версии/namespaces подключаются через явный dispatch и новые fixtures; неизвестные nodes сохраняются source-backed и диагностируются. Полная XSD-validity не обещается, проверяется только стабильный продуктовый контракт.
+
+**Fallback / rollback:** отключить содержательный parser для неподтверждённой версии, сохранив уже проверенную format/container boundary этапов 015–026.
+
+**Проверка:** `AC-027..051`, negative namespace/version/arity/limit tests, security review и отсутствие runtime network/filesystem schema resolution.
+
+**Связанные требования:** FR-WS-001..004, FR-REG-001..005, FR-AST-001..016, NFR-PARSE-001..003.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.
