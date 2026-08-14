@@ -52,8 +52,9 @@ REQUIRED_FILES = (
 CONTEXT_CONTRACTS = {
     "AGENTS.md": ("Маршрутизация контекста", "Инварианты проекта"),
     "docs/DESIGN.md": (
-        "Пользовательский интерфейс ещё не реализован",
-        "визуальная система владельцем продукта не утверждена",
+        "name: MathMorph Calm Blue UI",
+        "UI flow ещё не реализован",
+        "## Do's and Don'ts",
     ),
     "crates/mathcad-parser/AGENTS.md": ("Parser знает формат",),
     "crates/math-engine/AGENTS.md": ("Вычисление и представление разделены",),

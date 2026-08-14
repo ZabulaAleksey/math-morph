@@ -6,7 +6,7 @@ MathMorph является предметным overlay над `~/codex-workspac
 
 Статусы соответствуют `~/codex-workspace/docs/CONTEXT_COMPATIBILITY.md`: `INHERITED`, `EXTEND`, `PROJECT_ONLY`, `CONFLICT`, `OBSOLETE`.
 
-## Аудит 2026-08-13
+## Аудит 2026-08-14
 
 | Возможность | Глобальный источник | Потребность MathMorph | Статус | Каноническое решение |
 |---|---|---|---|---|
@@ -15,7 +15,7 @@ MathMorph является предметным overlay над `~/codex-workspac
 | Корневые и модульные инструкции | каскад `AGENTS.md` workspace | инварианты parser, math-engine, exporter, API, web и tests | `EXTEND` | корневой и ближайшие модульные `AGENTS.md` |
 | Требования | SDD и шаблоны workspace | требования продукта MathMorph | `PROJECT_ONLY` | `specs/system.spec.md`; индекс — `specs/README.md` |
 | План и состояние | project framework workspace | один текущий срез и один снимок | `PROJECT_ONLY` | `docs/AI_PLAN.md` и `docs/AI_STATUS.md` |
-| Архитектура, дизайн и решения | project framework workspace | границы Mathcad-конвейера и отсутствие утверждённого UI | `PROJECT_ONLY` | `docs/ARCHITECTURE.md`, `docs/DESIGN.md`, `docs/DECISIONS.md` |
+| Архитектура, дизайн и решения | project framework workspace | границы Mathcad-конвейера и утверждённый MathMorph Calm Blue UI contract | `PROJECT_ONLY` | `docs/ARCHITECTURE.md`, `docs/DESIGN.md`, `docs/DECISIONS.md` |
 | Mathcad agents | универсальные agents не содержат экспертизу форматов Mathcad | forensics, parser, math semantics, OpenXML | `PROJECT_ONLY` | `.codex/agents/*.toml`; запускать только при предметной пользе |
 | Mathcad Skills | общие workflows не содержат предметных регрессий Mathcad | forensics, conversion regression, security overlay | `PROJECT_ONLY` | `.agents/skills/*/SKILL.md` |
 | Универсальные fallback agents/Skill | уже доступны глобально | локальной потребности нет | `OBSOLETE` | удалены из optional-каталогов проекта |

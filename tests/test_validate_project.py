@@ -71,6 +71,25 @@ class ProjectValidatorTests(unittest.TestCase):
 
         self.assertIn("context contract services/api/AGENTS.md is missing marker: /api/v1", errors)
 
+    def test_design_contract_rejects_obsolete_placeholder(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            target = root / "docs/DESIGN.md"
+            target.parent.mkdir(parents=True)
+            target.write_text(
+                "# Дизайн и UI/UX\n\n"
+                "Пользовательский интерфейс ещё не реализован, "
+                "а визуальная система владельцем продукта не утверждена.\n",
+                encoding="utf-8",
+            )
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "context contract docs/DESIGN.md is missing marker: name: MathMorph Calm Blue UI",
+            errors,
+        )
+
     def test_canonical_document_rejects_empty_content(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
