@@ -67,14 +67,30 @@ DOCX/OMML          Markdown/...     Future Excel/Visio
 - аутентификация HTTP;
 - React UI.
 
-Текущая реализованная входная граница `mathcad-parser` разделена на четыре узких модуля:
+Текущая реализованная граница `mathcad-parser` разделена на слои:
 
 - `format` сопоставляет заявленное расширение с форматом, подтверждённым содержимым;
 - `mcdx` выполняет bounded ZIP preflight, перечисление и классификацию частей без извлечения на диск;
 - `xml_metadata` читает только безопасный root envelope, namespaces и schema URI без загрузки схем;
-- `diagnostic` содержит только scoped-коды этапов 015–026 до появления общего collector.
+- `source` владеет immutable XML bytes и безопасными `SourceSpan`/opaque fragments;
+- `xml_worksheet` выполняет bounded namespace-aware разбор worksheet30 и строит worksheet/region model;
+- `worksheet` и `region` отделяют metadata, layout, source/visual/z order и typed/opaque region content;
+- `math_xml` отображает подтверждённое подмножество math30 в синтаксический `ast` с проверкой QName, arity, shape и limits;
+- `diagnostic` содержит scoped machine-readable codes до появления общего collector.
 
-Эта граница намеренно заканчивается до worksheet metadata, regions и AST. Неизвестные безопасные MCDX parts сохраняются в `ContainerManifest`, а не исчезают и не интерпретируются эвристически.
+`WorksheetParser` поддерживает legacy XMCD contract worksheet30 3.0.3 + math30 3.0.2. Он сохраняет metadata, recursive regions, source provenance и синтаксический AST до сравнений, но ничего не вычисляет. `MathParseOutcome` различает parsed, typed invalid и unsupported math; неизвестные region/inline fragments остаются source-backed. Source order, visual order и z-order представлены отдельно.
+
+Безопасный MCDX container reader по-прежнему заканчивается на manifest. Внутренний Prime worksheet не передаётся legacy parser без отдельного подтверждённого schema contract. Неизвестные MCDX parts сохраняются в `ContainerManifest`, а не интерпретируются эвристически.
+
+Реальная последовательность текущего parser:
+
+```text
+bytes
+  -> FormatDetector / SafeMcdxReader / XML root inspector
+  -> WorksheetParser (только подтверждённый legacy worksheet30)
+  -> Worksheet + Regions + source-backed opaque fragments
+  -> structural Math AST (без evaluator)
+```
 
 ### Exporters
 

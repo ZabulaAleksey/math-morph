@@ -16,7 +16,21 @@
 
 Текущий MCDX reader ничего не извлекает на диск. Он применяет лимиты feature-SPEC, отвергает traversal, абсолютные/drive/backslash paths, duplicate/case-conflicting имена, symlinks, encryption и неподдерживаемое сжатие, затем сохраняет worksheet, resource и unknown metadata в детерминированном manifest. CRC32 является только metadata повреждения, не доказательством доверия.
 
-XML metadata reader разрешает только UTF-8, запрещает `DOCTYPE` и возвращает root namespace bindings и `xsi:schemaLocation` как строки без сетевой загрузки. Worksheet metadata и дочерние regions до этапа 027 не читаются.
+XML metadata reader разрешает только UTF-8, запрещает `DOCTYPE` и возвращает root namespace bindings и `xsi:schemaLocation` как строки без сетевой загрузки.
+
+## Поддерживаемое содержимое legacy XMCD
+
+`WorksheetParser` содержательно читает только явно подтверждённый contract:
+
+- root `{http://schemas.mathsoft.com/worksheet30}worksheet`, `version="3.0.3"`;
+- math namespace `http://schemas.mathsoft.com/math30`;
+- XML prefixes произвольны, сравниваются expanded QName;
+- metadata, recursive `area/region`, обязательный layout, text runs, math, plot/picture references и opaque fallbacks;
+- синтаксический Math AST: real/id/arithmetic, definitions/evaluation/functions, unary/grouping/index, matrix/vector, range, calculus и comparisons.
+
+Парсер не является полным runtime XSD validator и не выполняет формулы. `table` сохраняется как opaque `resultFormat` reference, `ml:program` — unsupported math expression, vector определяется как `1×N`/`N×1` matrix. Plot, picture и table binary payload не декодируется.
+
+Другие worksheet/math namespace и версии не маскируются под worksheet30. Prime MCDX content parsing не заявляется: контейнер безопасно инспектируется, но внутренний worksheet ждёт отдельного schema contract.
 
 ## Выходные форматы
 

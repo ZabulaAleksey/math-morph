@@ -4,7 +4,7 @@ MathMorph — monorepo расширяемой платформы parsing и ко
 
 ## Текущее состояние
 
-Уже реализована безопасная входная граница: определение XMCD/MCDX по содержимому, ограниченная ZIP-инспекция и XML root metadata. В работе — чтение структуры legacy XMCD worksheet и синтаксический Math AST этапов 027–051. Вычислитель, экспорт, API endpoints и пользовательский web-flow ещё не реализованы.
+Реализованы безопасная входная граница, чтение подтверждённого legacy XMCD worksheet30 и синтаксический Math AST до structural comparisons (этапы 001–051). Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но не вычисляет формулы. Экспорт, API endpoints и пользовательский web-flow ещё не реализованы; Prime MCDX пока безопасно инспектируется как контейнер без содержательного разбора его внутреннего worksheet.
 
 ## Структура
 

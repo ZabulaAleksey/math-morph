@@ -197,7 +197,9 @@ Controls:
 - Временные файлы: случайные имена, ограничительные разрешения, очистка и квоты.
 - Worker конвертации: sandbox и изоляция, где возможно; минимальные привилегии; отсутствие доступа к объектам других пользователей.
 
-Реализация этапов 015–026 применяет эти controls в `mathcad-parser`: ZIP проходит bounded central-directory/local-header preflight и фактическое bounded decompression без filesystem extraction; XML root envelope ограничен по размеру, namespace declarations и attributes. Структурированные ошибки не содержат payload, исходное имя пользовательского файла или абсолютные внутренние пути.
+Реализация этапов 015–051 применяет эти controls в `mathcad-parser`: ZIP проходит bounded central-directory/local-header preflight и фактическое bounded decompression без filesystem extraction; XML root/worksheet parsing ограничен по input bytes, depth, nodes, regions, namespaces, attributes, token/attribute/text bytes, AST nodes и matrix elements. Арифметика размеров checked, координаты обязаны быть конечными, DTD/entities запрещены.
+
+Parser не извлекает файлы, не загружает schema/URI, не декодирует binary references и не выполняет `ml:program` или формулы. Opaque content хранится как span в immutable source buffer. `Debug`, diagnostics и typed errors не включают text/formula payload, пользовательское имя файла или абсолютные пути; явный доступ к source bytes возможен только через возвращённый `SourceDocument` и проверенный `SourceSpan`.
 
 ## Обязательные проверки безопасности по типу изменения
 

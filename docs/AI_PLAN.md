@@ -1,13 +1,13 @@
 # Текущий план AI — этапы 027–051
 
-**Статус:** выполняется с 2026-08-14.
+**Статус:** завершён и проверен 2026-08-14.
 **Ветка:** `feature/stages-027-051`.
 
-## Цель
+## Достигнутый результат
 
-Реализовать XSD-backed чтение структуры legacy XMCD worksheet и синтаксический Math AST от базовых выражений до сравнений. Не выполнять формулы, не декодировать binary payload и не начинать этап 052.
+Реализовано XSD-backed чтение структуры legacy XMCD worksheet30 и синтаксический Math AST до structural comparisons. Формулы не вычисляются, binary payload не декодируется, этап 052 не начат.
 
-## Маршрутизация задачи
+## Маршрутизация
 
 - сложность: `COMPLEX`;
 - режим: production;
@@ -16,38 +16,38 @@
 - стек: Rust 1.88, `quick-xml`;
 - SPEC: `specs/system.spec.md`, `specs/features/worksheet-structure-and-ast.spec.md`.
 
-## Подтверждённый источник формата
+## Выполненные блоки
 
-Контракт сверен с официальными `worksheet30.xsd` 3.0.3 и `math30.xsd` 3.0.2 из локальной установки Mathcad 15. Vendor-файлы и содержимое официальных worksheets в репозиторий не копируются; тестовые данные синтетические.
-
-## Логические блоки
-
-1. **Контракт и архитектура:** зафиксировать namespaces, реальные уровни table/program/vector, limits, source provenance и диагностику; обновить учебный контекст.
-2. **027–035 — worksheet:** metadata, recursive regions, layout/order, text, math, plot, picture и opaque fallbacks.
-3. **036–037 — ядро AST:** real/id/arithmetic и детерминированные snapshot tests.
-4. **038–044 — определения и формы:** Definition, Evaluation, FunctionCall, FunctionDefinition, unary, grouping, index/subscript.
-5. **045–051 — составные выражения:** matrix/vector, range, integral, derivative, sum/product, comparisons.
-6. **Проверка:** negative/limit/security regressions, fmt/test/clippy, validators, независимые security/code reviews.
-7. **Завершение:** обновить архитектуру, форматы, status, traceability и learning log; сделать отдельные коммиты для проверенных блоков.
+1. **Контракт:** подтверждены `worksheet30.xsd` 3.0.3 и `math30.xsd` 3.0.2, создана feature-SPEC и ADR-0007.
+2. **027–035:** metadata, recursive regions, layout/source/visual/z order, text, math, plot, picture и opaque fallbacks.
+3. **036–037:** real/id/arithmetic AST, source spans и canonical test-only snapshots.
+4. **038–044:** definitions, evaluation, functions, unary, grouping и index/subscript.
+5. **045–051:** matrix/vector, range, calculus, sum/product и six comparisons.
+6. **Hardening:** namespace interning, full QName bounds, payload-redacted Debug, preservation/arity/signed-zero regressions.
+7. **Проверка:** 46 Rust integration tests, fmt, Clippy `-D warnings`, validators, 14 Python tests, независимые security/code reviews.
 
 ## Инварианты
 
-- Сравниваются expanded QName, не XML prefixes.
-- Source order, visual order и z-order остаются разными понятиями.
-- Неизвестное содержимое сохраняется source-backed и диагностируется, а не исполняется.
+- Expanded QName, не XML prefix.
+- Source, visual и z-order не смешиваются.
+- Opaque content source-backed; unsupported не исполняется.
 - DTD/entities, сеть, filesystem extraction и evaluator отсутствуют.
-- `ml:program` — math expression; table — result-format reference; vector — специализация matrix.
-- MCDX Prime worksheet parsing не заявляется без отдельного подтверждённого schema contract.
+- `ml:program` — unsupported math; table — result reference; vector — matrix specialization.
+- Prime MCDX worksheet parsing не заявляется без отдельного schema contract.
 
-## Контрольные точки и коммиты
+## Коммиты логических блоков
 
-- contract/docs;
-- worksheet 027–035;
-- AST 036–037;
-- AST 038–044;
-- AST 045–051;
-- review hardening и verified docs.
+- `80375bf` — SPEC/docs;
+- `124f43b` — worksheet 027–035;
+- `dbfc2c3` — AST 036–037;
+- `39371dd` — AST 038–044;
+- `183aa07` — AST 045–051;
+- `2be0fd9`, `1c205aa` — security/review hardening.
+
+## Следующий отдельный план
+
+Этап 052 (`booleans`) требует нового ограниченного плана и продолжает AST, не меняя завершённый контракт этапов 027–051.
 
 ## Откат
 
-Каждый логический блок оформляется отдельным коммитом. Миграций данных и внешнего состояния нет; откат выполняется отменой соответствующего коммита. Изменение public API после публикации требует отдельного решения.
+Миграций данных и внешнего состояния нет. Логические блоки отменяются соответствующими коммитами; public API после публикации меняется только отдельным решением.

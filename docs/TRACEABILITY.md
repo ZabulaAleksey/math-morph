@@ -26,8 +26,9 @@
 | SPEC-02 определение формата | 015–018 | `crates/mathcad-parser/src/format.rs`, `diagnostic.rs`, detector/mismatch tests в `tests/input_boundary.rs` | verified |
 | SPEC-02 безопасный MCDX container | 019–025 | `crates/mathcad-parser/src/mcdx.rs`, path/collision/limits/manifest tests в `tests/input_boundary.rs` | verified |
 | SPEC-02 XML root metadata | 026 | `crates/mathcad-parser/src/xml_metadata.rs`, UTF-8/DTD/namespace/schema/limits tests в `tests/input_boundary.rs` | verified |
-| SPEC-02 worksheet structure | 027–035 | worksheet metadata, regions, ordering, version compatibility и regression coverage | planned |
-| SPEC-04 архитектура конвертации | 036–061, 143–147 | AST, семантические границы, Document IR, тесты контракта конвейера | planned |
+| FR-WS-001..004, FR-REG-001..005 | 027–035 | `source.rs`, `worksheet.rs`, `region.rs`, `xml_worksheet.rs`; `tests/worksheet_structure.rs`; security/code review | verified |
+| FR-AST-001..016, NFR-PARSE-001..003 | 036–051 | `ast.rs`, `math_xml.rs`; `tests/math_ast.rs`, `math_ast_forms.rs`, `math_ast_advanced.rs`; security/code review | verified |
+| SPEC-04 архитектура конвертации | 052–061, 143–147 | дальнейший AST, семантические границы, Document IR и тесты контракта конвейера | planned |
 | SPEC-05 экспорт редактируемых формул | 062–094 | `crates/exporter-docx/`, тесты OMML и пакета, smoke-эталоны Word | planned |
 | SPEC-06 преобразования и точность | 095–111 | `crates/math-engine/`, тесты сохранения семантики и trace | planned |
 | SPEC-07 комплексные числа | 112–122 | round-trip проверки алгебраического и полярного представления и граничные тесты | planned |

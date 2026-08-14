@@ -2,43 +2,46 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–026 проверены; этапы 027–051 выполняются на ветке `feature/stages-027-051`.
-- **Текущий этап:** specification/architecture для worksheet parser и Math AST завершены; реализация ещё не отмечена выполненной.
-- **В работе:** этапы 027–051 по `specs/features/worksheet-structure-and-ast.spec.md`.
-- **Blockers:** нет. Официальный контракт legacy XML подтверждён локальными XSD Mathcad 15.
+- **Статус:** этапы 001–051 реализованы и проверены.
+- **Текущий этап:** 051 завершён на ветке `feature/stages-027-051`; ветка готова к пользовательской проверке и последующему merge по явному разрешению.
+- **В работе:** нет.
+- **Blockers:** нет.
+- **Следующий ещё не начатый этап:** 052 (`booleans`).
 
-## Уже реализовано и проверено
+## Реализовано
 
 - Воспроизводимый Cargo/uv/pnpm monorepo и минимальные Rust/Python/Next.js каркасы.
-- Project overlay, canonical docs и fail-closed project/fixture validators.
-- Versioned synthetic fixture corpus.
-- Content-based XMCD/MCDX detection и `FILE_EXTENSION_MISMATCH`.
-- Bounded ZIP inspection без filesystem extraction, безопасная path policy и ordered container manifest.
-- UTF-8 XML root-envelope inspection namespaces/schema metadata с запретом DTD/entities.
-- Rust 1.88, `zip = 8.6.0`, `quick-xml = 0.41.0`; предыдущий security/code review прошёл.
+- Project overlay, canonical docs, versioned fixture corpus и fail-closed validators.
+- Content-based XMCD/MCDX detection, `FILE_EXTENSION_MISMATCH` и безопасный MCDX container manifest без extraction.
+- UTF-8 XML root metadata inspection с запретом DTD/entities.
+- `WorksheetParser` для подтверждённого legacy contract worksheet30 3.0.3 + math30 3.0.2.
+- Metadata, recursive regions, finite layout, source/visual/z ordering, text/inline attributes, math, plot/picture/table references и source-backed opaque fragments.
+- Синтаксический Math AST этапов 036–051: literals/arithmetic, definitions/evaluation/functions, unary/grouping/index, matrix/vector/range, calculus/aggregates/comparisons.
+- Typed invalid/unsupported outcomes, source spans и configurable resource limits.
 
-## Принятый контракт следующего блока
+## Проверки этапов 027–051
 
-- Поддерживаемое legacy XML подмножество: worksheet30 3.0.3 + math30 3.0.2.
-- Table/program/vector трактуются по реальной XSD-модели, а не по неточной короткой формулировке ROADMAP.
-- Stages 027–051 заканчиваются structural comparisons. Boolean AST/evaluation, units, generic `UnsupportedNode`, IR/export/API/UI не входят.
+- `python -B scripts/validate_project.py` — PASS.
+- `python -B scripts/validate_fixtures.py` — PASS.
+- `python -B -m unittest discover -s tests -p "test_*.py" -v` — PASS, 14/14.
+- `cargo fmt --all -- --check` — PASS.
+- `cargo test --workspace --locked` — PASS, 46 Rust integration tests.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
+- Security review — PASS после закрытия namespace-memory amplification и numeric Debug leakage.
+- Independent code review — PASS после закрытия userData opaque preservation, one-element index sequence и signed-zero ordering.
+- Production dependencies не менялись; предыдущий locked `cargo-audit` result остаётся применимым.
 
 ## Известные ограничения
 
-- Совместимость с реальными вариантами подтверждается постепенно легально доступными образцами; в Git хранятся только synthetic fixtures.
-- MCDX container инспектируется безопасно, но его внутренний Prime worksheet ещё не имеет подтверждённого content schema contract.
-- API и web остаются каркасами; приложение пока не предоставляет пользовательский conversion flow.
-- На Windows Rust MSVC требует Visual Studio Build Tools с workload `Desktop development with C++` и запуск из Developer PowerShell либо окружения с доступным `link.exe`.
+- Parser реализует подтверждённое подмножество, а не полный runtime XSD validator.
+- Corpus хранит synthetic fixtures; совместимость с реальными документами расширяется только легально доступными образцами.
+- Prime MCDX безопасно инспектируется как контейнер, но его внутренний worksheet ещё не имеет подтверждённого content parser.
+- Boolean AST/evaluation, units, generic `UnsupportedNode`, `DocumentIR`, evaluator, exporters, CLI, API endpoints и UI flow не реализованы.
+- `math-engine`, `exporter-docx`, Python API и Next.js остаются каркасами.
+- На Windows Rust MSVC требует Visual Studio Build Tools с workload `Desktop development with C++` и доступный `link.exe`.
 
-## Проверки последнего verified блока
+## Следующие разумные действия
 
-- Python validators и unit tests: PASS, 14/14.
-- Rust 1.88: format, 17/17 integration tests и Clippy `-D warnings`: PASS.
-- `cargo-audit 0.22.2`: уязвимости в 23 locked dependencies не найдены.
-
-## Следующие действия
-
-1. Реализовать и проверить worksheet block 027–035.
-2. Реализовать AST блоками 036–037, 038–044 и 045–051.
-3. Провести limit/security regression suite и независимые reviews.
-4. Только после доказательств обновить stages 027–051 до `verified` в `TRACEABILITY.md`.
+1. Пользовательская проверка ветки и merge только после явного разрешения.
+2. Новый отдельный пакет начиная с этапа 052, не включая его автоматически в завершённый AST contract.
+3. По мере появления legal real-world corpus добавлять compatibility fixtures и regressions.

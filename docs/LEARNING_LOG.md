@@ -127,7 +127,7 @@ URI из XML сохраняются как строки metadata; сеть не 
 
 Review выявил drive-relative ZIP paths, unchecked offset arithmetic, неполную проверку XML attributes и неточное сопоставление namespace-limit error. Исправления получили отдельные regression tests — именно так review превращается в долговременную защиту.
 
-## 2026-08-14 — План worksheet parser и Math AST, этапы 027–051
+## 2026-08-14 — Worksheet parser и Math AST, этапы 027–051
 
 ### Почему сначала понадобилась SPEC
 
@@ -157,3 +157,89 @@ Review выявил drive-relative ZIP paths, unchecked offset arithmetic, не�
 2. Сравнить термины `table`, `program`, `vector` с разделом «Вне области» и ADR-0007.
 3. После реализации запустить validators и Rust format/test/clippy с `--locked`.
 4. Проверить `docs/TRACEABILITY.md`: `verified` допустим только рядом с конкретными tests/review evidence.
+
+### Что получилось в коде
+
+```text
+WorksheetParser::parse(bytes)
+  -> bounded XML tree builder
+  -> exact worksheet30/version gate
+  -> WorksheetMetadata
+  -> recursive Region discovery
+       -> Text / Math / Plot / Picture / Area / Opaque
+  -> math30 parser
+       -> MathExpression + SourceSpan
+       -> Invalid(MathAstError) или Unsupported(diagnostic)
+```
+
+`SourceDocument` владеет immutable копией входных bytes. `SourceSpan { start, end }` — полуоткрытый диапазон: первый byte входит, byte с индексом `end` уже не входит. Opaque fragment хранит QName + span, поэтому неизвестный XML не теряется и не копируется в каждую структуру. Метод `source.bytes(span)` возвращает fragment только при корректных границах.
+
+### Metadata, regions и порядок
+
+`WorksheetMetadata` читает generator, identity/user fields и typed custom values. Содержимое comment/extensions остаётся opaque. Каждый `Region` содержит:
+
+- `id` и `source_ordinal`;
+- `RegionLayout` с исходной числовой лексемой и конечным `f64`;
+- `z_order` отдельно;
+- source span;
+- typed или opaque content.
+
+`worksheet.regions` всегда остаётся в document order. `visual_order()` возвращает отдельный стабильный view по `(top, left, source_ordinal)`, а `z_order()` — по `(z_order, source_ordinal)`. Это views из ссылок, а не перестановка исходного документа.
+
+### Как устроен Math AST
+
+Этапы 036–051 добавили только синтаксис:
+
+- literals/identifiers и arithmetic;
+- definitions, saved evaluation results, function calls/definitions;
+- unary operations, grouping, literal subscript и array index;
+- matrix/vector shape, range;
+- integral, derivative, summation/product;
+- six comparisons.
+
+`RealLiteral` сохраняет lexeme и radix, потому что ранний перевод в floating point потерял бы точность. `Matrix` проверяет positive dimensions и `rows × cols == elements.len()` через checked arithmetic. `Vector` не ищется как XML element: это специализация `1×N` или `N×1` matrix. Calculus nodes сохраняют bound variable, body, bounds/degree и typed algorithm/style, но ничего не вычисляют.
+
+### Parsed, Invalid и Unsupported — разные состояния
+
+- `Parsed(ast)` — форма входит в подтверждённое подмножество и структурно корректна.
+- `Invalid(error)` — QName известен, но arity, radix, shape или wrapper нарушены.
+- `Unsupported(diagnostic)` — форма существует вне текущей области, например `ml:program` или boolean `not` до этапа 052.
+
+Так damaged supported input не смешивается с корректной, но ещё не реализованной возможностью.
+
+### Ограничения ресурсов
+
+`WorksheetLimits` ограничивает input, XML depth/nodes, regions, namespaces, attributes, token/attribute/text bytes, AST nodes и matrix elements. Проверяются не только большие файлы, но и маленькие документы с патологически глубокой/широкой структурой. DTD запрещён до любого entity resolution; namespace attributes также декодируются и валидируются.
+
+### Как читать тесты по этапам
+
+1. `input_boundary.rs` — входной XMCD/MCDX perimeter.
+2. `worksheet_structure.rs` — AC-027–035.
+3. `math_ast.rs` — AC-036–037.
+4. `math_ast_forms.rs` — AC-038–044.
+5. `math_ast_advanced.rs` — AC-045–051.
+
+Snapshots — обычные ожидаемые S-expression strings внутри tests. Если snapshot изменился, сначала нужно доказать изменение SPEC; автоматическое «принятие нового golden» запрещено.
+
+### Что сознательно ещё не работает
+
+- `cargo run` по-прежнему нечего запускать: в workspace нет CLI binary;
+- parser не является evaluator;
+- boolean AST начинается на этапе 052;
+- units и generic `UnsupportedNode` — этапы 053–054;
+- `DocumentIR`, DOCX, API и UI идут позже;
+- внутренний Prime MCDX worksheet не передаётся legacy worksheet30 parser без отдельной схемы.
+
+### Что нашли независимые reviews
+
+Security review воспроизвёл memory amplification: один длинный namespace URI копировался в каждый XML node. Исправление интернирует URI как `Arc<str>`, поэтому все повторения делят одну строку; regression проверяет общую allocation через `Arc::ptr_eq`. Полный QName, включая prefix, теперь также ограничен. Отдельно custom `Debug` для чисел перестал выводить исходную лексему.
+
+Code review нашёл три семантических края: direct extension внутри `userData` терялся, одноэлементный `sequence` принимался за multi-index, а `-0.0` сортировался раньше `+0.0`. После исправлений каждый случай имеет regression test. Это полезный пример: зелёный happy-path test не доказывает preservation, точную arity и стабильность математически равных layout values.
+
+### Практика для самостоятельного повторения
+
+1. Открыть один test `ac_045_and_046...` и вручную сопоставить XML children с AST fields.
+2. Изменить только локально одну matrix dimension и увидеть typed `MatrixElementCountMismatch`.
+3. Сравнить `id@subscript` с `apply/indexer/sequence` в тестах этапа 044.
+4. Запустить `cargo test -p mathcad-parser --test math_ast_advanced --locked`.
+5. Затем запустить полный `cargo test --workspace --locked` и Clippy.

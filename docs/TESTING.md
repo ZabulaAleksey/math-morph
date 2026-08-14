@@ -68,6 +68,18 @@
 
 Каждый fixture включается в манифест с форматом, версией, функциями и ожидаемым статусом. Исправленная ошибка parser получает постоянный регрессионный fixture, если это допустимо юридически и технически.
 
+## Текущее покрытие parser
+
+- `tests/input_boundary.rs`: format detection, MCDX path/container/limit policy и XML root metadata;
+- `tests/worksheet_structure.rs`: AC-027–035, metadata/regions/layout/order/text/math/plot/picture/opaque и worksheet resource limits;
+- `tests/math_ast.rs`: AC-036–037, core AST/radix/arity/node limits и canonical test-only snapshots;
+- `tests/math_ast_forms.rs`: AC-038–044, definitions/evaluation/functions/unary/grouping/index;
+- `tests/math_ast_advanced.rs`: AC-045–051, matrix/vector/range/calculus/comparisons и shape/limit regressions.
+
+Небольшие synthetic XML cases находятся inline рядом с Rust integration tests: так grammar edge case виден в одном месте и не раздувает corpus manifest. Постоянный cross-language или full-document regression fixture по-прежнему обязан входить в `tests/fixtures/manifest.json`.
+
+Snapshot renderer существует только в tests и выдаёт канонический S-expression. Production serialization dependency для этапа 037 не добавлялась.
+
 ## Правило эталонных данных
 
 Не обновляй эталонный fixture только потому, что после изменения реализации тест упал. Сначала докажи, что желаемое поведение изменилось намеренно.
