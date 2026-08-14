@@ -84,6 +84,66 @@
 
 **Связанные требования:** FR-WS-001..004, FR-REG-001..005, FR-AST-001..016, NFR-PARSE-001..003.
 
+## ADR-0008 — AST и Document IR получают нейтральных владельцев
+
+**Статус:** принято 2026-08-14.
+
+**Контекст:** `mathcad-parser` уже владеет source AST, а этап 055 требует общий сериализуемый IR. Размещение IR в `math-engine` связало бы exporters с будущим evaluator; размещение в `exporter-docx` сделало бы Word владельцем общего контракта.
+
+**Варианты:** оставить AST в parser и дублировать formula model; поместить IR в `math-engine`; поместить IR в exporter; выделить нейтральные crates.
+
+**Решение:** добавить `math-model` для source-neutral AST и `document-ir` для wire schema/export ports. `mathcad-parser` сохраняет совместимые re-export; `exporter-docx` не зависит от parser.
+
+**Причина:** единая formula model не дублируется, а dependency DAG сохраняет границы XML, semantics и Word.
+
+**Последствия:** workspace и validator получают два новых crate; AST-типы становятся сериализуемыми, но `Debug` остаётся redacted.
+
+**Fallback / rollback:** вернуть re-exported AST в parser до публикации внешнего API; не переносить IR в exporter/evaluator как shortcut.
+
+**Проверка:** workspace dependency inspection, compile tests без циклов и AC-052–061.
+
+**Связанные требования:** FR-AST2-001..007, FR-IR-001..007, ADR-0005.
+
+## ADR-0009 — Document IR V1 использует строгий JSON и integer micrometres
+
+**Статус:** принято 2026-08-14.
+
+**Контекст:** exporter boundary должна быть сохраняемой и совместимой, а layout с `f64` допускает NaN, platform-dependent rounding и неоднозначные единицы. Binary assets нельзя встраивать в основной IR без раздувания и утечки путей.
+
+**Варианты:** неверсированный in-memory Rust API; JSON с floating-point layout и bytes; строгий versioned envelope с asset references.
+
+**Решение:** V1 сериализуется в bounded UTF-8 JSON с `schema_version = 1`, exact field set и integer micrometres. Изображения представлены `AssetRefIr`; bytes предоставляет отдельный `AssetResolver`.
+
+**Причина:** wire contract детерминирован, проверяем и независим от filesystem/Word; физические conversions используют checked integer arithmetic.
+
+**Последствия:** unknown version/field требует явной migration; сериализация содержимого остаётся сознательной операцией, а не способом логирования.
+
+**Fallback / rollback:** V1 reader сохраняется после появления artifacts; новая несовместимая модель получает V2.
+
+**Проверка:** golden/round-trip/version/geometry/privacy tests и AC-055–061.
+
+**Связанные требования:** FR-IR-001..007, ADR-0005.
+
+## ADR-0010 — DOCX exporter производит bounded deterministic OPC subset
+
+**Статус:** принято 2026-08-14.
+
+**Контекст:** ручная генерация произвольного OOXML создаёт риск broken relationships, active content и недетерминированных artifacts. Полный универсальный DOCX validator не входит в текущий этап.
+
+**Варианты:** Office COM/Open XML SDK runtime; сторонний high-level DOCX stack; ограниченный Rust writer/validator на закреплённых ZIP/XML dependencies.
+
+**Решение:** `exporter-docx` генерирует только заявленный Transitional OPC/WordprocessingML/OMML subset, только internal relationships и проверенные PNG/JPEG. Package/XML writer и validator ограничены ресурсными лимитами и используют детерминированные IDs/order/timestamps.
+
+**Причина:** core остаётся кроссплатформенным, воспроизводимым и не зависит от установленного Office или внешнего schema resolver.
+
+**Последствия:** неподдерживаемые sections/assets/equations дают typed error; validator гарантирует только generated subset и не рекламируется как универсальная очистка чужих DOCX.
+
+**Fallback / rollback:** отключить соответствующий exporter layer, сохранив Document IR и parser; не переходить на внешний runtime без отдельного dependency/security ADR.
+
+**Проверка:** AC-062–076, deterministic bytes, negative OPC/XML/image tests и security review.
+
+**Связанные требования:** FR-DOCX-001..006, FR-OMML-001..003, SPEC-05.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.
