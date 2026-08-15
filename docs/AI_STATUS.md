@@ -3,7 +3,7 @@
 ## Снимок состояния
 
 - **Статус:** этапы 001–091 реализованы и проверены.
-- **Текущий этап:** 091 завершён на ветке `feature/stage-091`.
+- **Текущий этап:** 091 завершён и интегрирован в ветку `math-tutor`.
 - **В работе:** нет.
 - **Blockers:** нет.
 - **Следующий ещё не начатый этап:** 092 (`experimental MathType adapter`).
@@ -12,6 +12,7 @@
 
 - Воспроизводимый Cargo/uv/pnpm monorepo, project overlay, canonical docs и versioned fixture corpus.
 - Безопасная входная граница XMCD/MCDX, worksheet30 parser и синтаксический Math AST этапов 015–051.
+- Утверждён канонический MathMorph Calm Blue UI design contract с `light`, `dark`, `system` и независимыми accessibility/density/workspace modes; пользовательский UI flow ещё не реализован.
 - `math-model`: source-neutral AST, boolean expressions, units, `UnsupportedNode`, строгий Serde contract и redacted `Debug`.
 - `document-ir`: versioned V1 JSON envelope, metadata/pages/layout, text/equation/table/image/plot/diagram blocks, provenance/fidelity и external asset ports.
 - `exporter-docx`: детерминированный OPC/DOCX subset, WordprocessingML text/styles, bounded PNG/JPEG embedding, page settings и fail-closed structural validator.
@@ -27,10 +28,11 @@
 
 - `python -B scripts/validate_project.py` — PASS.
 - `python -B scripts/validate_fixtures.py` — PASS.
-- `python -B -m unittest discover -s tests -p "test_*.py" -v` — PASS, 17/17.
+- `python -B -m unittest discover -s tests -p "test_*.py" -v` — PASS, 18/18.
 - `cargo fmt --all -- --check` — PASS.
 - `cargo test --workspace --locked` — PASS, 102 Rust tests.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
+- `pnpm.cmd run typecheck` и `pnpm.cmd run build:web` — PASS; `/` статически собирается, но пока возвращает пустую страницу.
 - `cargo run -p exporter-docx --example advanced_omml_reference` — PASS, reference artifact generated.
 - Structural DOCX/OMML validator — PASS.
 - Independent automated review — PASS после исправлений.
@@ -54,6 +56,5 @@
 
 ## Следующие разумные действия
 
-1. Пользовательская проверка ветки и merge только после явного разрешения.
-2. Подготовить отдельный experimental contract этапа 092 (`MathType adapter`) без ослабления fail-closed default и без скрытой зависимости от Office.
-3. По мере появления legal real-world corpus добавлять compatibility fixtures и regressions.
+1. Подготовить отдельный experimental contract этапа 092 (`MathType adapter`) без ослабления fail-closed default и без скрытой зависимости от Office.
+2. По мере появления legal real-world corpus добавлять compatibility fixtures и regressions.

@@ -54,8 +54,9 @@ REQUIRED_FILES = (
 CONTEXT_CONTRACTS = {
     "AGENTS.md": ("Маршрутизация контекста", "Инварианты проекта"),
     "docs/DESIGN.md": (
-        "Пользовательский интерфейс ещё не реализован",
-        "визуальная система владельцем продукта не утверждена",
+        "name: MathMorph Calm Blue UI",
+        "UI flow ещё не реализован",
+        "## Do's and Don'ts",
     ),
     "crates/document-ir/AGENTS.md": ("backend-neutral Document IR",),
     "crates/math-model/AGENTS.md": ("source-neutral Math AST",),
