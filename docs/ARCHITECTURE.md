@@ -105,6 +105,7 @@ Dependency DAG не допускает обратной связи exporter → 
 math-model <--- mathcad-parser
      ^
      +------ document-ir <--- exporter-docx
+                        <--- exporter-mathml
 ```
 
 `FormulaIr` хранит immutable optional `original` и обязательный `display`; exporter читает только `display`. Binary assets, filesystem paths и URLs не входят в Document IR JSON и выдаются адаптеру только через `AssetResolver`.
@@ -113,6 +114,7 @@ math-model <--- mathcad-parser
 
 - `WordEquationExporter`: `MathExpression` → bounded editable OMML subset для numbers, identifiers, add/subtract, multiplication, fractions, powers, roots, scripts, typed function calls, paired grouping, vectors/matrices, integrals, derivatives и sum/product. Renderer выдаёт только канонические `m:*` shapes, проверяемые строгим `DocxValidator`.
 - `EquationBackend`/`DocxExportConfig`: публичный выбор backend для DOCX; `WordOmml` — default, а зарезервированный `MathType` завершается typed `EquationBackendUnavailable` без fallback.
+- `MathMlRenderer`: независимый от Word bounded exporter `MathExpression` → standalone Presentation MathML Core для принятого scalar subset. Он реализует общий `EquationExporter`, не зависит от parser/DOCX и пока не подключён к `EquationBackend::MathType`.
 - `MathTypeExporter`: будущий отдельный adapter через MathML; в текущем backend enum путь намеренно fail closed и не добавляет MathML/OLE/dependency.
 - `DocxExporter`: validated Document IR → deterministic single-page DOCX/OOXML с text/styles, internal PNG/JPEG и equations.
 - `DocxValidator`: fail-closed validator только генерируемого subset, а не универсальный validator произвольного DOCX.

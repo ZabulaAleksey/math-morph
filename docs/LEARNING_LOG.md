@@ -355,3 +355,59 @@ Security review нашёл показательный asymmetry bug: generation 
 3. Запустить `cargo run -p exporter-docx --example advanced_omml_reference`, открыть полученный DOCX в Word и проверить, что в нём остаётся один редактируемый `OMath`.
 4. Запустить `python -B scripts/validate_project.py` и `python -B -m unittest discover -s tests -p "test_*.py" -v`, чтобы отделить project gates от Rust gates.
 5. Запустить `cargo test --workspace --locked`, затем `cargo clippy --workspace --all-targets --locked -- -D warnings` и проверить `git diff --check`.
+
+## 2026-08-15 — Этап 090: первый самостоятельный Presentation MathML renderer
+
+### Что и зачем изменено
+
+Добавлен crate `exporter-mathml`. Он преобразует базовое scalar-подмножество общего `MathExpression` в standalone Presentation MathML Core: числа, identifiers и literal subscripts, сложение/вычитание/умножение, дробь, степень, квадратный корень и парную grouping. Это отдельный output backend, а не часть DOCX: Word продолжает получать OMML, а зарезервированный `MathType` всё ещё возвращает typed unavailable error.
+
+### Ключевой поток данных / управления
+
+```text
+MathExpression
+    -> Accountant: supported shape + depth/nodes/input bytes
+    -> iterative Renderer: fixed MathML allowlist + escaping + output bytes
+    -> opaque MathMlFragment
+```
+
+`MathMlRenderer` реализует тот же `document_ir::EquationExporter`, что и Word renderer. Поэтому consumer работает через общий порт, но конкретный output остаётся типизированным: `MathMlFragment` нельзя сконструировать с raw XML снаружи crate.
+
+Корень всегда один и детерминирован:
+
+```xml
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">...</math>
+```
+
+Presentation MathML описывает структуру отображения. Например, дробь — это `mfrac`, степень — `msup`, а скобки для MathML Core разворачиваются в `mrow` и два `mo fence="true"`; `mfenced` намеренно не используется. Это не Content MathML и пока не обещание совместимости с конкретной версией MathType.
+
+### Команды и проверки
+
+```text
+cargo test -p exporter-mathml --locked
+cargo test --workspace --locked
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+python -B scripts/validate_project.py
+python -B -m unittest discover -s tests -p "test_*.py" -v
+git diff --check
+```
+
+### Решения и trade-offs
+
+- Новый crate не зависит от DOCX, parser или Office: только от общей модели, exporter port и `thiserror`.
+- Этап 090 поддерживает небольшой явно записанный subset. Неподдержанная форма возвращает error, а не похожий текст и не screenshot.
+- Renderer дважды защищает ресурсы: сначала считает AST nodes/depth и cumulative dynamic text bytes, затем ограничивает фактический output. Оба обхода итеративны.
+- Renderer заимствует AST и поэтому не владеет её уничтожением. Безопасный caller должен получать выражение через bounded Document IR boundary; вручную построенное чрезмерно глубокое дерево caller обязан разбирать безопасно сам.
+
+### Проблемы и способы исправления
+
+Security review заметил, что первоначальная проверка identifier/numeric text могла полностью просканировать огромную строку до output-limit. Теперь byte length начисляется до content scan, а numeric validator использует boolean вместо потенциально переполняемого счётчика. Дополнительно project validator проверяет не только `[dependencies]`, но и build/dev/target-specific Cargo dependency tables.
+
+### Как повторить самостоятельно
+
+1. Открыть `crates/exporter-mathml/tests/mathml.rs` и сопоставить AST helpers с `mn`, `mi`, `mrow`, `mfrac`, `msup` и `msqrt`.
+2. Запустить `cargo test -p exporter-mathml --locked` и убедиться, что positive, escaping, unsupported и limit cases проходят.
+3. Изменить один expected operator code point в тесте и увидеть, что deterministic policy обнаруживает расхождение; затем вернуть изменение.
+4. Запустить `python -B scripts/validate_project.py`, чтобы проверить workspace registration и dependency boundary.
+5. Завершить workspace tests, Clippy и `git diff --check` командами выше.

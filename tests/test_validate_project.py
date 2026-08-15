@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from validate_project import validate_project  # noqa: E402
+from validate_project import _scoped_dependency_tables, validate_project  # noqa: E402
 
 
 class ProjectValidatorTests(unittest.TestCase):
@@ -25,12 +26,43 @@ class ProjectValidatorTests(unittest.TestCase):
             errors = validate_project(root)
 
         self.assertIn(
-            "unexpected Cargo workspace members: ['crates/document-ir', 'crates/math-model']",
+            "unexpected Cargo workspace members: ['crates/document-ir', 'crates/exporter-mathml', 'crates/math-model']",
             errors,
         )
 
     def test_current_repository_is_valid(self) -> None:
         self.assertEqual(validate_project(PROJECT_ROOT), [])
+
+    def test_mathml_renderer_crate_has_only_the_backend_neutral_dependencies(self) -> None:
+        manifest_path = PROJECT_ROOT / "crates/exporter-mathml/Cargo.toml"
+        with manifest_path.open("rb") as stream:
+            manifest = tomllib.load(stream)
+
+        self.assertEqual(
+            set(manifest["dependencies"]),
+            {"document-ir", "math-model", "thiserror"},
+        )
+        self.assertEqual(_scoped_dependency_tables(manifest), [])
+
+    def test_dependency_scope_guard_finds_alternate_cargo_tables(self) -> None:
+        manifest = {
+            "build-dependencies": {"native-build": "1"},
+            "dev-dependencies": {"snapshot-helper": "1"},
+            "target": {
+                "cfg(windows)": {"dependencies": {"platform-loader": "1"}},
+                "cfg(unix)": {"dev-dependencies": {"unix-test": "1"}},
+            },
+        }
+
+        self.assertEqual(
+            _scoped_dependency_tables(manifest),
+            [
+                "build-dependencies",
+                "dev-dependencies",
+                "target.cfg(unix).dev-dependencies",
+                "target.cfg(windows).dependencies",
+            ],
+        )
 
     def test_legacy_progress_document_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

@@ -215,6 +215,8 @@ Parser не извлекает файлы, не загружает schema/URI, �
 
 XML paths используют explicit stack depth limits (`quick-xml` reader + bounded parser/validator state); DTD/entities и invalid XML 1.0 characters отклоняются. OMML renderer и `DocxValidator` используют согласованные equation byte/node/depth quotas. Renderer дополнительно учитывает `linear_work_items`: left-associated linear expressions обходятся итеративно, а work budget не даёт стоимости обхода превысить node budget и не полагается на unbounded recursive descent.
 
+Этап 090 добавляет отдельную выходную границу Presentation MathML. `exporter-mathml` создаёт только фиксированные MathML Core elements/attributes, не принимает raw XML, namespace, DTD, URL или external resource и проверяет/экранирует весь dynamic text. Depth, nodes, cumulative input text bytes и output bytes ограничены до сериализации; traversal итеративен. Borrowed renderer принимает уже bounded AST: construction/deserialization и teardown произвольно глубокой caller-owned структуры остаются обязанностью безопасного Document IR entry point и caller-а. Project validator отдельно запрещает незаявленные normal/build/dev/target-specific зависимости нового crate.
+
 ## Обязательные проверки безопасности по типу изменения
 
 | Изменение | Минимальные проверки |

@@ -105,7 +105,26 @@ EXPECTED_CRATES = {
     "crates/mathcad-parser": "mathcad-parser",
     "crates/math-engine": "math-engine",
     "crates/exporter-docx": "exporter-docx",
+    "crates/exporter-mathml": "exporter-mathml",
 }
+
+EXPECTED_CRATE_DEPENDENCIES = {
+    "crates/exporter-mathml": {"document-ir", "math-model", "thiserror"},
+}
+
+
+def _scoped_dependency_tables(manifest: dict) -> list[str]:
+    scopes: list[str] = []
+    for section in ("build-dependencies", "dev-dependencies"):
+        if manifest.get(section):
+            scopes.append(section)
+    for target, target_config in manifest.get("target", {}).items():
+        if not isinstance(target_config, dict):
+            continue
+        for section in ("dependencies", "build-dependencies", "dev-dependencies"):
+            if target_config.get(section):
+                scopes.append(f"target.{target}.{section}")
+    return sorted(scopes)
 
 CANONICAL_DOCUMENTS = (
     "README.md",
@@ -253,6 +272,20 @@ def validate_project(root: Path) -> list[str]:
             crate = _load_toml(manifest_path, errors)
             if crate.get("package", {}).get("name") != expected_name:
                 errors.append(f"unexpected crate name in {relative}")
+            expected_dependencies = EXPECTED_CRATE_DEPENDENCIES.get(relative)
+            if expected_dependencies is not None:
+                dependencies = set(crate.get("dependencies", {}))
+                if dependencies != expected_dependencies:
+                    errors.append(
+                        f"unexpected crate dependencies in {relative}: "
+                        f"{sorted(dependencies ^ expected_dependencies)}"
+                    )
+                scoped_dependencies = _scoped_dependency_tables(crate)
+                if scoped_dependencies:
+                    errors.append(
+                        f"unexpected scoped crate dependencies in {relative}: "
+                        f"{scoped_dependencies}"
+                    )
         if cargo.get("workspace", {}).get("package", {}).get("rust-version") != "1.88":
             errors.append("Cargo workspace rust-version must equal 1.88")
 

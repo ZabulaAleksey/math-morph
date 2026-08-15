@@ -6,6 +6,7 @@ members = [
     "crates/mathcad-parser",
     "crates/math-engine",
     "crates/exporter-docx",
+    "crates/exporter-mathml",
 ]
 
 [workspace.package]

@@ -164,6 +164,26 @@
 
 **Связанные требования:** AC-077..AC-089, SPEC-05.
 
+## ADR-0012 — MathML является отдельным backend-neutral exporter
+
+**Статус:** принято 2026-08-15.
+
+**Контекст:** этап 090 требует Presentation MathML, но подключение MathType к DOCX относится к более позднему экспериментальному adapter. Размещение renderer внутри `exporter-docx` связало бы стандартный MathML с Word/OPC и сделало зарезервированный backend доступным преждевременно.
+
+**Варианты:** добавить MathML в `exporter-docx`; встроить renderer в `document-ir`; создать отдельный exporter crate.
+
+**Решение:** `exporter-mathml` зависит только от `math-model`, `document-ir` и закреплённого `thiserror`, реализует общий `EquationExporter` и выдаёт opaque bounded `MathMlFragment`. Этап 090 ограничен принятым scalar Presentation MathML Core subset; `EquationBackend::MathType` остаётся unavailable.
+
+**Причина:** стандартный output format не зависит от Word, parser или будущего proprietary adapter; exact shapes, XML trust boundary и resource budgets тестируются самостоятельно.
+
+**Последствия:** расширение AST coverage требует явного изменения SPEC; snapshot corpus и MathType-specific normalization остаются этапами 091–093. Renderer принимает уже bounded borrowed AST, а lifecycle caller-owned recursive структуры не входит в его ownership boundary.
+
+**Fallback / rollback:** удалить новый crate и workspace registration; существующие Document IR и DOCX/OMML contracts не изменяются.
+
+**Проверка:** AC-090-001..006, workspace tests/Clippy, project validator, independent review и security review.
+
+**Связанные требования:** FR-MATHML-001..004, NFR-MATHML-001..002, SEC-MATHML-001.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.
