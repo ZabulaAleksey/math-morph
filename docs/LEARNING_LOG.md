@@ -471,7 +471,7 @@ git diff --check
 
 Git graph показал, что `feature/stage-091` уже содержит `main` и все этапные ветки 001–090. Независимой оставалась только `docs/adopt-calm-blue-design`, поэтому временная ветка `integration/math-morph` создана от этапа 091 и получила один merge этой design-ветки. Такой порядок не дублирует коммиты и сохраняет историю обеих линий.
 
-Единственный content conflict возник в `docs/AI_STATUS.md`: актуальный статус 001–091 объединён с Calm Blue design contract. Все локальные и remote-ветки после merge являются предками `integration/math-morph`.
+Единственный content conflict возник в `docs/AI_STATUS.md`: актуальный статус 001–091 объединён с Calm Blue design contract. После проверки временная ветка была fast-forward слита в `main`; все завершённые локальные и remote-ветки являются предками `main`.
 
 ### Что реально запускается
 
@@ -519,7 +519,7 @@ pnpm.cmd run dev:web
 
 ### Как повторить самостоятельно
 
-1. Выполнить `git log --graph --oneline --decorate --all` и найти merge-коммит во временной ветке `integration/math-morph`.
+1. Выполнить `git log --graph --oneline --decorate --all` и найти design merge-коммит в истории `main`.
 2. Запустить полный Rust test suite и Python validators.
 3. Запустить `pnpm.cmd run dev:web`, открыть `http://localhost:3000` и убедиться, что пустой экран пока ожидаем.
 4. Сгенерировать DOCX example и открыть его в Word.
