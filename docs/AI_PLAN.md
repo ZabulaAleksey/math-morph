@@ -1,43 +1,42 @@
-# Текущий план AI — этап 090
+# Текущий план AI — этап 091
 
 **Статус:** завершён 2026-08-15.
-**Ветка:** `feature/stage-090`.
+**Ветка:** `feature/stage-091`.
 
 ## Маршрутизация
 
 - сложность: `STANDARD`;
 - режим: production;
-- SDLC: specification → implementation → testing → review;
-- домен: mathematical document export и безопасная XML serialization;
-- стек: Rust 1.88, `math-model`, `document-ir`, `thiserror`;
-- SPEC: `specs/features/mathml-renderer.spec.md`.
+- SDLC: specification → testing → review;
+- домен: mathematical document export и golden regression testing;
+- стек: Rust 1.88, `exporter-mathml`, filesystem-backed test fixtures;
+- SPEC: `specs/features/mathml-renderer.spec.md` версии 1.1.0.
 
 ## Ограниченный план
 
-1. **Контракт — завершено:** зафиксированы exact Presentation MathML Core shapes, supported scalar subset, typed errors, limits и non-goals 091+.
-2. **Граница crate — завершено:** добавлен нейтральный `exporter-mathml`, зависящий только от `math-model`, `document-ir` и `thiserror`; workspace/project validator обновлён.
-3. **Renderer — завершено:** реализованы deterministic standalone root, structural scalar elements, XML validation/escaping и backend-neutral `EquationExporter`.
-4. **Budgets — завершено:** depth/node/output и cumulative input text bytes проверяются checked counters; traversal больших left-associated expressions полностью итеративен.
-5. **Tests — завершено:** supported shapes, multiplication styles, escaping, invalid/unsupported paths, limits, redaction и port contract покрыты focused tests.
-6. **Review — завершено:** independent review и повторный security review прошли после исправления input work budget, numeric validation и Cargo dependency scopes.
-7. **Документация — завершено:** обновлены только затронутые architecture/status/roadmap/traceability/security/testing/learning records.
-8. **Публикация — завершено:** итоговый commit подготовлен для push временной ветки `feature/stage-090`; PR/merge не выполняются.
+1. **Контракт — завершено:** зафиксировать 17-file snapshot inventory, canonical file format, exact comparison и update policy без automatic bless.
+2. **Golden corpus — завершено:** добавлены synthetic standalone `.mathml` snapshots для всех stage-090 shape/data classes.
+3. **Tests — завершено:** table-driven AST cases сравниваются byte-for-byte через production renderer; проверяются inventory/BOM/CR/newline/root, malformed envelope и origin invariance.
+4. **Regression — завершено:** все stage-090 tests и fail-closed MathType behavior сохранены без изменений production-кода.
+5. **Review — завершено:** targeted/workspace gates и два read-only review-cycle завершены; Windows EOL и incomplete root-envelope guard исправлены. Security review не требовался, поскольку trust boundary/production behavior не изменялись.
+6. **Документация — завершено:** обновлены status/roadmap/traceability/testing/learning; architecture/decisions/security не менялись.
+7. **Публикация — завершено:** итоговый commit подготовлен для push временной ветки `feature/stage-091`; PR/merge не выполняются.
 
-## Интерфейсы
+## Интерфейсы и файлы
 
-- вход: immutable `math_model::MathExpression`;
-- порт: `document_ir::EquationExporter`;
-- выход: opaque `MathMlFragment`;
-- ошибки: typed redacted `MathMlError`;
-- limits: caller-configurable `MathMlLimits` с безопасными defaults.
+- `crates/exporter-mathml/tests/golden/*.mathml` — version-controlled expected output с закреплённым `.gitattributes` `eol=lf`;
+- новый Rust integration test — единственный владелец inventory и AST-to-fixture mapping;
+- `MathMlRenderer` и его public API не изменяются;
+- новые dependencies, generators, snapshot libraries и update mode не добавляются.
 
 ## Non-goals
 
-- stage 091 snapshot corpus;
-- stage 092 MathType adapter и изменение `EquationBackend::MathType`;
-- MathML input/validator, Content MathML, DOCX/OLE/Office integration;
-- расширение AST/parser/Document IR или UI/API/CLI.
+- новые MathML shapes или расширение AST coverage;
+- experimental MathType adapter этапа 092;
+- compatibility claims/docs этапа 093;
+- feature-gated backend selection этапа 094;
+- DOM/schema validation, browser visual testing либо Office automation.
 
 ## Откат
 
-Новый crate и его workspace registration удаляются одним commit без изменения существующих public contracts. `exporter-docx` и `EquationBackend::MathType` остаются в прежнем fail-closed состоянии.
+Golden directory и один integration test удаляются без изменения production crates/API. Stage-090 inline tests остаются исходной проверкой renderer behavior.

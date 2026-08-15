@@ -411,3 +411,56 @@ Security review заметил, что первоначальная провер
 3. Изменить один expected operator code point в тесте и увидеть, что deterministic policy обнаруживает расхождение; затем вернуть изменение.
 4. Запустить `python -B scripts/validate_project.py`, чтобы проверить workspace registration и dependency boundary.
 5. Завершить workspace tests, Clippy и `git diff --check` командами выше.
+
+## 2026-08-15 — Этап 091: reviewable MathML golden snapshots
+
+### Что и зачем изменено
+
+К существующему renderer добавлен не новый production behavior, а внешний регрессионный контракт: 17 небольших `.mathml` файлов. Они показывают точный output для четырёх numeric bases, identifiers/escaping/subscript, арифметики, четырёх визуально различающихся multiplication policies, дроби, степени, корня и grouping.
+
+Inline assertion полезен разработчику, но отдельный golden-файл удобнее проверять в Git diff: изменение namespace, code point оператора, порядка tags или escaping видно как обычное изменение артефакта. Тест не умеет автоматически «благословлять» новый output, поэтому упавший snapshot нельзя случайно обновить вместе с ошибочной реализацией.
+
+### Ключевой поток данных / управления
+
+```text
+synthetic MathExpression
+    -> production MathMlRenderer
+    -> MathMlFragment bytes
+    -> exact comparison with tests/golden/<case>.mathml minus one final LF
+```
+
+Отдельный guard проверяет exact inventory, UTF-8 без BOM, отсутствие CR, compact single-line payload, ровно один финальный LF и один внешний `math` root. Второй regression меняет `ExpressionOrigin` на каждом вложенном узле и доказывает, что provenance не попадает в output.
+
+### Команды и проверки
+
+```text
+cargo test -p exporter-mathml --test mathml_snapshots --locked
+git check-attr text eol -- crates/exporter-mathml/tests/golden/add.mathml
+git ls-files --eol -- crates/exporter-mathml/tests/golden/*.mathml
+cargo test --workspace --locked
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+python -B scripts/validate_project.py
+git diff --check
+```
+
+### Решения и trade-offs
+
+- Golden corpus покрывает только уже поддержанные формы 090 и не расширяет renderer.
+- Каждый файл является standalone MathML, а не общей текстовой сводкой: его можно открыть и проверять отдельно.
+- Один финальный LF сохраняет обычный text-file workflow, а тест сравнивает точный payload после удаления только этого LF.
+- Dot snapshot представляет одинаковый output `Default`/`AutoSelect`/трёх dot styles; существующий enum-level test продолжает проверять все варианты.
+
+### Проблемы и способы исправления
+
+На Windows `core.autocrlf=true` мог после checkout заменить LF на CRLF и сломать byte-level test. Scoped `.gitattributes` закрепляет `text eol=lf`; `git ls-files --eol` подтверждает `i/lf w/lf` для всех 17 fixtures.
+
+Первый root guard считал только точную opening-строку и мог пропустить вложенный `<math>`, маскирующий незакрытый внешний root. Теперь guard выделяет body между exact prefix/suffix и запрещает любые дополнительные `<math`/`</math>`; malformed примеры находятся в отдельном negative test.
+
+### Как повторить самостоятельно
+
+1. Запустить targeted snapshot test и открыть любой файл из `crates/exporter-mathml/tests/golden/`.
+2. Временно изменить один operator code point в golden-файле и увидеть точный mismatch; затем вернуть файл.
+3. Добавить временный лишний `.mathml` и убедиться, что inventory guard падает; затем удалить файл.
+4. Выполнить `git check-attr` и `git ls-files --eol`, чтобы проверить LF policy на Windows.
+5. Завершить workspace test/Clippy/validator/diff checks командами выше.

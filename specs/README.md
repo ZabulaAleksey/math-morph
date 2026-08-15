@@ -6,6 +6,6 @@
 - [`features/math-ast-completion.spec.md`](features/math-ast-completion.spec.md) — XSD-backed контракт этапов 052–054 для boolean/unit AST и явного `UnsupportedNode`.
 - [`features/document-ir-docx-omml.spec.md`](features/document-ir-docx-omml.spec.md) — контракт этапов 055–076 для Document IR V1, безопасного DOCX subset и базового OMML.
 - [`features/advanced-omml-and-backend-config.spec.md`](features/advanced-omml-and-backend-config.spec.md) — принятый контракт этапов 077–089 для расширяемого редактируемого OMML, resource limits, reference Word smoke и явного DOCX equation backend.
-- [`features/mathml-renderer.spec.md`](features/mathml-renderer.spec.md) — контракт этапа 090 для bounded standalone Presentation MathML renderer без подключения MathType/DOCX adapter.
+- [`features/mathml-renderer.spec.md`](features/mathml-renderer.spec.md) — контракт этапов 090–091 для bounded standalone Presentation MathML renderer и reviewable exact golden snapshots без подключения MathType/DOCX adapter.
 
 Новые feature-SPEC создаются в `specs/features/` только когда системной спецификации недостаточно. `docs/ROADMAP.md`, `docs/PROMPTS.md` и `docs/TRACEABILITY.md` не являются источниками требований.

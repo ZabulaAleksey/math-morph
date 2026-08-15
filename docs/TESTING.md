@@ -89,6 +89,7 @@ Snapshot renderer существует только в tests и выдаёт к�
 - `crates/exporter-docx/tests/advanced_omml.rs`: AC-077..089 для scripts/roots/functions/grouping/vector/matrix/calculus, canonical shape allowlist, backend selection, shared renderer/validator budgets и fail-closed `MathType`.
 - `crates/exporter-docx/examples/advanced_omml_reference.rs`: воспроизводимый generator артефакта `advanced_omml_reference.docx`; запускать `cargo run -p exporter-docx --example advanced_omml_reference`.
 - `crates/exporter-mathml/tests/mathml.rs`: AC-090-001..006 для standalone namespace/root, scalar structural shapes, multiplication policy, XML escaping, unsupported cases, depth/node/input/output budgets, iterative deep traversal и общего `EquationExporter` port.
+- `crates/exporter-mathml/tests/mathml_snapshots.rs` + `tests/golden/*.mathml`: AC-091-001..004, 17 external golden outputs, exact inventory/bytes, UTF-8/LF/root-envelope guard, malformed corpus cases, deterministic rerender и отсутствие `ExpressionOrigin` в output. `.gitattributes` закрепляет `eol=lf` для воспроизводимости на Windows.
 
 Текущий `DocxValidator` доказывает только строгий subset, который генерирует `exporter-docx`. Для reference artifact подтверждено Word 16.0 open/enumerate/edit: Word открыл DOCX, exposed 1 `OMath`, а `Linearize→BuildUp` сохранил 1 `OMath`. Microsoft Open XML SDK 2.5.4728 validator сообщил 0 errors. Это evidence конкретного artifact, а не обещание полной schema conformance для произвольных DOCX.
 

@@ -2,7 +2,7 @@
 
 > Каждый этап должен допускать независимое тестирование. Исполняемый текст prompts находится в `docs/PROMPTS.md`.
 
-**Текущий статус:** этапы 001–090 реализованы и проверены на ветке `feature/stage-090`; работы нет. Следующий ещё не начатый этап — 091 (`MathML snapshots`). Подробные доказательства и статус `verified` находятся только в `docs/TRACEABILITY.md`.
+**Текущий статус:** этапы 001–091 реализованы и проверены на ветке `feature/stage-091`; работы нет. Следующий ещё не начатый этап — 092 (`experimental MathType adapter`). Подробные доказательства и статус `verified` находятся только в `docs/TRACEABILITY.md`.
 
 ## Основа — 001–010
 
@@ -123,7 +123,7 @@
 
 - **089** — `backend enum/config` — `verified`
 - **090** — `MathML renderer` — `verified`
-- **091** — `MathML snapshots` — `planned`
+- **091** — `MathML snapshots` — `verified`
 - **092** — `experimental MathType adapter` — `planned`
 - **093** — `compatibility doc` — `planned`
 - **094** — `feature-gated backend selection` — `planned`

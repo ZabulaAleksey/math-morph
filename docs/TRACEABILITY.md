@@ -34,7 +34,8 @@
 | FR-OMML-001..003 | 070–076 | `document-ir::ports::EquationExporter`, `exporter-docx/src/omml.rs`, 7 OMML snapshots и 3 equation-in-DOCX tests; independent/security review | verified |
 | SPEC-05 расширенный OMML и backend configuration | 077–089 | `specs/features/advanced-omml-and-backend-config.spec.md`; `crates/exporter-docx/src/{omml,package,validator}.rs`, `tests/{omml,docx_equations,advanced_omml}.rs`, `examples/advanced_omml_reference.rs`; canonical power/root/scripts/function/grouping/matrix/calculus shapes, shared bounded validator, generated reference DOCX, Word/Open XML SDK evidence, independent/security review | verified |
 | FR-MATHML-001..004, NFR/SEC-MATHML-001..002 | 090 | `specs/features/mathml-renderer.spec.md`; `crates/exporter-mathml/`, focused structural/negative/limit/port tests и independent/security review | verified |
-| SPEC-05 последующие формы расширенного экспорта | 091–094 | snapshot corpus, experimental MathType adapter, compatibility contract и feature-gated selection | planned |
+| FR-MATHML-005, NFR-MATHML-003 | 091 | 17 `tests/golden/*.mathml`, `mathml_snapshots.rs`, exact inventory/bytes/canonical LF-root guards, origin-invariance regression и independent review | verified |
+| SPEC-05 последующие формы расширенного экспорта | 092–094 | experimental MathType adapter, compatibility contract и feature-gated selection | planned |
 | SPEC-04 единый конвейер | 143–147 | producer Document IR, diagnostics collector, fidelity report и partial conversion policy | planned |
 | SPEC-06 преобразования и точность | 095–111 | `crates/math-engine/`, тесты сохранения семантики и trace | planned |
 | SPEC-07 комплексные числа | 112–122 | round-trip проверки алгебраического и полярного представления и граничные тесты | planned |
