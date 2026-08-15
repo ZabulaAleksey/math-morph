@@ -464,3 +464,63 @@ git diff --check
 3. Добавить временный лишний `.mathml` и убедиться, что inventory guard падает; затем удалить файл.
 4. Выполнить `git check-attr` и `git ls-files --eol`, чтобы проверить LF policy на Windows.
 5. Завершить workspace test/Clippy/validator/diff checks командами выше.
+
+## 2026-08-15 — Интеграция веток в `math-tutor` и фактический запуск проекта
+
+### Что объединено
+
+Git graph показал, что `feature/stage-091` уже содержит `main` и все этапные ветки 001–090. Независимой оставалась только `docs/adopt-calm-blue-design`, поэтому `math-tutor` создана от этапа 091 и получила один merge этой design-ветки. Такой порядок не дублирует коммиты и сохраняет историю обеих линий.
+
+Единственный content conflict возник в `docs/AI_STATUS.md`: актуальный статус 001–091 объединён с Calm Blue design contract. Все локальные и remote-ветки после merge являются предками `math-tutor`.
+
+### Что реально запускается
+
+Сейчас рабочая часть проекта — Rust core и exporters. `services/api` является устанавливаемым Python package без HTTP endpoints, а `apps/web` — собираемым Next.js shell, где `/` пока возвращает `null`. Поэтому `pnpm.cmd run dev:web` запускает сервер, но браузер показывает пустую страницу; это ожидаемое состояние, а не runtime error.
+
+Наглядный результат уже можно получить через DOCX example:
+
+```powershell
+cargo run -p exporter-docx --example advanced_omml_reference
+Invoke-Item target/word-reference/advanced-omml-reference.docx
+```
+
+Файл содержит синтетическую редактируемую OMML-формулу. Reviewable MathML output хранится в `crates/exporter-mathml/tests/golden/`.
+
+### Проверенный Windows workflow
+
+```powershell
+cd ~/codex-workspace/projects/math-morph
+
+cargo test --workspace --locked
+python -B scripts/validate_project.py
+python -B scripts/validate_fixtures.py
+python -B -m unittest discover -s tests -p "test_*.py" -v
+
+uv sync --project services/api --locked
+uv run --project services/api python -c "import math_morph_api; print(math_morph_api.__doc__)"
+
+pnpm.cmd install --frozen-lockfile
+pnpm.cmd run typecheck
+pnpm.cmd run build:web
+pnpm.cmd run dev:web
+```
+
+В PowerShell используется `pnpm.cmd`, потому что локальная execution policy может блокировать `pnpm.ps1`. Для Rust MSVC по-прежнему нужен Visual Studio Build Tools workload `Desktop development with C++`, предоставляющий `link.exe`.
+
+### Проверки интеграции
+
+- project и fixture validators — PASS;
+- Python unittest — PASS, 18/18;
+- Rust workspace tests — PASS, 102 tests;
+- Rustfmt и Clippy с `-D warnings` — PASS;
+- Next.js typecheck и production build — PASS;
+- DOCX example generation — PASS;
+- `git diff --check` — PASS.
+
+### Как повторить самостоятельно
+
+1. Выполнить `git log --graph --oneline --decorate --all` и найти merge-коммит `math-tutor`.
+2. Запустить полный Rust test suite и Python validators.
+3. Запустить `pnpm.cmd run dev:web`, открыть `http://localhost:3000` и убедиться, что пустой экран пока ожидаем.
+4. Сгенерировать DOCX example и открыть его в Word.
+5. Открыть несколько `.mathml` файлов из golden corpus и сопоставить их с тестами renderer.

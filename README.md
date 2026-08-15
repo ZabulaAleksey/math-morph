@@ -4,13 +4,16 @@ MathMorph — monorepo расширяемой платформы parsing и ко
 
 ## Текущее состояние
 
-Реализованы безопасная входная граница, чтение подтверждённого legacy XMCD worksheet30 и синтаксический Math AST до structural comparisons (этапы 001–051). Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но не вычисляет формулы. Экспорт, API endpoints и пользовательский web-flow ещё не реализованы; Prime MCDX пока безопасно инспектируется как контейнер без содержательного разбора его внутреннего worksheet.
+Реализованы и проверены этапы 001–091: безопасная входная граница, чтение подтверждённого legacy XMCD worksheet30, структурный Math AST, versioned Document IR, детерминированный DOCX/OMML exporter и bounded Presentation MathML renderer с golden snapshots. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но формулы пока не вычисляет. API endpoints и пользовательский web-flow ещё не реализованы; Prime MCDX безопасно инспектируется как контейнер без содержательного разбора внутреннего worksheet.
 
 ## Структура
 
 - `crates/mathcad-parser/` — Rust parser недоверенных Mathcad inputs;
+- `crates/math-model/` — общая source-neutral Math AST;
+- `crates/document-ir/` — backend-neutral модель документа и exporter ports;
 - `crates/math-engine/` — каркас будущей семантики и вычислений;
-- `crates/exporter-docx/` — каркас будущего DOCX/OMML exporter;
+- `crates/exporter-docx/` — DOCX/WordprocessingML и редактируемый OMML subset;
+- `crates/exporter-mathml/` — Presentation MathML Core renderer;
 - `services/api/` — Python package будущего FastAPI adapter;
 - `apps/web/` — минимальный Next.js App Router shell;
 - `specs/` — канонические проверяемые требования;
@@ -50,3 +53,34 @@ pnpm.cmd --filter @math-morph/web build
 `--locked` запрещает Cargo незаметно менять `Cargo.lock`. Если Cargo сообщает, что не найден `Cargo.toml`, команда запущена не из репозитория. Если не найден `link.exe`, установите C++ Build Tools и перезапустите терминал; подробнее — в `docs/LEARNING_LOG.md`.
 
 Перед изменениями прочитайте корневой и ближайший модульный `AGENTS.md`, затем выберите требования через `specs/README.md`.
+
+## Что можно запустить сейчас
+
+Сгенерировать проверенный DOCX с редактируемой формулой и открыть его в Word:
+
+```powershell
+cargo run -p exporter-docx --example advanced_omml_reference
+Invoke-Item target/word-reference/advanced-omml-reference.docx
+```
+
+Проверить standalone MathML snapshots:
+
+```powershell
+cargo test -p exporter-mathml --locked
+Get-Content crates/exporter-mathml/tests/golden/add.mathml
+```
+
+Запустить Next.js shell:
+
+```powershell
+pnpm.cmd run dev:web
+```
+
+После этого откройте `http://localhost:3000`. Сейчас маршрут `/` намеренно возвращает пустую страницу: ветка содержит утверждённый Calm Blue design contract, но React-компоненты пользовательского flow ещё не реализованы.
+
+Python package можно установить и проверить, но HTTP-сервер запускать пока нечего:
+
+```powershell
+uv sync --project services/api --locked
+uv run --project services/api python -c "import math_morph_api; print(math_morph_api.__doc__)"
+```
