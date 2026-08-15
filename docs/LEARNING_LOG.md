@@ -465,13 +465,13 @@ git diff --check
 4. Выполнить `git check-attr` и `git ls-files --eol`, чтобы проверить LF policy на Windows.
 5. Завершить workspace test/Clippy/validator/diff checks командами выше.
 
-## 2026-08-15 — Интеграция веток в `math-tutor` и фактический запуск проекта
+## 2026-08-15 — Интеграция веток MathMorph и фактический запуск проекта
 
 ### Что объединено
 
-Git graph показал, что `feature/stage-091` уже содержит `main` и все этапные ветки 001–090. Независимой оставалась только `docs/adopt-calm-blue-design`, поэтому `math-tutor` создана от этапа 091 и получила один merge этой design-ветки. Такой порядок не дублирует коммиты и сохраняет историю обеих линий.
+Git graph показал, что `feature/stage-091` уже содержит `main` и все этапные ветки 001–090. Независимой оставалась только `docs/adopt-calm-blue-design`, поэтому временная ветка `integration/math-morph` создана от этапа 091 и получила один merge этой design-ветки. Такой порядок не дублирует коммиты и сохраняет историю обеих линий.
 
-Единственный content conflict возник в `docs/AI_STATUS.md`: актуальный статус 001–091 объединён с Calm Blue design contract. Все локальные и remote-ветки после merge являются предками `math-tutor`.
+Единственный content conflict возник в `docs/AI_STATUS.md`: актуальный статус 001–091 объединён с Calm Blue design contract. Все локальные и remote-ветки после merge являются предками `integration/math-morph`.
 
 ### Что реально запускается
 
@@ -519,7 +519,7 @@ pnpm.cmd run dev:web
 
 ### Как повторить самостоятельно
 
-1. Выполнить `git log --graph --oneline --decorate --all` и найти merge-коммит `math-tutor`.
+1. Выполнить `git log --graph --oneline --decorate --all` и найти merge-коммит во временной ветке `integration/math-morph`.
 2. Запустить полный Rust test suite и Python validators.
 3. Запустить `pnpm.cmd run dev:web`, открыть `http://localhost:3000` и убедиться, что пустой экран пока ожидаем.
 4. Сгенерировать DOCX example и открыть его в Word.
