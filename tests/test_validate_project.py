@@ -89,6 +89,7 @@ class ProjectValidatorTests(unittest.TestCase):
         contracts = (
             "AGENTS.md",
             "docs/DESIGN.md",
+            "docs/SELF_GUIDED_STAGE_WORKFLOW.md",
             "crates/document-ir/AGENTS.md",
             "crates/math-model/AGENTS.md",
             "crates/mathcad-parser/AGENTS.md",
@@ -120,6 +121,21 @@ class ProjectValidatorTests(unittest.TestCase):
             errors = validate_project(root)
 
         self.assertIn("context contract services/api/AGENTS.md is missing marker: /api/v1", errors)
+
+    def test_stage_workflow_requires_dod_and_handoff_markers(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            target = root / "docs/SELF_GUIDED_STAGE_WORKFLOW.md"
+            target.parent.mkdir(parents=True)
+            target.write_text("# Самостоятельная работа\n", encoding="utf-8")
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "context contract docs/SELF_GUIDED_STAGE_WORKFLOW.md is missing marker: "
+            "## 8. Definition of Done одного этапа",
+            errors,
+        )
 
     def test_design_contract_rejects_obsolete_placeholder(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

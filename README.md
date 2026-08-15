@@ -54,6 +54,8 @@ pnpm.cmd --filter @math-morph/web build
 
 Перед изменениями прочитайте корневой и ближайший модульный `AGENTS.md`, затем выберите требования через `specs/README.md`.
 
+Подробный самостоятельный workflow с шаблонами prompts, матрицей тестов, Definition of Done и handoff при окончании лимита находится в [`docs/SELF_GUIDED_STAGE_WORKFLOW.md`](docs/SELF_GUIDED_STAGE_WORKFLOW.md).
+
 ## Что можно запустить сейчас
 
 Сгенерировать проверенный DOCX с редактируемой формулой и открыть его в Word:
