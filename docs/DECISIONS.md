@@ -184,6 +184,26 @@
 
 **Связанные требования:** FR-MATHML-001..004, NFR-MATHML-001..002, SEC-MATHML-001.
 
+## ADR-0013 — MathType adapter остаётся pure payload boundary
+
+**Статус:** принято 2026-08-17.
+
+**Контекст:** этап 092 должен подготовить будущую интеграцию MathType, но прямое подключение proprietary SDK, OLE/COM или DOCX backend одновременно добавило бы platform/license/runtime trust boundary и преждевременно реализовало этапы 093–094. `exporter-mathml` уже создаёт bounded allowlist Presentation MathML.
+
+**Варианты:** вызвать native MathType SDK; встроить raw MathML/OLE непосредственно в DOCX; добавить сетевой WIRIS service; создать отдельный pure adapter над production MathML renderer.
+
+**Решение:** добавить `exporter-mathtype`, который принимает `MathExpression`, делегирует `MathMlRenderer` и возвращает opaque `MathTypePayload` с media type `application/mathml+xml`. Публичного raw XML constructor, network/filesystem/process/registry access и proprietary dependency нет. `EquationBackend::MathType` остаётся unavailable.
+
+**Причина:** минимальный срез проверяет архитектурную границу и переиспользует существующие XML/resource guarantees, не создавая ложной совместимости и новых привилегий.
+
+**Последствия:** actual importer/version evidence переносится в 093, а feature-gated DOCX wiring — в 094. Новый crate получает только internal dependencies и может быть удалён без изменения parser, IR, MathML или OMML contracts.
+
+**Fallback / rollback:** удалить crate, workspace/lockfile registration и SPEC 092; оставить `MathMlRenderer` и fail-closed DOCX backend без изменений.
+
+**Проверка:** AC-092-001..006, targeted/workspace tests, dependency-scope validator, fmt/Clippy, independent architecture/security review.
+
+**Связанные требования:** `specs/features/experimental-mathtype-adapter.spec.md`, SPEC-05.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

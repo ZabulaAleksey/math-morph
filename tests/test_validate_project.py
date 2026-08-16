@@ -26,7 +26,7 @@ class ProjectValidatorTests(unittest.TestCase):
             errors = validate_project(root)
 
         self.assertIn(
-            "unexpected Cargo workspace members: ['crates/document-ir', 'crates/exporter-mathml', 'crates/math-model']",
+            "unexpected Cargo workspace members: ['crates/document-ir', 'crates/exporter-mathml', 'crates/exporter-mathtype', 'crates/math-model']",
             errors,
         )
 
@@ -41,6 +41,17 @@ class ProjectValidatorTests(unittest.TestCase):
         self.assertEqual(
             set(manifest["dependencies"]),
             {"document-ir", "math-model", "thiserror"},
+        )
+        self.assertEqual(_scoped_dependency_tables(manifest), [])
+
+    def test_mathtype_adapter_crate_has_only_internal_boundary_dependencies(self) -> None:
+        manifest_path = PROJECT_ROOT / "crates/exporter-mathtype/Cargo.toml"
+        with manifest_path.open("rb") as stream:
+            manifest = tomllib.load(stream)
+
+        self.assertEqual(
+            set(manifest["dependencies"]),
+            {"document-ir", "exporter-mathml", "math-model"},
         )
         self.assertEqual(_scoped_dependency_tables(manifest), [])
 

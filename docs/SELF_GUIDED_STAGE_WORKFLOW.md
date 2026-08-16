@@ -4,10 +4,10 @@
 
 Этот документ помогает владельцу MathMorph самостоятельно выполнять этапы `docs/ROADMAP.md`, привлекая ChatGPT как помощника, но сохраняя проверяемость результата.
 
-Текущее состояние на 2026-08-15:
+Текущее состояние на 2026-08-17:
 
-- этапы 001–091 имеют статус `verified`;
-- следующий этап — 092, `experimental MathType adapter`;
+- этапы 001–092 имеют статус `verified`;
+- следующий этап — 093, `compatibility doc`;
 - всего в roadmap 304 этапа;
 - пользовательский web-интерфейс начинается с этапа 154, первый прикладной компонент `dropzone` — с этапа 156.
 
@@ -98,7 +98,7 @@ git status -sb
 Создайте ветку одного этапа:
 
 ```powershell
-git switch -c feature/stage-092-mathtype-adapter
+git switch -c feature/stage-093-compatibility-doc
 ```
 
 Для следующего этапа заменяйте номер и короткое имя. Не работайте непосредственно в `main`.
@@ -251,7 +251,8 @@ Finding считается закрытым только после измене
 - `math-engine`;
 - `document-ir`;
 - `exporter-docx`;
-- `exporter-mathml`.
+- `exporter-mathml`;
+- `exporter-mathtype`.
 
 ### 7.2. Обязательные финальные проверки Rust-этапа
 
@@ -304,7 +305,15 @@ Invoke-Item target/word-reference/advanced-omml-reference.docx
 
 Ручная проверка Word дополняет, но не заменяет автоматические structural tests. Golden MathML находятся в `crates/exporter-mathml/tests/golden/`; не обновляйте их без намеренного изменения SPEC.
 
-### 7.5. Frontend
+### 7.5. Experimental MathType adapter
+
+```powershell
+cargo test -p exporter-mathtype --locked
+```
+
+Эта проверка доказывает только pure payload boundary этапа 092. Она не доказывает импорт в установленный MathType/Word и не включает SDK/OLE/service; такие claims относятся к этапу 093.
+
+### 7.6. Frontend
 
 Один раз после изменения lockfile или нового checkout:
 
@@ -322,7 +331,7 @@ pnpm.cmd run dev:web
 
 Откройте `http://localhost:3000` и вручную проверьте desktop/mobile ширину, keyboard navigation, focus, loading/error/empty states, `light`/`dark`/`system`, `forced-colors` и reduced motion в пределах этапа. Автоматический test/E2E script запускайте только после того, как он реально появится в `apps/web/package.json`; не придумывайте несуществующую команду.
 
-### 7.6. API
+### 7.7. API
 
 Сейчас API является package-каркасом без HTTP endpoints:
 
@@ -334,7 +343,7 @@ uv run --project services/api python -c "import math_morph_api; print(math_morph
 
 После появления FastAPI/test dependencies используйте команды, закреплённые в `services/api/pyproject.toml` и CI. До этого не заявляйте, что HTTP server или endpoint протестирован.
 
-### 7.7. Документационный этап
+### 7.8. Документационный этап
 
 ```powershell
 python -B scripts/validate_project.py
