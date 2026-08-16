@@ -2,6 +2,12 @@
 
 ## Обязательные уровни тестирования
 
+### Project context и fixtures
+
+- `scripts/validate_project.py` и `tests/test_validate_project.py` проверяют обязательные manifests, canonical docs/context markers, workspace/dependency boundaries и отсутствие obsolete context-pack файлов;
+- самостоятельный stage workflow является обязательным living contract: validator требует разделы Definition of Done, handoff при окончании лимита и шаблон финального отчёта;
+- `scripts/validate_fixtures.py` и `tests/test_validate_fixtures.py` проверяют двустороннее соответствие fixture corpus и manifest, taxonomy, path policy и fail-closed schema validation.
+
 ### Parser/core
 
 - unit-тесты для каждого узла и функции;

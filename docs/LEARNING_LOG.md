@@ -524,3 +524,28 @@ pnpm.cmd run dev:web
 3. Запустить `pnpm.cmd run dev:web`, открыть `http://localhost:3000` и убедиться, что пустой экран пока ожидаем.
 4. Сгенерировать DOCX example и открыть его в Word.
 5. Открыть несколько `.mathml` файлов из golden corpus и сопоставить их с тестами renderer.
+
+## 2026-08-15 — Руководство для самостоятельного выполнения этапов
+
+### Что и зачем изменено
+
+Добавлен `docs/SELF_GUIDED_STAGE_WORKFLOW.md`: единый воспроизводимый маршрут для владельца проекта и ChatGPT от выбора одного этапа до статуса `verified`. Руководство отделяет roadmap/prompt от канонической SPEC, объясняет ветвление и checkpoint, содержит готовые prompts, матрицу команд для Rust/Python/frontend/API, Definition of Done, review-процесс и handoff при окончании лимита.
+
+Project validator теперь требует этот документ и ключевые разделы DoD/handoff/final report. Негативный unit test доказывает, что пустая или урезанная заглушка не заменит living contract незаметно.
+
+Одновременно устранён устаревший status context: `AI_PLAN` больше не утверждает активность завершённой ветки 091, а `ROADMAP` указывает интеграцию этапов 001–091 в `main`.
+
+### Команды проверки
+
+```text
+python -B scripts/validate_project.py
+python -B -m unittest discover -s tests -p "test_*.py" -v
+git diff --check
+```
+
+### Как повторить самостоятельно
+
+1. Открыть `docs/SELF_GUIDED_STAGE_WORKFLOW.md` и заполнить starter prompt номером следующего этапа.
+2. Сопоставить test matrix с изменяемым модулем и выбрать targeted commands.
+3. Проверить будущий этап по Definition of Done до присвоения статуса `verified`.
+4. При остановке заполнить handoff template и отправить временную ветку.

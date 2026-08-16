@@ -28,7 +28,7 @@
 
 - `python -B scripts/validate_project.py` — PASS.
 - `python -B scripts/validate_fixtures.py` — PASS.
-- `python -B -m unittest discover -s tests -p "test_*.py" -v` — PASS, 18/18.
+- `python -B -m unittest discover -s tests -p "test_*.py" -v` — PASS, 19/19.
 - `cargo fmt --all -- --check` — PASS.
 - `cargo test --workspace --locked` — PASS, 102 Rust tests.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
@@ -56,5 +56,6 @@
 
 ## Следующие разумные действия
 
-1. Подготовить отдельный experimental contract этапа 092 (`MathType adapter`) без ослабления fail-closed default и без скрытой зависимости от Office.
-2. По мере появления legal real-world corpus добавлять compatibility fixtures и regressions.
+1. При самостоятельном продолжении использовать `docs/SELF_GUIDED_STAGE_WORKFLOW.md` и оставлять checkpoint после каждого этапа.
+2. Подготовить отдельный experimental contract этапа 092 (`MathType adapter`) без ослабления fail-closed default и без скрытой зависимости от Office.
+3. По мере появления legal real-world corpus добавлять compatibility fixtures и regressions.
