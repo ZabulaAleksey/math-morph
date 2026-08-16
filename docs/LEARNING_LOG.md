@@ -549,3 +549,60 @@ git diff --check
 2. Сопоставить test matrix с изменяемым модулем и выбрать targeted commands.
 3. Проверить будущий этап по Definition of Done до присвоения статуса `verified`.
 4. При остановке заполнить handoff template и отправить временную ветку.
+
+## 2026-08-17 — Experimental MathType adapter, этап 092
+
+### Зачем понадобился отдельный adapter
+
+`MathMlRenderer` уже создаёт bounded allowlist Presentation MathML, но непосредственное подключение MathType SDK, OLE/COM, Word automation или сетевого WIRIS service одновременно добавило бы platform-, license- и security-boundary. Этап 092 поэтому реализует только чистую внутреннюю границу данных:
+
+```text
+MathExpression
+  -> MathMlRenderer
+  -> MathTypeAdapter
+  -> opaque application/mathml+xml payload
+```
+
+Это проверяет направление зависимостей и будущую точку интеграции, не создавая ложного заявления о совместимости с конкретной версией MathType.
+
+### Что добавлено
+
+- новый crate `exporter-mathtype`;
+- `MathTypeAdapter`, реализующий общий `EquationExporter`;
+- read-only `MathTypePayload` без публичного конструктора из raw XML;
+- typed/redacted `MathTypeError`;
+- только internal path dependencies на `math-model`, `document-ir` и `exporter-mathml`;
+- positive, port, unsupported, depth/node/output-limit и privacy regressions;
+- отдельный SPEC и repository dependency guard.
+
+### Что доказывают тесты
+
+- supported scalar expression даёт payload byte-for-byte равный production `MathMlRenderer`;
+- unsupported/invalid input и все три budget categories завершаются fail closed;
+- payload/error Debug не раскрывает formula text;
+- новый crate не активирует `EquationBackend::MathType` в DOCX;
+- workspace dependency DAG, formatting, Clippy и project context остаются валидными.
+
+Фактические результаты:
+
+```text
+cargo test -p exporter-mathtype --locked                         PASS, 4/4
+cargo test -p exporter-docx --locked                             PASS, 30 tests
+cargo test --workspace --locked                                  PASS, 106 tests
+cargo fmt --all -- --check                                       PASS
+cargo clippy --workspace --all-targets --locked -- -D warnings   PASS
+python -B scripts/validate_project.py                            PASS
+python unittest discovery                                       PASS, 20/20
+git diff --check                                                 PASS; only LF→CRLF warnings
+read-only architecture/security review                           PASS
+```
+
+### Что сознательно не доказано
+
+- импорт generated payload в конкретную версию MathType или Word;
+- полная совместимость поддерживаемых MathML shapes;
+- MTEF/OLE object generation;
+- licensed SDK/service integration;
+- feature-gated DOCX backend.
+
+Эти вопросы относятся к этапам 093–094. До них `EquationBackend::MathType` продолжает возвращать typed unavailable error.

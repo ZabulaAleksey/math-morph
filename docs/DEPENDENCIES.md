@@ -52,4 +52,8 @@
 
 Все версии и транзитивный граф закреплены в `Cargo.lock`. ZIP/XML/Serde libraries не получают сетевой или файловый доступ и не выполняют postinstall scripts.
 
+## Экспериментальная граница MathType
+
+`exporter-mathtype` добавляет только внутренние path dependencies на `math-model`, `document-ir` и `exporter-mathml`. MathType/WIRIS SDK, cloud/self-hosted service, native DLL/WLL, OLE/COM и license runtime не входят в dependency graph этапа 092. Любое их будущее добавление требует отдельной SPEC, license/supply-chain/security review и feature gate.
+
 На 2026-08-14 локальный `cargo-audit` не установлен, поэтому полный автоматический advisory scan `Cargo.lock` не заявляется выполненным. Direct dependency review выполнен вручную; `quick-xml = 0.41.0` удовлетворяет patched boundary `>= 0.41.0` для [RUSTSEC-2026-0195](https://rustsec.org/advisories/RUSTSEC-2026-0195.html). Автоматизация audit остаётся этапом 242.

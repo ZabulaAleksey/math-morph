@@ -113,10 +113,12 @@ EXPECTED_CRATES = {
     "crates/math-engine": "math-engine",
     "crates/exporter-docx": "exporter-docx",
     "crates/exporter-mathml": "exporter-mathml",
+    "crates/exporter-mathtype": "exporter-mathtype",
 }
 
 EXPECTED_CRATE_DEPENDENCIES = {
     "crates/exporter-mathml": {"document-ir", "math-model", "thiserror"},
+    "crates/exporter-mathtype": {"document-ir", "exporter-mathml", "math-model"},
 }
 
 

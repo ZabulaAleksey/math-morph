@@ -4,7 +4,7 @@ MathMorph — monorepo расширяемой платформы parsing и ко
 
 ## Текущее состояние
 
-Реализованы и проверены этапы 001–091: безопасная входная граница, чтение подтверждённого legacy XMCD worksheet30, структурный Math AST, versioned Document IR, детерминированный DOCX/OMML exporter и bounded Presentation MathML renderer с golden snapshots. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но формулы пока не вычисляет. API endpoints и пользовательский web-flow ещё не реализованы; Prime MCDX безопасно инспектируется как контейнер без содержательного разбора внутреннего worksheet.
+Реализованы и проверены этапы 001–092: безопасная входная граница, чтение подтверждённого legacy XMCD worksheet30, структурный Math AST, versioned Document IR, детерминированный DOCX/OMML exporter, bounded Presentation MathML renderer с golden snapshots и pure experimental MathType payload adapter без SDK/OLE/DOCX wiring. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но формулы пока не вычисляет. API endpoints и пользовательский web-flow ещё не реализованы; Prime MCDX безопасно инспектируется как контейнер без содержательного разбора внутреннего worksheet.
 
 ## Структура
 
@@ -14,6 +14,7 @@ MathMorph — monorepo расширяемой платформы parsing и ко
 - `crates/math-engine/` — каркас будущей семантики и вычислений;
 - `crates/exporter-docx/` — DOCX/WordprocessingML и редактируемый OMML subset;
 - `crates/exporter-mathml/` — Presentation MathML Core renderer;
+- `crates/exporter-mathtype/` — experimental opaque MathML payload adapter без SDK/OLE/DOCX wiring;
 - `services/api/` — Python package будущего FastAPI adapter;
 - `apps/web/` — минимальный Next.js App Router shell;
 - `specs/` — канонические проверяемые требования;
@@ -65,10 +66,11 @@ cargo run -p exporter-docx --example advanced_omml_reference
 Invoke-Item target/word-reference/advanced-omml-reference.docx
 ```
 
-Проверить standalone MathML snapshots:
+Проверить standalone MathML snapshots и experimental MathType payload adapter:
 
 ```powershell
 cargo test -p exporter-mathml --locked
+cargo test -p exporter-mathtype --locked
 Get-Content crates/exporter-mathml/tests/golden/add.mathml
 ```
 
