@@ -12,6 +12,7 @@
 - API: `services/api/AGENTS.md`.
 - Веб-интерфейс: `apps/web/AGENTS.md`.
 - Тесты и fixtures: `tests/AGENTS.md`.
+- Автоматически прогоняй unit, integration и component тесты после изменений; изменения тестовых файлов выполняются только в отдельном согласованном этапе.
 
 ## Инварианты проекта
 
