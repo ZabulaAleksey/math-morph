@@ -16,13 +16,14 @@
 
 1. Baseline и gap audit 094/100–142 — completed.
 2. Этап 100 `SymbolTable` — completed.
-3. Этапы 101–105 — next.
-4. Этапы 106–111 — pending.
-5. Этапы 112–122 — pending.
-6. Этапы 123–132 — pending.
-7. Этапы 133–142 — pending.
-8. Full regression, reviewer/security review, traceability/status — pending.
-9. Этап 094 — blocked by external licensed live evidence.
+3. Этап 101 `ReferenceAnalyzer` — completed.
+4. Этапы 102–105 — next.
+5. Этапы 106–111 — pending.
+6. Этапы 112–122 — pending.
+7. Этапы 123–132 — pending.
+8. Этапы 133–142 — pending.
+9. Full regression, reviewer/security review, traceability/status — pending.
+10. Этап 094 — blocked by external licensed live evidence.
 
 ## Канонические контракты
 

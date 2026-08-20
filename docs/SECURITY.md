@@ -228,6 +228,8 @@ XML paths используют explicit stack depth limits (`quick-xml` reader +
 
 Этап 100 добавляет semantic input boundary `SymbolTable`. Public build принимает borrowed AST, применяет cumulative limits на expressions, definitions, AST nodes, payload text bytes и элементы коллекций до первой clone/index allocation, отдельно ограничивает один identifier и требует строго возрастающие source ordinals. Каждое определение имеет одну canonical `Arc<MathExpression>` копию; history/ordered indices не дублируют глубокий AST. `Debug` и lookup failures не раскрывают identifier/literal payload.
 
+Этап 101 расширяет semantic boundary bounded-анализом свободных ссылок. `ReferenceAnalyzer` выполняет borrowed preflight до result allocation, суммарно ограничивает expressions, depth, nodes, text, collections и raw references, проверяет каждый identifier, а lexical shadowing учитывает через borrowed `HashMap` со счётчиками без квадратичного сканирования параметров. Ошибки и публичный `Debug` не раскрывают symbol/formula payload.
+
 ## Обязательные проверки безопасности по типу изменения
 
 | Изменение | Минимальные проверки |

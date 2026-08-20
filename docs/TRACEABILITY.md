@@ -40,7 +40,8 @@
 | SPEC-05 feature-gated DOCX backend selection | 094 | Требуется versioned live MathType import/edit `PASS`; `EquationBackend::MathType` остаётся typed unavailable без fallback | blocked |
 | FR-TRANSFORM-095..099, NFR/SEC-TRANSFORM-001 | 095–099 | `specs/features/transformation-pipeline.spec.md`; `crates/math-engine/`; immutable Original→Display AST, bounded transforms, profile/registry, deterministic semantic-preservation tests и два review-cycle | verified |
 | FR/NFR/SEC-SEMANTIC-100 | 100 | `specs/features/semantic-dependency-analysis.spec.md`; `crates/math-engine/src/symbol_table.rs`; ordered scalar/function revisions, visible-before lookup, borrowed bounded preflight, shared canonical AST, 10 targeted regressions и independent/security review | verified |
-| FR-SEMANTIC-101..105 | 101–105 | variable/callable references, dependency graph, faithful worksheet order, undefined/cycle diagnostics | planned |
+| FR/NFR/SEC-SEMANTIC-101 | 101 | `crates/math-engine/src/reference_analysis.rs`; bounded free variable/callable references, per-site deterministic dedup, lexical binder scopes, malformed-form rejection, 11 targeted regressions и independent/security review | verified |
+| FR-SEMANTIC-102..105 | 102–105 | dependency graph, faithful worksheet order, undefined/cycle diagnostics | planned |
 | FR/NFR/SEC-SUBSTITUTE-106..111 | 106–111 | `specs/features/substitution-and-evaluation-display.spec.md`; substitution, trace, explicit display modes и precision policy | planned |
 | FR-CONVERT-143, FR-DIAG-144, FR-SEVERITY-145, FR-REPORT-146, FR-PARTIAL-147 | 143–147 | `specs/features/conversion-pipeline-and-report.spec.md`; `crates/conversion-core/`; XMCD→parser→transform→Document IR→DOCX→validator, bounded/redacted diagnostics, report/fidelity/partial tests и два review-cycle | verified |
 | SPEC-07 комплексные числа | 112–122 | round-trip проверки алгебраического и полярного представления и граничные тесты | planned |

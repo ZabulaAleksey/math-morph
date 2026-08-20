@@ -131,6 +131,8 @@ math-model <--- mathcad-parser
 
 `FormulaIr` хранит immutable optional `original` и обязательный `display`; exporter читает только `display`. Binary assets, filesystem paths и URLs не входят в Document IR JSON и выдаются адаптеру только через `AssetResolver`.
 
+`math-engine` отделяет синтаксис от будущего вычисления. `SymbolTable` хранит ordered scalar/function revisions и разрешает только definitions, видимые строго до source ordinal. `ReferenceAnalyzer` поверх того же immutable AST извлекает свободные variable/function references с typed identity, lexical binder scopes и детерминированной per-site дедупликацией; dependency graph и evaluator на этапе 101 ещё не строятся.
+
 ### Exporters
 
 - `WordEquationExporter`: `MathExpression` → bounded editable OMML subset для numbers, identifiers, add/subtract, multiplication, fractions, powers, roots, scripts, typed function calls, paired grouping, vectors/matrices, integrals, derivatives и sum/product. Renderer выдаёт только канонические `m:*` shapes, проверяемые строгим `DocxValidator`.

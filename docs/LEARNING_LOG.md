@@ -730,3 +730,29 @@ python -B scripts/validate_project.py
 3. Вызвать visible-before lookup перед первой, между первой и второй и после второй revision.
 4. Уменьшить node/text limit и убедиться, что возвращается typed error без partial table.
 5. Запустить targeted tests и Clippy.
+
+## 2026-08-20 — Этап 101: bounded-анализ свободных ссылок
+
+### Что изменено
+
+- `ReferenceAnalyzer` различает variable и function references с arity и сохраняет source ordinal/provenance.
+- Definition targets, function parameters и calculus-bound identifiers не считаются свободными ссылками.
+- Дедупликация действует внутри одного source site, поэтому будущий dependency graph не теряет одинаковую ссылку из следующей definition revision.
+- Borrowed preflight ограничивает AST/text/collections/references; malformed identifiers и ambiguous callees завершаются typed redacted error.
+
+### Команды проверки
+
+```powershell
+cargo test -p math-engine --locked
+cargo clippy -p math-engine --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+python -B scripts/validate_project.py
+```
+
+### Как повторить самостоятельно
+
+1. Создать expression с повтором `x` и убедиться, что внутри одного source ordinal возвращается одна ссылка.
+2. Передать два source sites с `x` и проверить, что сохраняются обе зависимости.
+3. Поместить `x` в parameters/body функции и проверить, что bound occurrence исключён, а свободный symbol остаётся.
+4. Передать пустое имя, ambiguous callee и слишком маленький node/reference limit; каждый случай должен вернуть typed error без payload.
+5. Запустить targeted tests, полный workspace suite и Clippy.

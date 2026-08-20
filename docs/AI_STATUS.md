@@ -2,13 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–093, 095–100, 143–148 и независимый frontend-этап 154 реализованы и проверены в stacked ветке `feature/stage-148-cli-conversion`; этапы 101–142 остаются planned.
+- **Статус:** этапы 001–093, 095–101, 143–148 и независимый frontend-этап 154 реализованы и проверены в stacked ветке `feature/stage-148-cli-conversion`; этапы 102–142 остаются planned.
 - **Текущий backend-этап:** 148 завершён — доступен реальный локальный legacy XMCD→DOCX путь через binary `mathmorph`.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** semantic analysis 101–105, затем substitution/display 106–111 и complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
+- **Следующие этапы:** semantic analysis 102–105, затем substitution/display 106–111 и complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
 
 ## Реализовано
 
@@ -29,20 +29,22 @@
 - Этап 093: `docs/MATHTYPE_COMPATIBILITY.md` фиксирует exact 17-case matrix, official-source scope, независимые static/live/edit evidence statuses, read-only environment probe и воспроизводимый smoke protocol; validator запрещает missing/duplicate cases, неизвестные статусы и ложный `VERIFIED` при `NOT_RUN`.
 - Этапы 095–099: `math-engine` реализует bounded immutable Original AST→Display AST pipeline, explicit definition/symbol presentation rules, `NotationProfile` и deterministic semantic-preservation regressions.
 - Этап 100: `math-engine::SymbolTable` хранит ordered scalar/function revisions с arity, top-to-bottom visible-before lookup, borrowed cumulative AST/text/collection preflight и одной canonical AST-копией через `Arc`.
+- Этап 101: `math-engine::ReferenceAnalyzer` детерминированно извлекает свободные variable/function references, дедуплицирует их внутри source site, учитывает lexical binders и отклоняет malformed/unsupported формы через bounded redacted errors.
 - Этапы 143–147: `conversion-core` реализует независимый от адаптеров путь `detect → parse → transform → Document IR → DOCX → validate`, bounded/redacted diagnostics, severity/fidelity report и explicit safe partial policy.
 - Этап 148: binary `mathmorph convert <input.xmcd> --to docx [--output <path>]` читает input с hard limit, использует `AllowSafePartial`, не перезаписывает output и публикует DOCX через same-directory atomic no-replace hard link.
 - Typed errors и configurable limits на JSON, XML, ZIP, images, AST/OMML depth, nodes и output bytes.
 
-## Проверка этапа 100
+## Проверка этапов 100–101
 
-- `cargo test -p math-engine --locked` — PASS, 21 tests, включая 10 `SymbolTable` regressions.
-- `cargo test --workspace --locked` — PASS, 156 Rust tests.
+- `cargo test -p math-engine --locked` — PASS, включая 10 `SymbolTable` и 11 `ReferenceAnalyzer` regressions.
+- `cargo test --workspace --locked` — PASS, 167 Rust tests.
 - `cargo fmt --all -- --check` — PASS.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
 - `python -B scripts/validate_project.py` и `python -B scripts/validate_fixtures.py` — PASS.
 - Python repository tests — PASS, 29/29.
 - Independent code review — PASS после исправления cumulative budgets, zero-depth contract и clone amplification.
 - Security review — PASS после borrowed preflight, payload/collection accounting, bounded lookup и extreme-depth subprocess regression.
+- Stage 101 independent/security review — PASS после исправления nested `UnitedValue` preflight, malformed identifiers, per-site dedup и O(1)-average lexical scope lookup.
 
 ## Проверки этапов 001–092
 

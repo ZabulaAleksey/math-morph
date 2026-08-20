@@ -1,7 +1,13 @@
 //! Backend-neutral presentation transformations for the source math AST.
 
+pub mod reference_analysis;
 pub mod symbol_table;
 
+pub use reference_analysis::{
+    ARRAY_INDEX_TARGET_POLICY, ArrayIndexTargetPolicy, ReferenceAnalysis, ReferenceAnalyzer,
+    ReferenceDedupPolicy, ReferenceError, ReferenceIdentity, ReferenceInput, ReferenceLimits,
+    ReferenceOccurrence,
+};
 pub use symbol_table::{
     FunctionKey, FunctionSymbolDefinition, SymbolDefinition, SymbolInput, SymbolKey, SymbolTable,
     SymbolTableError, SymbolTableLimits, VariableDefinition,
