@@ -230,6 +230,8 @@ XML paths используют explicit stack depth limits (`quick-xml` reader +
 
 Этап 101 расширяет semantic boundary bounded-анализом свободных ссылок. `ReferenceAnalyzer` выполняет borrowed preflight до result allocation, суммарно ограничивает expressions, depth, nodes, text, collections и raw references, проверяет каждый identifier, а lexical shadowing учитывает через borrowed `HashMap` со счётчиками без квадратичного сканирования параметров. Ошибки и публичный `Debug` не раскрывают symbol/formula payload.
 
+Этап 102 строит graph index только после успешного graph-wide borrowed analysis. Raw occurrence budget отделён от post-dedup materialized-reference budget, graph nodes/edges/unresolved records имеют независимые hard ceilings, а поиск видимой revision использует бинарный `partition_point`, исключая квадратичное усиление на длинной истории повторных определений. Unresolved identities доступны semantic caller-у, но публичные `Debug`/errors остаются redacted.
+
 ## Обязательные проверки безопасности по типу изменения
 
 | Изменение | Минимальные проверки |

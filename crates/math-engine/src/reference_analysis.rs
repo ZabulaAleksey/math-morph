@@ -56,7 +56,7 @@ impl ReferenceLimits {
         }
     }
 
-    fn validate(self) -> Result<(), ReferenceError> {
+    pub(crate) fn validate(self) -> Result<(), ReferenceError> {
         if self.max_input_expressions == 0
             || self.max_input_expressions > Self::HARD_MAX_INPUT_EXPRESSIONS
             || self.max_ast_depth == 0
@@ -251,6 +251,10 @@ pub enum ReferenceError {
         source_ordinal: usize,
         limit: usize,
     },
+    MaterializedReferenceLimitExceeded {
+        source_ordinal: usize,
+        limit: usize,
+    },
     NonIncreasingSourceOrdinal {
         previous: usize,
         current: usize,
@@ -294,6 +298,7 @@ impl ReferenceError {
             Self::IdentifierLimitExceeded { .. } => "IdentifierLimitExceeded",
             Self::CollectionLimitExceeded { .. } => "CollectionLimitExceeded",
             Self::ReferenceLimitExceeded { .. } => "ReferenceLimitExceeded",
+            Self::MaterializedReferenceLimitExceeded { .. } => "MaterializedReferenceLimitExceeded",
             Self::NonIncreasingSourceOrdinal { .. } => "NonIncreasingSourceOrdinal",
             Self::InvalidDefinitionTarget { .. } => "InvalidDefinitionTarget",
             Self::InvalidFunctionName { .. } => "InvalidFunctionName",
@@ -325,6 +330,9 @@ impl fmt::Display for ReferenceError {
             Self::IdentifierLimitExceeded { .. } => "reference identifier budget exceeded",
             Self::CollectionLimitExceeded { .. } => "reference collection budget exceeded",
             Self::ReferenceLimitExceeded { .. } => "reference count limit exceeded",
+            Self::MaterializedReferenceLimitExceeded { .. } => {
+                "materialized reference output limit exceeded"
+            }
             Self::NonIncreasingSourceOrdinal { .. } => {
                 "reference source ordinals are not increasing"
             }
@@ -371,10 +379,22 @@ impl ReferenceAnalyzer {
         self.analyze_indexed(inputs.len(), |index| inputs[index])
     }
 
-    fn analyze_indexed<'a, F>(
+    pub(crate) fn analyze_indexed<'a, F>(
+        &self,
+        input_count: usize,
+        input_at: F,
+    ) -> Result<ReferenceAnalysis, ReferenceError>
+    where
+        F: FnMut(usize) -> ReferenceInput<'a>,
+    {
+        self.analyze_indexed_with_output_limit(input_count, input_at, None)
+    }
+
+    pub(crate) fn analyze_indexed_with_output_limit<'a, F>(
         &self,
         input_count: usize,
         mut input_at: F,
+        materialized_output_limit: Option<usize>,
     ) -> Result<ReferenceAnalysis, ReferenceError>
     where
         F: FnMut(usize) -> ReferenceInput<'a>,
@@ -413,8 +433,10 @@ impl ReferenceAnalyzer {
             )?;
         }
 
-        let mut references =
-            Vec::with_capacity(state.reference_count.min(self.limits.max_references));
+        let output_capacity_limit = materialized_output_limit
+            .unwrap_or(self.limits.max_references)
+            .min(self.limits.max_references);
+        let mut references = Vec::with_capacity(state.reference_count.min(output_capacity_limit));
         let mut seen = HashSet::with_capacity(references.capacity());
         for index in 0..input_count {
             let input = input_at(index);
@@ -424,6 +446,7 @@ impl ReferenceAnalyzer {
                 references: &mut references,
                 seen: &mut seen,
                 policy: self.dedup_policy,
+                materialized_output_limit,
             };
             collect(
                 input.expression,
@@ -996,6 +1019,7 @@ struct Collector<'a> {
     references: &'a mut Vec<ReferenceOccurrence>,
     seen: &'a mut HashSet<ReferenceIdentity>,
     policy: ReferenceDedupPolicy,
+    materialized_output_limit: Option<usize>,
 }
 
 fn collect<'a>(
@@ -1019,7 +1043,7 @@ fn collect<'a>(
                     ordinal,
                     expr.origin,
                     collector,
-                );
+                )?;
             }
         }
         MathExpressionKind::Definition(Definition { target, value, .. }) => {
@@ -1086,7 +1110,7 @@ fn collect<'a>(
                     ordinal,
                     callee.origin,
                     collector,
-                );
+                )?;
             }
             for arg in arguments {
                 collect(arg, ordinal, depth + 1, scope, collector)?;
@@ -1250,17 +1274,34 @@ fn record(
     ordinal: usize,
     provenance: ExpressionOrigin,
     collector: &mut Collector<'_>,
-) {
+) -> Result<(), ReferenceError> {
     if collector.policy == ReferenceDedupPolicy::FirstOccurrence
-        && !collector.seen.insert(identity.clone())
+        && collector.seen.contains(&identity)
     {
-        return;
+        return Ok(());
     }
-    let occurrence_index = collector.references.len();
+    let next_count = collector
+        .references
+        .len()
+        .checked_add(1)
+        .ok_or(ReferenceError::ArithmeticOverflow)?;
+    if let Some(limit) = collector.materialized_output_limit {
+        if next_count > limit {
+            return Err(ReferenceError::MaterializedReferenceLimitExceeded {
+                source_ordinal: ordinal,
+                limit,
+            });
+        }
+    }
+    if collector.policy == ReferenceDedupPolicy::FirstOccurrence {
+        collector.seen.insert(identity.clone());
+    }
+    let occurrence_index = next_count - 1;
     collector.references.push(ReferenceOccurrence {
         source_ordinal: ordinal,
         occurrence_index,
         provenance,
         identity,
     });
+    Ok(())
 }

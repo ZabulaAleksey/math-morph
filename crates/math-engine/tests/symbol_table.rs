@@ -105,6 +105,49 @@ fn revisions_are_retained_and_visibility_is_strictly_before_source_ordinal() {
 }
 
 #[test]
+fn visibility_uses_ordered_history_boundaries_for_large_revision_sets() {
+    let revisions: Vec<_> = (0..2048)
+        .map(|index| scalar("x", &index.to_string()))
+        .collect();
+    let table = SymbolTable::build(
+        revisions.iter().enumerate(),
+        SymbolTableLimits::new(3000, 3000, 256, 100_000, 100_000, 100_000, 100_000),
+    )
+    .expect("large revision history");
+    let key = SymbolKey::new("x", None);
+
+    assert_eq!(table.visible_variable_before(&key, 0), None);
+    assert_eq!(
+        table
+            .visible_variable_before(&key, 1)
+            .expect("first revision")
+            .source_ordinal,
+        0
+    );
+    assert_eq!(
+        table
+            .visible_variable_before(&key, 1024)
+            .expect("middle revision")
+            .source_ordinal,
+        1023
+    );
+    assert_eq!(
+        table
+            .visible_variable_before(&key, 2048)
+            .expect("last revision")
+            .source_ordinal,
+        2047
+    );
+    assert_eq!(
+        table
+            .visible_variable_before(&key, 4096)
+            .expect("after all revisions")
+            .source_ordinal,
+        2047
+    );
+}
+
+#[test]
 fn canonical_expression_is_shared_and_original_ast_is_unchanged() {
     let scalar_expression = scalar("x", "private-rhs");
     let function_expression = function("f", &["argument"], "private-body");

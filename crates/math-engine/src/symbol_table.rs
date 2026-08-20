@@ -623,10 +623,11 @@ impl SymbolTable {
         source_ordinal: usize,
     ) -> Option<&VariableDefinition> {
         self.variable_history(key).and_then(|history| {
-            history
-                .iter()
-                .rev()
-                .find(|revision| revision.source_ordinal < source_ordinal)
+            let visible_count =
+                history.partition_point(|revision| revision.source_ordinal < source_ordinal);
+            visible_count
+                .checked_sub(1)
+                .and_then(|index| history.get(index))
         })
     }
     pub fn visible_function_before(
@@ -635,10 +636,11 @@ impl SymbolTable {
         source_ordinal: usize,
     ) -> Option<&FunctionSymbolDefinition> {
         self.function_history(key).and_then(|history| {
-            history
-                .iter()
-                .rev()
-                .find(|revision| revision.source_ordinal < source_ordinal)
+            let visible_count =
+                history.partition_point(|revision| revision.source_ordinal < source_ordinal);
+            visible_count
+                .checked_sub(1)
+                .and_then(|index| history.get(index))
         })
     }
     pub fn lookup_variable(

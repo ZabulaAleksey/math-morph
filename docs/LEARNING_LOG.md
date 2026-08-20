@@ -756,3 +756,29 @@ python -B scripts/validate_project.py
 3. Поместить `x` в parameters/body функции и проверить, что bound occurrence исключён, а свободный symbol остаётся.
 4. Передать пустое имя, ambiguous callee и слишком маленький node/reference limit; каждый случай должен вернуть typed error без payload.
 5. Запустить targeted tests, полный workspace suite и Clippy.
+
+## 2026-08-20 — Этап 102: детерминированный dependency graph
+
+### Что изменено
+
+- Каждый узел графа соответствует конкретной variable/function revision, а не только последнему значению symbol.
+- Ребро направлено от definition к definition, от которой она зависит; forward/missing reference остаётся отдельной unresolved записью.
+- Повторные определения разрешаются бинарным visible-before lookup; exact function self-reference сохраняется как self-edge для будущего cycle detector.
+- Graph index создаётся только после cumulative borrowed reference analysis; raw и post-dedup output budgets разделены.
+
+### Команды проверки
+
+```powershell
+cargo test -p math-engine --test dependency_graph --locked
+cargo test -p math-engine --locked
+cargo clippy -p math-engine --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+```
+
+### Как повторить самостоятельно
+
+1. Создать `x := 1`, затем `y := x` и проверить edge `y → x`.
+2. Поставить `y := x` перед `x := 1` и проверить unresolved без guessed edge.
+3. Добавить две revisions `x` и убедиться, что последующая ссылка выбирает ближайшую предыдущую.
+4. Создать `f() := f()` и проверить exact callable self-edge; scalar `x := x` должен остаться unresolved.
+5. Уменьшить edge/unresolved/output limits и убедиться в typed redacted failure без partial graph.
