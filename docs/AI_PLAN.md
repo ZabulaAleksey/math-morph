@@ -18,13 +18,14 @@
 2. Этап 100 `SymbolTable` — completed.
 3. Этап 101 `ReferenceAnalyzer` — completed.
 4. Этап 102 `DependencyGraph` — completed.
-5. Этапы 103–105 — next.
-6. Этапы 106–111 — pending.
-7. Этапы 112–122 — pending.
-8. Этапы 123–132 — pending.
-9. Этапы 133–142 — pending.
-10. Full regression, reviewer/security review, traceability/status — pending.
-11. Этап 094 — blocked by external licensed live evidence.
+5. Этап 103 `EvaluationPlan` — completed.
+6. Этапы 104–105 — next session.
+7. Этапы 106–111 — pending.
+8. Этапы 112–122 — pending.
+9. Этапы 123–132 — pending.
+10. Этапы 133–142 — pending/evidence-gated.
+11. Full regression, reviewer/security review, traceability/status — completed through stage 103.
+12. Этап 094 — blocked by external licensed live evidence.
 
 ## Канонические контракты
 

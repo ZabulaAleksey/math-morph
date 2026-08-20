@@ -2,13 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–093, 095–102, 143–148 и независимый frontend-этап 154 реализованы и проверены в stacked ветке `feature/stage-148-cli-conversion`; этапы 103–142 остаются planned.
+- **Статус:** этапы 001–093, 095–103, 143–148 и независимый frontend-этап 154 реализованы и проверены в stacked ветке `feature/stage-148-cli-conversion`; этапы 104–142 остаются planned.
 - **Текущий backend-этап:** 148 завершён — доступен реальный локальный legacy XMCD→DOCX путь через binary `mathmorph`.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** semantic analysis 103–105, затем substitution/display 106–111 и complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
+- **Следующие этапы:** semantic diagnostics 104–105, затем substitution/display 106–111 и complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
 
 ## Реализовано
 
@@ -31,14 +31,15 @@
 - Этап 100: `math-engine::SymbolTable` хранит ordered scalar/function revisions с arity, top-to-bottom visible-before lookup, borrowed cumulative AST/text/collection preflight и одной canonical AST-копией через `Arc`.
 - Этап 101: `math-engine::ReferenceAnalyzer` детерминированно извлекает свободные variable/function references, дедуплицирует их внутри source site, учитывает lexical binders и отклоняет malformed/unsupported формы через bounded redacted errors.
 - Этап 102: `math-engine::DependencyGraph` связывает definition revisions только с видимыми prior definitions, сохраняет forward/missing references отдельно и создаёт exact callable self-edge только для последующей диагностики recursion/cycle.
+- Этап 103: `math-engine::EvaluationPlan` итеративно строит полный dependency-first порядок со stable source-ordinal tie-break; unresolved/cyclic graph возвращает typed error без partial plan.
 - Этапы 143–147: `conversion-core` реализует независимый от адаптеров путь `detect → parse → transform → Document IR → DOCX → validate`, bounded/redacted diagnostics, severity/fidelity report и explicit safe partial policy.
 - Этап 148: binary `mathmorph convert <input.xmcd> --to docx [--output <path>]` читает input с hard limit, использует `AllowSafePartial`, не перезаписывает output и публикует DOCX через same-directory atomic no-replace hard link.
 - Typed errors и configurable limits на JSON, XML, ZIP, images, AST/OMML depth, nodes и output bytes.
 
-## Проверка этапов 100–102
+## Проверка этапов 100–103
 
-- `cargo test -p math-engine --locked` — PASS, включая 11 `SymbolTable`, 11 `ReferenceAnalyzer` и 12 `DependencyGraph` regressions.
-- `cargo test --workspace --locked` — PASS, 180 Rust tests.
+- `cargo test -p math-engine --locked` — PASS, включая 11 `SymbolTable`, 11 `ReferenceAnalyzer`, 12 `DependencyGraph` и 9 `EvaluationPlan` regressions.
+- `cargo test --workspace --locked` — PASS, 189 Rust tests.
 - `cargo fmt --all -- --check` — PASS.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
 - `python -B scripts/validate_project.py` и `python -B scripts/validate_fixtures.py` — PASS.
@@ -47,6 +48,7 @@
 - Security review — PASS после borrowed preflight, payload/collection accounting, bounded lookup и extreme-depth subprocess regression.
 - Stage 101 independent/security review — PASS после исправления nested `UnitedValue` preflight, malformed identifiers, per-site dedup и O(1)-average lexical scope lookup.
 - Stage 102 independent/security review — PASS после переноса graph allocation за preflight, разделения raw/materialized reference budgets и бинарного revision lookup.
+- Stage 103 independent/security review — PASS; bounded iterative Kahn traversal, stable ordering, checked limits и fail-closed unresolved/cycle semantics подтверждены.
 
 ## Проверки этапов 001–092
 

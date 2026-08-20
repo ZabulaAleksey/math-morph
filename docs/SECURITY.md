@@ -232,6 +232,8 @@ XML paths используют explicit stack depth limits (`quick-xml` reader +
 
 Этап 102 строит graph index только после успешного graph-wide borrowed analysis. Raw occurrence budget отделён от post-dedup materialized-reference budget, graph nodes/edges/unresolved records имеют независимые hard ceilings, а поиск видимой revision использует бинарный `partition_point`, исключая квадратичное усиление на длинной истории повторных определений. Unresolved identities доступны semantic caller-у, но публичные `Debug`/errors остаются redacted.
 
+Этап 103 строит evaluation order без рекурсии. Node/edge/ready/output limits проверяются до соответствующих аллокаций, Kahn traversal использует bounded `BinaryHeap`, а checked indegree counters исключают wraparound. Unresolved, cyclic, duplicate или dangling graph state завершается typed redacted error без успешного partial plan.
+
 ## Обязательные проверки безопасности по типу изменения
 
 | Изменение | Минимальные проверки |

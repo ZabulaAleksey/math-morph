@@ -2,7 +2,7 @@
 
 > Каждый этап должен допускать независимое тестирование. Исполняемый текст prompts находится в `docs/PROMPTS.md`.
 
-**Текущий статус:** этапы 001–093, 095–102 и 143–148, а также независимый frontend-этап 154 реализованы и проверены в stacked feature-ветке. Этап 094 заблокирован до versioned MathType import/edit `PASS`; этапы 103–142 остаются planned и не объявляются выполненными. Первый локальный legacy XMCD→DOCX CLI path доступен на этапе 148. Подробные доказательства находятся в `docs/TRACEABILITY.md`.
+**Текущий статус:** этапы 001–093, 095–103 и 143–148, а также независимый frontend-этап 154 реализованы и проверены в stacked feature-ветке. Этап 094 заблокирован до versioned MathType import/edit `PASS`; этапы 104–142 остаются planned и не объявляются выполненными. Первый локальный legacy XMCD→DOCX CLI path доступен на этапе 148. Подробные доказательства находятся в `docs/TRACEABILITY.md`.
 
 ## Основа — 001–010
 
@@ -141,7 +141,7 @@
 - **100** — `SymbolTable` — `verified`
 - **101** — `variable references` — `verified`
 - **102** — `dependency graph` — `verified`
-- **103** — `worksheet evaluation order`
+- **103** — `worksheet evaluation order` — `verified`
 - **104** — `undefined-variable diagnostic`
 - **105** — `circular dependency diagnostic`
 

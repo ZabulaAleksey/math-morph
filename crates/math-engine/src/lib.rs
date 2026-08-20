@@ -1,6 +1,9 @@
 //! Backend-neutral presentation transformations for the source math AST.
 
 pub mod dependency_graph;
+pub mod evaluation_plan;
+
+pub use evaluation_plan::{EvaluationPlan, EvaluationPlanError, EvaluationPlanLimits};
 pub mod reference_analysis;
 pub mod symbol_table;
 

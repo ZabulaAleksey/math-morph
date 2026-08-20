@@ -782,3 +782,29 @@ cargo test --workspace --locked
 3. Добавить две revisions `x` и убедиться, что последующая ссылка выбирает ближайшую предыдущую.
 4. Создать `f() := f()` и проверить exact callable self-edge; scalar `x := x` должен остаться unresolved.
 5. Уменьшить edge/unresolved/output limits и убедиться в typed redacted failure без partial graph.
+
+## 2026-08-20 — Этап 103: stable worksheet evaluation order
+
+### Что изменено
+
+- `EvaluationPlan` выдаёт каждую definition revision ровно один раз и только после её dependencies.
+- Одновременно готовые nodes выбираются по source ordinal, поэтому порядок остаётся совместимым с top-to-bottom worksheet semantics.
+- Unresolved references и cycles возвращают typed error без частичного успешного плана.
+- Traversal итеративен; node/edge/ready/output budgets имеют hard ceilings и checked arithmetic.
+
+### Команды проверки
+
+```powershell
+cargo test -p math-engine --test evaluation_plan --locked
+cargo test -p math-engine --locked
+cargo clippy -p math-engine --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+```
+
+### Как повторить самостоятельно
+
+1. Построить chain `a → b → c` и проверить порядок `a, b, c`.
+2. Добавить независимые definitions и проверить source-ordinal tie-break.
+3. Передать graph с unresolved reference и убедиться, что plan не возвращается.
+4. Передать function self-cycle и проверить `CyclePresent` без recursion/panic.
+5. Уменьшить ready/output limits и запустить targeted regressions.
