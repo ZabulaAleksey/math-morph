@@ -258,6 +258,26 @@ MathMorph хранит только предметную delta в:
 `SECURITY.md`, `ARCHITECTURE.md` и tests; отсутствие полной копии
 глобальной `rules/fallback-policy.md` внутри проекта.
 
+## ADR-0015 — Functional stage 148 использует dependency-aware vertical slice
+
+**Статус:** принято, 2026-08-20.
+
+**Контекст:** roadmap между 094 и 148 содержит как обязательные части первого CLI path, так и независимые аналитические и экспериментальные направления: symbol/evaluation graph, substitutions, complex arithmetic, ChartIR/Excel и DiagramIR/Visio. Этап 094 отдельно заблокирован отсутствием versioned live MathType import/edit evidence. Требование пользователя — получить первую реальную локальную конвертацию на этапе 148.
+
+**Варианты:** (1) последовательно реализовать и объявить завершёнными все 095–147; (2) создать shortcut XML→DOCX внутри CLI; (3) реализовать минимальную архитектурно полную dependency chain 095–099 и 143–148, сохранив остальные этапы planned.
+
+**Решение:** выбран вариант 3. `math-engine` предоставляет backend-neutral presentation pipeline; новый application core владеет parser→IR→export orchestration, diagnostics/report и safe partial policy; CLI остаётся тонким adapter. Этапы 100–142 не помечаются выполненными и не блокируют faithful static XMCD→DOCX. Этап 094 остаётся `BLOCKED`; для DOCX используется `WordOmml`.
+
+**Причина:** этот путь даёт честный end-to-end результат без дублирования core logic, фиктивной реализации независимых POC и обхода MathType evidence gate.
+
+**Последствия:** этап 148 первоначально поддерживает только подтверждённый legacy XMCD worksheet30, text и supported math. MCDX content, binary assets, plots/charts/diagrams и evaluation получают explicit typed unsupported diagnostics. `Document IR V1` не меняется.
+
+**Fallback / rollback:** изменения аддитивны. Rollback удаляет новые workspace crates и presentation API; existing parser/IR/exporter contracts и пользовательские документы не изменяются. Security/limit failures никогда не переходят в partial conversion.
+
+**Проверка:** SPEC этапов 095–099, 143–148; unit/integration tests; настоящий CLI E2E XMCD→DOCX→`DocxValidator`; независимый architecture/security review.
+
+**Связанные требования:** `FR-TRANSFORM-095..099`, `FR-CONVERT-143`, `FR-DIAG-144`, `FR-SEVERITY-145`, `FR-REPORT-146`, `FR-PARTIAL-147`, `FR-CLI-148`.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

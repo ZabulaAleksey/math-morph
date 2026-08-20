@@ -10,5 +10,8 @@
 - [`features/experimental-mathtype-adapter.spec.md`](features/experimental-mathtype-adapter.spec.md) — контракт этапа 092 для pure offline adapter `MathExpression` → opaque bounded Presentation MathML payload без SDK/OLE/DOCX integration.
 - [`features/mathtype-compatibility-evidence.spec.md`](features/mathtype-compatibility-evidence.spec.md) — контракт этапа 093 для versioned compatibility matrix, evidence levels и воспроизводимого MathType import/edit smoke без преждевременного включения DOCX backend.
 - [`features/visible-nextjs-shell.spec.md`](features/visible-nextjs-shell.spec.md) — контракт этапа 154 для первой видимой публичной Calm Blue UI оболочки без преждевременного upload/backend flow.
+- [`features/transformation-pipeline.spec.md`](features/transformation-pipeline.spec.md) — контракт этапов 095–099 для immutable Original AST → Display AST presentation pipeline.
+- [`features/conversion-pipeline-and-report.spec.md`](features/conversion-pipeline-and-report.spec.md) — контракт этапов 143–147 для общего XMCD→DOCX application core, diagnostics, fidelity report и safe partial conversion.
+- [`features/minimal-cli-convert.spec.md`](features/minimal-cli-convert.spec.md) — контракт этапа 148 для настоящей локальной команды `mathmorph convert`.
 
 Новые feature-SPEC создаются в `specs/features/` только когда системной спецификации недостаточно. `docs/ROADMAP.md`, `docs/PROMPTS.md` и `docs/TRACEABILITY.md` не являются источниками требований.
