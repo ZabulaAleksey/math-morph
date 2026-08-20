@@ -1,29 +1,32 @@
 # Текущий план AI
 
-**Статус:** `completed`.
-**Цель:** functional stage 148 — первая реальная локальная XMCD→DOCX конвертация через общий core и CLI.
+**Статус:** `in_progress`.
+**Цель:** последовательно реализовать и проверить все незакрытые этапы до 148, не ослабляя принятые контракты и evidence gates.
 **Ветка:** `feature/stage-148-cli-conversion`, stacked поверх этапов 093 и 154.
 **Backend-этап 094:** `blocked by versioned live evidence`; MathType wiring запрещён.
 
-## Dependency-aware scope
+## Текущий scope
 
-- Реализовать этапы 095–099: immutable Original AST → Display AST presentation pipeline.
-- Этапы 100–142 сохранить `planned`: они не являются dependency первой faithful static conversion и не объявляются завершёнными.
-- Реализовать этапы 143–147: `ConversionPipeline`, bounded diagnostics, severity, fidelity report и safe partial policy.
-- Реализовать этап 148: `mathmorph convert <input.xmcd> --to docx` поверх production core.
-- MCDX content parsing оставить explicit unsupported до отдельного подтверждённого Prime schema contract.
+- Этапы 095–099 и 143–148 сохранить verified и защищать полной регрессией.
+- Последовательно закрыть 100–105, 106–111, 112–122, 123–127, 128–132 и 133–142.
+- Для каждого этапа соблюдать SPEC → implementation → targeted tests → integration/component regression → review → status.
+- Этап 094 не объявлять выполненным без versioned live MathType import/edit `PASS`.
 
 ## Порядок
 
-1. SPEC и ADR — completed.
-2. `math-engine` stages 095–099 — completed.
-3. `conversion-core` stages 143–147 — completed.
-4. `mathmorph-cli` stage 148 и live CLI→core→parser→IR→DOCX E2E — completed.
-5. Full validation, security/reviewer cycles, traceability/status и atomic commits — completed.
+1. Baseline и gap audit 094/100–142 — completed.
+2. Этап 100 `SymbolTable` — in progress.
+3. Этапы 101–111 — pending.
+4. Этапы 112–122 — pending.
+5. Этапы 123–132 — pending.
+6. Этапы 133–142 — pending.
+7. Full regression, reviewer/security review, traceability/status — pending.
+8. Этап 094 — blocked by external licensed live evidence.
 
 ## Канонические контракты
 
 - `specs/features/transformation-pipeline.spec.md`
+- `specs/features/semantic-dependency-analysis.spec.md`
 - `specs/features/conversion-pipeline-and-report.spec.md`
 - `specs/features/minimal-cli-convert.spec.md`
 - `docs/DECISIONS.md` — ADR-0015, ADR-0016
