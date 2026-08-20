@@ -116,7 +116,7 @@ math-model <--- mathcad-parser
 - `EquationBackend`/`DocxExportConfig`: публичный выбор backend для DOCX; `WordOmml` — default, а зарезервированный `MathType` завершается typed `EquationBackendUnavailable` без fallback.
 - `MathMlRenderer`: независимый от Word bounded exporter `MathExpression` → standalone Presentation MathML Core для принятого scalar subset. Он реализует общий `EquationExporter` и не зависит от parser/DOCX.
 - `MathTypeAdapter`: отдельный experimental crate поверх `MathMlRenderer`; выдаёт opaque `application/mathml+xml` payload, не принимает raw XML, не выполняет I/O и не подключён к `DocxExporter`.
-- Будущий MathType bridge/SDK/OLE/service и реальная compatibility matrix остаются отдельными этапами; в текущем backend enum `MathType` по-прежнему fail closed.
+- Compatibility matrix этапа 093 хранится в `docs/MATHTYPE_COMPATIBILITY.md`: static WIRIS coverage отделено от versioned live import/edit evidence, которое пока `UNVERIFIED`. Будущий MathType bridge/SDK/OLE/service остаётся отдельным этапом; в текущем backend enum `MathType` по-прежнему fail closed.
 - `DocxExporter`: validated Document IR → deterministic single-page DOCX/OOXML с text/styles, internal PNG/JPEG и equations.
 - `DocxValidator`: fail-closed validator только генерируемого subset, а не универсальный validator произвольного DOCX.
 - В будущем: Markdown, LaTeX, PDF, HTML, JSON, Typst.

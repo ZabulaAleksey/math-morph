@@ -2,7 +2,7 @@
 
 > Каждый этап должен допускать независимое тестирование. Исполняемый текст prompts находится в `docs/PROMPTS.md`.
 
-**Текущий статус:** этапы 001–092 реализованы и проверены. Следующий ещё не начатый этап — 093 (`compatibility doc`). Подробные доказательства и статус `verified` находятся только в `docs/TRACEABILITY.md`.
+**Текущий статус:** этапы 001–093 реализованы и проверены. Compatibility document этапа 093 имеет общий live-evidence статус `UNVERIFIED`; этап 094 заблокирован до versioned MathType import/edit `PASS`. Подробные доказательства и stage status находятся только в `docs/TRACEABILITY.md`.
 
 ## Основа — 001–010
 
@@ -125,8 +125,8 @@
 - **090** — `MathML renderer` — `verified`
 - **091** — `MathML snapshots` — `verified`
 - **092** — `experimental MathType adapter` — `verified`
-- **093** — `compatibility doc` — `planned`
-- **094** — `feature-gated backend selection` — `planned`
+- **093** — `compatibility doc` — `verified` (`live compatibility: UNVERIFIED`)
+- **094** — `feature-gated backend selection` — `blocked by versioned live evidence`
 
 ## Преобразование нотации — 095–099
 

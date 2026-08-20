@@ -97,6 +97,8 @@ Snapshot renderer существует только в tests и выдаёт к�
 - `crates/exporter-mathml/tests/mathml.rs`: AC-090-001..006 для standalone namespace/root, scalar structural shapes, multiplication policy, XML escaping, unsupported cases, depth/node/input/output budgets, iterative deep traversal и общего `EquationExporter` port.
 - `crates/exporter-mathml/tests/mathml_snapshots.rs` + `tests/golden/*.mathml`: AC-091-001..004, 17 external golden outputs, exact inventory/bytes, UTF-8/LF/root-envelope guard, malformed corpus cases, deterministic rerender и отсутствие `ExpressionOrigin` в output. `.gitattributes` закрепляет `eol=lf` для воспроизводимости на Windows.
 - `crates/exporter-mathtype/tests/mathtype_adapter.rs`: AC-092-001..006 для exact generated payload, media type/opaque API, общего `EquationExporter`, unsupported/limit fail-closed behavior и redacted payload/error Debug.
+- `tests/test_mathtype_compatibility.py`: AC-093-001..005 для exact 17-case compatibility inventory, разрешённого evidence vocabulary, duplicate/missing cases и запрета общего `VERIFIED` при любом live `NOT_RUN`.
+- `docs/MATHTYPE_COMPATIBILITY.md`: manual smoke contract для MathType Web и MathType 7 desktop SDK; static WIRIS coverage не заменяет live import/edit. Пока соответствующий runtime отсутствует, live результат обязан оставаться `UNVERIFIED`.
 
 Текущий `DocxValidator` доказывает только строгий subset, который генерирует `exporter-docx`. Для reference artifact подтверждено Word 16.0 open/enumerate/edit: Word открыл DOCX, exposed 1 `OMath`, а `Linearize→BuildUp` сохранил 1 `OMath`. Microsoft Open XML SDK 2.5.4728 validator сообщил 0 errors. Это evidence конкретного artifact, а не обещание полной schema conformance для произвольных DOCX.
 

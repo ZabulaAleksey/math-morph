@@ -1,21 +1,20 @@
 # Текущий план AI
 
 **Статус:** `completed`.
-**Завершённый технический этап:** fallback-policy/context/toolchain hardening.
-**Последний verified продуктовый этап:** 092 — `experimental MathType adapter`.
-**Следующий ещё не начатый продуктовый этап:** 093 — `compatibility doc`.
+**Завершённый продуктовый этап:** 093 — `compatibility doc`.
+**Последний интегрированный в `main` этап:** 092 — `experimental MathType adapter`.
+**Следующий продуктовый этап:** 094 — `feature-gated backend selection`, `blocked by versioned live evidence`.
 
 ## Результат
 
-- MathMorph наследует глобальную Fallback Policy;
-- `docs/FALLBACKS.md` является канонической project-specific delta;
-- TOML subagents валидны;
-- Node engine совместим с `pnpm@11.20.0`;
-- web-команды используют pnpm;
-- project validator требует `docs/FALLBACKS.md`;
-- проверки corrective stage прошли.
+- Создана и проиндексирована SPEC этапа 093.
+- `docs/MATHTYPE_COMPATIBILITY.md` сопоставляет exact 17-case golden inventory с official static coverage и отдельными live/edit statuses.
+- Локальный environment probe не обнаружил MathType/SDK; MathType Web/Desktop live smoke честно отмечен `NOT_RUN / UNVERIFIED`.
+- Project validator и девять новых negative/positive tests защищают inventory, evidence vocabulary и versioned provenance от завышенных compatibility claims.
+- Runtime crates, DOCX backend selection и fallback contract не изменены.
+- Unit, integration, component/build, workspace и lint checks прошли.
 
 ## Handoff
 
-Следующая product feature не начинается автоматически.
-По текущему Git evidence следующим planned stage остаётся 093.
+Этап 094 не начинается автоматически: сначала требуется versioned live MathType import/edit `PASS` для явно выбранной поверхности.
+До появления такого evidence `EquationBackend::MathType` остаётся typed unavailable без silent fallback.

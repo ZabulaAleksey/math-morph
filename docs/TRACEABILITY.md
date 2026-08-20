@@ -36,7 +36,8 @@
 | FR-MATHML-001..004, NFR/SEC-MATHML-001..002 | 090 | `specs/features/mathml-renderer.spec.md`; `crates/exporter-mathml/`, focused structural/negative/limit/port tests и independent/security review | verified |
 | FR-MATHML-005, NFR-MATHML-003 | 091 | 17 `tests/golden/*.mathml`, `mathml_snapshots.rs`, exact inventory/bytes/canonical LF-root guards, origin-invariance regression и independent review | verified |
 | FR/NFR/SEC-MATHTYPE-001..005 | 092 | `specs/features/experimental-mathtype-adapter.spec.md`; `crates/exporter-mathtype/`, exact payload/port/unsupported/depth/node/output/redaction tests; `cargo test -p exporter-mathtype`, `cargo test -p exporter-docx`, workspace 106 tests, fmt, Clippy, Python 20/20, project validator, diff check и independent architecture/security review | verified |
-| SPEC-05 последующие формы расширенного экспорта | 093–094 | documented compatibility evidence и feature-gated DOCX backend selection | planned |
+| FR-MTCOMP-001..005, NFR-MTCOMP-001, SEC-MTCOMP-001 | 093 | `specs/features/mathtype-compatibility-evidence.spec.md`; `docs/MATHTYPE_COMPATIBILITY.md`; exact 17-case matrix, official-source scope, environment probe, manual smoke protocol, project validator и negative contract tests | verified |
+| SPEC-05 feature-gated DOCX backend selection | 094 | Требуется versioned live MathType import/edit `PASS`; `EquationBackend::MathType` остаётся typed unavailable без fallback | blocked |
 | SPEC-04 единый конвейер | 143–147 | producer Document IR, diagnostics collector, fidelity report и partial conversion policy | planned |
 | SPEC-06 преобразования и точность | 095–111 | `crates/math-engine/`, тесты сохранения семантики и trace | planned |
 | SPEC-07 комплексные числа | 112–122 | round-trip проверки алгебраического и полярного представления и граничные тесты | planned |

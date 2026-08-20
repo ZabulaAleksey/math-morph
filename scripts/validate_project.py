@@ -7,6 +7,7 @@ import tomllib
 from pathlib import Path
 
 from validate_fixtures import validate_fixtures
+from validate_mathtype_compatibility import validate_mathtype_compatibility
 
 REQUIRED_FILES = (
     "AGENTS.md",
@@ -26,6 +27,7 @@ REQUIRED_FILES = (
     "docs/DESIGN.md",
     "docs/FALLBACKS.md",
     "docs/FORMATS.md",
+    "docs/MATHTYPE_COMPATIBILITY.md",
     "docs/AI_PLAN.md",
     "docs/AI_STATUS.md",
     "docs/PRIVACY.md",
@@ -49,6 +51,8 @@ REQUIRED_FILES = (
     "services/api/uv.lock",
     "apps/web/package.json",
     "scripts/validate_fixtures.py",
+    "scripts/validate_mathtype_compatibility.py",
+    "specs/features/mathtype-compatibility-evidence.spec.md",
     "tests/fixtures/README.md",
     "tests/fixtures/manifest.json",
 )
@@ -149,6 +153,7 @@ CANONICAL_DOCUMENTS = (
     "docs/DESIGN.md",
     "docs/FALLBACKS.md",
     "docs/FORMATS.md",
+    "docs/MATHTYPE_COMPATIBILITY.md",
     "docs/AI_PLAN.md",
     "docs/AI_STATUS.md",
     "docs/PRIVACY.md",
@@ -354,6 +359,10 @@ def validate_project(root: Path) -> list[str]:
 
     _validate_markdown_links(root, errors)
     errors.extend(f"fixtures: {error}" for error in validate_fixtures(root))
+    errors.extend(
+        f"mathtype compatibility: {error}"
+        for error in validate_mathtype_compatibility(root)
+    )
     return errors
 
 

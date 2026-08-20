@@ -8,5 +8,6 @@
 - [`features/advanced-omml-and-backend-config.spec.md`](features/advanced-omml-and-backend-config.spec.md) — принятый контракт этапов 077–089 для расширяемого редактируемого OMML, resource limits, reference Word smoke и явного DOCX equation backend.
 - [`features/mathml-renderer.spec.md`](features/mathml-renderer.spec.md) — контракт этапов 090–091 для bounded standalone Presentation MathML renderer и reviewable exact golden snapshots без подключения MathType/DOCX adapter.
 - [`features/experimental-mathtype-adapter.spec.md`](features/experimental-mathtype-adapter.spec.md) — контракт этапа 092 для pure offline adapter `MathExpression` → opaque bounded Presentation MathML payload без SDK/OLE/DOCX integration.
+- [`features/mathtype-compatibility-evidence.spec.md`](features/mathtype-compatibility-evidence.spec.md) — контракт этапа 093 для versioned compatibility matrix, evidence levels и воспроизводимого MathType import/edit smoke без преждевременного включения DOCX backend.
 
 Новые feature-SPEC создаются в `specs/features/` только когда системной спецификации недостаточно. `docs/ROADMAP.md`, `docs/PROMPTS.md` и `docs/TRACEABILITY.md` не являются источниками требований.

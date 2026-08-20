@@ -2,12 +2,12 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–092 реализованы и проверены; fallback-policy integration присутствует в `main`.
-- **Текущий продуктовый этап:** 092 завершён и интегрирован.
+- **Статус:** этапы 001–092 интегрированы в `main`; этап 093 реализован и проверен в `feature/stage-093-mathtype-compatibility`.
+- **Текущий продуктовый этап:** 093 (`compatibility doc`) завершён в feature-ветке; live MathType compatibility остаётся `UNVERIFIED`.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
-- **Blockers:** нет.
-- **Следующий ещё не начатый продуктовый этап:** 093 (`compatibility doc`).
+- **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
+- **Следующий продуктовый этап:** 094 (`feature-gated backend selection`) — `blocked by versioned live evidence`.
 
 ## Реализовано
 
@@ -24,6 +24,7 @@
 - `exporter-mathml`: отдельный bounded Presentation MathML Core renderer этапа 090 для real/identifier/subscript, basic binary operators, square root и paired grouping; реализует backend-neutral `EquationExporter` без подключения DOCX/MathType.
 - Этап 091: 17 reviewable standalone `.mathml` golden snapshots, exact inventory/byte comparison, canonical UTF-8/LF/root guard и recursive origin-invariance regression; production renderer/API не изменялись.
 - Этап 092: отдельный `exporter-mathtype` формирует opaque bounded Presentation MathML payload через production `MathMlRenderer`, не принимает raw XML и не подключает SDK/OLE/DOCX backend.
+- Этап 093: `docs/MATHTYPE_COMPATIBILITY.md` фиксирует exact 17-case matrix, official-source scope, независимые static/live/edit evidence statuses, read-only environment probe и воспроизводимый smoke protocol; validator запрещает missing/duplicate cases, неизвестные статусы и ложный `VERIFIED` при `NOT_RUN`.
 - Typed errors и configurable limits на JSON, XML, ZIP, images, AST/OMML depth, nodes и output bytes.
 
 ## Проверки этапов 001–092
@@ -72,17 +73,33 @@
 - `pnpm.cmd install --frozen-lockfile` — PASS.
 - `pnpm.cmd run typecheck` и `pnpm.cmd run build:web` — PASS.
 
+## Проверка этапа 093
+
+- Focused `test_mathtype_compatibility.py` — PASS, 9/9.
+- Python repository tests — PASS, 29/29.
+- `python -B scripts/validate_project.py` и `python -B scripts/validate_fixtures.py` — PASS.
+- `cargo fmt --all -- --check` — PASS.
+- `cargo test -p exporter-mathml --locked` — PASS, 10 integration tests.
+- `cargo test -p exporter-docx --locked` — PASS, 30 Rust tests.
+- `cargo test --workspace --locked` — PASS, 106 Rust tests.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
+- `pnpm.cmd run typecheck` и `pnpm.cmd run build:web` — PASS.
+- `git diff --check` — PASS; только информационные Windows LF→CRLF warnings.
+- Два read-only review-cycle завершены; все findings исправлены, включая fail-closed provenance records, календарные даты, artifact SHA-256 и уникальный overall status; финальная self-validation — PASS.
+- Live MathType Web/Desktop import/edit — `NOT_RUN / UNVERIFIED` по зафиксированной причине; static documentation не выдана за runtime evidence.
+
 ## Известные ограничения
 
 - Parser поддерживает подтверждённое legacy worksheet30/math30 подмножество, а не полный runtime XSD validator; Prime MCDX worksheet пока не имеет content parser.
 - Corpus преимущественно synthetic; совместимость расширяется только легально доступными образцами.
 - Document IR producer из worksheet AST ещё не реализован: `math-engine` остаётся каркасом.
 - DOCX subset поддерживает одну страницу, text, PNG/JPEG и поддержанные OMML equations. Table, plot/diagram без preview, unsupported blocks и multiple pages отклоняются явно.
-- MathML renderer и experimental adapter покрывают только принятый scalar subset. Adapter 092 лишь готовит payload; фактическая MathType compatibility не доказана, а DOCX `MathType` backend по-прежнему fail closed.
+- MathML renderer и experimental adapter покрывают только принятый scalar subset. Матрица этапа 093 документирует static coverage, но live MathType Web/Desktop compatibility не доказана; DOCX `MathType` backend по-прежнему fail closed.
 - CLI, API endpoints и пользовательский UI flow не реализованы; workspace не содержит CLI binary.
 - На Windows Rust MSVC требует Visual Studio Build Tools с workload `Desktop development with C++` и доступный `link.exe`.
 
 ## Следующие разумные действия
 
-1. Проверить и интегрировать текущую corrective fix-ветку только после явного решения владельца.
-2. После интеграции при отдельном запросе начать этап 093 (`compatibility doc`) с реальными import/smoke evidence без изменения DOCX backend.
+1. Проверить feature-ветку этапа 093 и интегрировать её только после явного решения владельца.
+2. Предоставить явно разрешённую среду MathType Web либо установленный MathType 7 + SDK license и выполнить 17-case live import/edit smoke по `docs/MATHTYPE_COMPATIBILITY.md`.
+3. Планировать этап 094 только после versioned `PASS` evidence для выбранной поверхности; до этого `EquationBackend::MathType` сохраняет typed fail-closed поведение.
