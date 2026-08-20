@@ -44,7 +44,8 @@
 | SPEC-08 графики | 123–132 | PlotIR/ChartIR, fallback предпросмотра и fixtures восстановления | planned |
 | SPEC-09 схемы | 133–142 | DiagramIR, растровый fallback и доказательства редактируемого POC VSDX | planned |
 | SPEC-13 локальный адаптер CLI | 148–153 | команды общего core `convert` и `inspect` и тесты структурированных отчётов | planned |
-| SPEC-10–11 веб-страницы и состояния конвертации | 154–161 | `apps/web/`, тесты компонентов, E2E, доступности и состояний ошибок | planned |
+| FR-WEB-SHELL-001..005, NFR-WEB-SHELL-001..002, SEC-WEB-SHELL-001 | 154 | `specs/features/visible-nextjs-shell.spec.md`; `apps/web/app/`; unit/component/integration render tests, static production build и Playwright desktop/mobile/light/dark interaction smoke | verified |
+| SPEC-10–11 converter UI и состояния конвертации | 155–161 | design compliance, dropzone, validation/settings/states, Error Boundary и localized error mapping | planned |
 | SPEC-16 интернационализация | 162–165 | внешние каталоги и проверка отсутствующих ключей в CI | planned |
 | SPEC-12 аутентификация и восстановление | 173–186 | граница аутентификации, тесты replay, brute force и восстановления | planned |
 | SPEC-13 API и ключи API | 166–172, 191–217 | `services/api/`, тесты контракта, авторизации, задач и идемпотентности | planned |

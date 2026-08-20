@@ -9,5 +9,6 @@
 - [`features/mathml-renderer.spec.md`](features/mathml-renderer.spec.md) — контракт этапов 090–091 для bounded standalone Presentation MathML renderer и reviewable exact golden snapshots без подключения MathType/DOCX adapter.
 - [`features/experimental-mathtype-adapter.spec.md`](features/experimental-mathtype-adapter.spec.md) — контракт этапа 092 для pure offline adapter `MathExpression` → opaque bounded Presentation MathML payload без SDK/OLE/DOCX integration.
 - [`features/mathtype-compatibility-evidence.spec.md`](features/mathtype-compatibility-evidence.spec.md) — контракт этапа 093 для versioned compatibility matrix, evidence levels и воспроизводимого MathType import/edit smoke без преждевременного включения DOCX backend.
+- [`features/visible-nextjs-shell.spec.md`](features/visible-nextjs-shell.spec.md) — контракт этапа 154 для первой видимой публичной Calm Blue UI оболочки без преждевременного upload/backend flow.
 
 Новые feature-SPEC создаются в `specs/features/` только когда системной спецификации недостаточно. `docs/ROADMAP.md`, `docs/PROMPTS.md` и `docs/TRACEABILITY.md` не являются источниками требований.

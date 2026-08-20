@@ -2,7 +2,7 @@
 
 > Каждый этап должен допускать независимое тестирование. Исполняемый текст prompts находится в `docs/PROMPTS.md`.
 
-**Текущий статус:** этапы 001–093 реализованы и проверены. Compatibility document этапа 093 имеет общий live-evidence статус `UNVERIFIED`; этап 094 заблокирован до versioned MathType import/edit `PASS`. Подробные доказательства и stage status находятся только в `docs/TRACEABILITY.md`.
+**Текущий статус:** этапы 001–093 реализованы и проверены; независимый frontend-этап 154 реализован и проверен в stacked feature-ветке. Compatibility document этапа 093 имеет общий live-evidence статус `UNVERIFIED`; этап 094 заблокирован до versioned MathType import/edit `PASS`. Следующий безопасный frontend-этап — 155. Подробные доказательства и stage status находятся только в `docs/TRACEABILITY.md`.
 
 ## Основа — 001–010
 
@@ -216,7 +216,7 @@
 
 ## Веб-интерфейс — 154–161
 
-- **154** — `Next.js shell`
+- **154** — `Next.js shell` — verified в `feature/stage-154-visible-nextjs-shell`
 - **155** — `design compliance checklist`
 - **156** — `dropzone`
 - **157** — `file validation UI`

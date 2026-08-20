@@ -1,20 +1,19 @@
 # Текущий план AI
 
 **Статус:** `completed`.
-**Завершённый продуктовый этап:** 093 — `compatibility doc`.
-**Последний интегрированный в `main` этап:** 092 — `experimental MathType adapter`.
-**Следующий продуктовый этап:** 094 — `feature-gated backend selection`, `blocked by versioned live evidence`.
+**Завершённый frontend-этап:** 154 — `Next.js shell`.
+**Ветка:** `feature/stage-154-visible-nextjs-shell`, stacked поверх commit этапа 093.
+**Следующий независимый frontend-этап:** 155 — `design compliance checklist`.
+**Backend-этап 094:** `blocked by versioned live evidence`.
 
 ## Результат
 
-- Создана и проиндексирована SPEC этапа 093.
-- `docs/MATHTYPE_COMPATIBILITY.md` сопоставляет exact 17-case golden inventory с official static coverage и отдельными live/edit statuses.
-- Локальный environment probe не обнаружил MathType/SDK; MathType Web/Desktop live smoke честно отмечен `NOT_RUN / UNVERIFIED`.
-- Project validator и девять новых negative/positive tests защищают inventory, evidence vocabulary и versioned provenance от завышенных compatibility claims.
-- Runtime crates, DOCX backend selection и fallback contract не изменены.
-- Unit, integration, component/build, workspace и lint checks прошли.
+- Создана и проиндексирована SPEC этапа 154.
+- Приняты три section-level ImageGen concept и извлечена Calm Blue UI композиция.
+- `/` стал видимой статически рендеримой landing shell с responsive navigation, light/dark/system, доступными landmarks и честным staged converter state.
+- Реальные upload, validation, conversion, API, billing и locale routing не имитируются и не реализованы раньше roadmap.
+- Unit/component/integration tests, typecheck, production build, project validator и Playwright visual/interaction QA прошли.
 
 ## Handoff
 
-Этап 094 не начинается автоматически: сначала требуется versioned live MathType import/edit `PASS` для явно выбранной поверхности.
-До появления такого evidence `EquationBackend::MathType` остаётся typed unavailable без silent fallback.
+Этап 155 может проверить design compliance и формализовать найденные отклонения перед добавлением dropzone на этапе 156. Этап 094 остаётся независимо заблокирован MathType live evidence.

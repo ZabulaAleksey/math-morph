@@ -606,3 +606,44 @@ read-only architecture/security review                           PASS
 - feature-gated DOCX backend.
 
 Эти вопросы относятся к этапам 093–094. До них `EquationBackend::MathType` продолжает возвращать typed unavailable error.
+
+## 2026-08-20 — Первая видимая public landing shell, этап 154
+
+### Что и зачем изменено
+
+Пустой маршрут `/` заменён статически рендеримой Next.js landing shell по Calm Blue UI. Страница показывает назначение MathMorph, synthetic workflow preview, возможности, будущий conversion flow, privacy/API/pricing/status и отдельно сообщает, что интерактивная загрузка ещё не подключена.
+
+### Ключевой поток управления
+
+```text
+content catalog
+  -> server-rendered HomePage
+  -> scoped Calm Blue CSS tokens
+  -> two small client boundaries: theme + compact navigation
+  -> static Next.js output
+```
+
+### Команды и проверки
+
+```text
+pnpm.cmd --filter @math-morph/web test
+pnpm.cmd --filter @math-morph/web typecheck
+pnpm.cmd --filter @math-morph/web build
+python -B scripts/validate_project.py
+node %TEMP%\mathmorph-stage154-qa.mjs
+```
+
+### Решения и trade-offs
+
+- Upload/file validation/backend intentionally remain stages 156+; CTA leads to an explicit unavailable state instead of imitating conversion.
+- User copy is isolated in a Ukrainian catalog; full locale routing remains stages 162–165.
+- The page is a server component; only theme and compact-menu interactions enter the client bundle.
+- Browser plugin failed before tab acquisition, so exact Playwright 1.62.1 was used temporarily outside the project without manifest/lockfile changes.
+
+### Как повторить самостоятельно
+
+1. Выполнить `pnpm.cmd --filter @math-morph/web dev` и открыть `/`.
+2. Проверить hero CTA и ссылку «Як це працює».
+3. Переключить `system → light → dark` и перезагрузить страницу.
+4. На ширине 390 px открыть menu, выбрать «Приватність» и убедиться, что menu закрыт, а focus вернулся к кнопке.
+5. Запустить unit/component/integration tests, typecheck и production build.

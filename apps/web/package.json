@@ -9,6 +9,7 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
+    "test": "tsc -p tsconfig.test.json && node --test .next/test-dist/tests/landing-page.test.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -2,18 +2,19 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–092 интегрированы в `main`; этап 093 реализован и проверен в `feature/stage-093-mathtype-compatibility`.
-- **Текущий продуктовый этап:** 093 (`compatibility doc`) завершён в feature-ветке; live MathType compatibility остаётся `UNVERIFIED`.
+- **Статус:** этапы 001–092 интегрированы в `main`; этап 093 и независимый frontend-этап 154 реализованы и проверены в stacked feature-ветке `feature/stage-154-visible-nextjs-shell`.
+- **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующий продуктовый этап:** 094 (`feature-gated backend selection`) — `blocked by versioned live evidence`.
+- **Следующие этапы:** 155 (`design compliance checklist`) можно выполнять независимо; 094 (`feature-gated backend selection`) остаётся `blocked by versioned live evidence`.
 
 ## Реализовано
 
 - Воспроизводимый Cargo/uv/pnpm monorepo, project overlay, canonical docs и versioned fixture corpus.
 - Безопасная входная граница XMCD/MCDX, worksheet30 parser и синтаксический Math AST этапов 015–051.
-- Утверждён канонический MathMorph Calm Blue UI design contract с `light`, `dark`, `system` и независимыми accessibility/density/workspace modes; пользовательский UI flow ещё не реализован.
+- Утверждён канонический MathMorph Calm Blue UI design contract с `light`, `dark`, `system` и независимыми accessibility/density/workspace modes.
+- Этап 154: `/` статически рендерит видимую украинскую public landing shell с responsive navigation, hero/workflow preview, feature/process/privacy/API/pricing/status sections, честным staged converter state и переключателем `system → light → dark` без flash.
 - `math-model`: source-neutral AST, boolean expressions, units, `UnsupportedNode`, строгий Serde contract и redacted `Debug`.
 - `document-ir`: versioned V1 JSON envelope, metadata/pages/layout, text/equation/table/image/plot/diagram blocks, provenance/fidelity и external asset ports.
 - `exporter-docx`: детерминированный OPC/DOCX subset, WordprocessingML text/styles, bounded PNG/JPEG embedding, page settings и fail-closed structural validator.
@@ -88,6 +89,18 @@
 - Два read-only review-cycle завершены; все findings исправлены, включая fail-closed provenance records, календарные даты, artifact SHA-256 и уникальный overall status; финальная self-validation — PASS.
 - Live MathType Web/Desktop import/edit — `NOT_RUN / UNVERIFIED` по зафиксированной причине; static documentation не выдана за runtime evidence.
 
+## Проверка этапа 154
+
+- `pnpm.cmd --filter @math-morph/web test` — PASS, unit/component/integration 3/3.
+- `pnpm.cmd --filter @math-morph/web typecheck` — PASS.
+- `pnpm.cmd --filter @math-morph/web build` — PASS; `/` статически prerendered.
+- `python -B scripts/validate_project.py` — PASS.
+- Playwright 1.62.1 production smoke на `1440 × 1000`, `390 × 844` и граничных `320 × 800` — PASS: правильные URL/title/landmarks, нет blank/overlay/console errors, нет horizontal overflow; keyboard menu также проверен с `forced-colors` и `reduced-motion`.
+- Interaction smoke — PASS: hero anchor, theme `system → light → dark`, compact menu open → privacy anchor → close → focus return.
+- Visual QA accepted concepts ↔ latest desktop/mobile/dark screenshots — PASS; сохранены плоский primary token, thin borders, whitespace, section hierarchy и staged-state copy.
+- Финальный независимый Lighthouse review на `320 × 900` — PASS: Accessibility, Best Practices и SEO получили `100` в light и dark themes; contrast regression закрыт через semantic `--cbui-color-primary-text`.
+- Встроенный Browser runtime не загрузился из-за инфраструктурного запрета импорта `node:process`; использован разрешённый Playwright fallback без изменения project dependencies/lockfile.
+
 ## Известные ограничения
 
 - Parser поддерживает подтверждённое legacy worksheet30/math30 подмножество, а не полный runtime XSD validator; Prime MCDX worksheet пока не имеет content parser.
@@ -95,11 +108,13 @@
 - Document IR producer из worksheet AST ещё не реализован: `math-engine` остаётся каркасом.
 - DOCX subset поддерживает одну страницу, text, PNG/JPEG и поддержанные OMML equations. Table, plot/diagram без preview, unsupported blocks и multiple pages отклоняются явно.
 - MathML renderer и experimental adapter покрывают только принятый scalar subset. Матрица этапа 093 документирует static coverage, но live MathType Web/Desktop compatibility не доказана; DOCX `MathType` backend по-прежнему fail closed.
-- CLI, API endpoints и пользовательский UI flow не реализованы; workspace не содержит CLI binary.
+- CLI, API endpoints и интерактивный converter flow не реализованы; public landing shell видима, но не содержит file input или сетевых запросов. Workspace не содержит CLI binary.
+- Пользовательские строки stage 154 изолированы в украинском typed catalog, но полноценные locale routing/catalog loading и проверка отсутствующих ключей остаются этапами 162–165; текущая shell не является полной i18n-реализацией.
 - На Windows Rust MSVC требует Visual Studio Build Tools с workload `Desktop development with C++` и доступный `link.exe`.
 
 ## Следующие разумные действия
 
-1. Проверить feature-ветку этапа 093 и интегрировать её только после явного решения владельца.
-2. Предоставить явно разрешённую среду MathType Web либо установленный MathType 7 + SDK license и выполнить 17-case live import/edit smoke по `docs/MATHTYPE_COMPATIBILITY.md`.
-3. Планировать этап 094 только после versioned `PASS` evidence для выбранной поверхности; до этого `EquationBackend::MathType` сохраняет typed fail-closed поведение.
+1. Проверить stacked feature-ветку `feature/stage-154-visible-nextjs-shell` и интегрировать её только после явного решения владельца.
+2. Выполнить этап 155 (`design compliance checklist`) перед dropzone; затем этап 156 может добавить реальный выбор файла без имитации backend.
+3. Предоставить явно разрешённую среду MathType Web либо установленный MathType 7 + SDK license и выполнить 17-case live import/edit smoke по `docs/MATHTYPE_COMPATIBILITY.md`.
+4. Планировать этап 094 только после versioned `PASS` evidence; до этого `EquationBackend::MathType` сохраняет typed fail-closed поведение.
