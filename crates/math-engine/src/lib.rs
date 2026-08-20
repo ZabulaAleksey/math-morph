@@ -1,5 +1,12 @@
 //! Backend-neutral presentation transformations for the source math AST.
 
+pub mod symbol_table;
+
+pub use symbol_table::{
+    FunctionKey, FunctionSymbolDefinition, SymbolDefinition, SymbolInput, SymbolKey, SymbolTable,
+    SymbolTableError, SymbolTableLimits, VariableDefinition,
+};
+
 use math_model::{DefinitionStyle, Identifier, MathExpression, MathExpressionKind};
 use std::{collections::BTreeMap, fmt};
 

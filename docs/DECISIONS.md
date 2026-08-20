@@ -298,6 +298,22 @@ MathMorph хранит только предметную delta в:
 
 **Связанные требования:** `FR-CLI-OUTPUT-148`, `NFR-CLI-148`, `SEC-CLI-148`.
 
+## ADR-0017 — SymbolTable сохраняет ordered revisions и проверяет borrowed AST до клонирования
+
+**Статус:** принято, 2026-08-20.
+
+**Контекст:** Mathcad допускает повторные определения, а подстановка должна видеть последнюю revision только до точки использования. Простая map `symbol → latest value` теряет историю и позволяет позднему определению влиять назад. Public AST также может содержать много узлов, большие строки и вложенные коллекции.
+
+**Решение:** `math-engine::SymbolTable` разделяет scalar/function namespaces, включает arity в function key, требует строго возрастающие source ordinals и хранит ordered revision history. Visibility API использует правило `definition.ordinal < use.ordinal`. Build принимает borrowed expressions, выполняет cumulative node/text/collection и per-identifier preflight до клонирования, после чего сохраняет одну canonical AST-копию через `Arc`.
+
+**Последствия:** этапы 101–111 обязаны использовать visible-before lookup, а не глобальный latest. Local/global scope и function execution не угадываются на этапе 100. API остаётся backend-neutral и не зависит от parser, Document IR или exporter.
+
+**Fallback / rollback:** при malformed target, неверном порядке или превышении budget операция завершается typed fail-closed error без частичной таблицы. Эвристический lookup и повторный запуск без лимитов запрещены.
+
+**Проверка:** targeted unit/integration regressions, extreme-depth subprocess, workspace tests, Clippy, independent review и security review.
+
+**Связанные требования:** `FR-SEMANTIC-100`, `NFR-SEMANTIC-001`, `SEC-SEMANTIC-001`.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

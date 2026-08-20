@@ -226,6 +226,8 @@ XML paths используют explicit stack depth limits (`quick-xml` reader +
 
 Этап 090 добавляет отдельную выходную границу Presentation MathML. `exporter-mathml` создаёт только фиксированные MathML Core elements/attributes, не принимает raw XML, namespace, DTD, URL или external resource и проверяет/экранирует весь dynamic text. Depth, nodes, cumulative input text bytes и output bytes ограничены до сериализации; traversal итеративен. Borrowed renderer принимает уже bounded AST: construction/deserialization и teardown произвольно глубокой caller-owned структуры остаются обязанностью безопасного Document IR entry point и caller-а. Project validator отдельно запрещает незаявленные normal/build/dev/target-specific зависимости нового crate.
 
+Этап 100 добавляет semantic input boundary `SymbolTable`. Public build принимает borrowed AST, применяет cumulative limits на expressions, definitions, AST nodes, payload text bytes и элементы коллекций до первой clone/index allocation, отдельно ограничивает один identifier и требует строго возрастающие source ordinals. Каждое определение имеет одну canonical `Arc<MathExpression>` копию; history/ordered indices не дублируют глубокий AST. `Debug` и lookup failures не раскрывают identifier/literal payload.
+
 ## Обязательные проверки безопасности по типу изменения
 
 | Изменение | Минимальные проверки |

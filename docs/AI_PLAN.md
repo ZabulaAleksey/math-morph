@@ -15,18 +15,21 @@
 ## Порядок
 
 1. Baseline и gap audit 094/100–142 — completed.
-2. Этап 100 `SymbolTable` — in progress.
-3. Этапы 101–111 — pending.
-4. Этапы 112–122 — pending.
-5. Этапы 123–132 — pending.
-6. Этапы 133–142 — pending.
-7. Full regression, reviewer/security review, traceability/status — pending.
-8. Этап 094 — blocked by external licensed live evidence.
+2. Этап 100 `SymbolTable` — completed.
+3. Этапы 101–105 — next.
+4. Этапы 106–111 — pending.
+5. Этапы 112–122 — pending.
+6. Этапы 123–132 — pending.
+7. Этапы 133–142 — pending.
+8. Full regression, reviewer/security review, traceability/status — pending.
+9. Этап 094 — blocked by external licensed live evidence.
 
 ## Канонические контракты
 
 - `specs/features/transformation-pipeline.spec.md`
 - `specs/features/semantic-dependency-analysis.spec.md`
+- `specs/features/substitution-and-evaluation-display.spec.md`
+- `specs/features/complex-numbers.spec.md`
 - `specs/features/conversion-pipeline-and-report.spec.md`
 - `specs/features/minimal-cli-convert.spec.md`
-- `docs/DECISIONS.md` — ADR-0015, ADR-0016
+- `docs/DECISIONS.md` — ADR-0015, ADR-0016, ADR-0017

@@ -94,7 +94,7 @@ bytes
 
 Функциональный путь этапов 095–148 добавляет поверх parser две production-границы:
 
-- `math-engine`: bounded immutable `Original AST → Display AST` presentation pipeline; он не выполняет evaluation и не изменяет исходное дерево;
+- `math-engine`: bounded immutable `Original AST → Display AST` presentation pipeline и backend-neutral semantic foundation `SymbolTable`; таблица хранит ordered revisions и не выполняет evaluation/substitution;
 - `conversion-core`: application orchestration `detect → parse → transform → Document IR → DOCX export → DOCX validate`, bounded diagnostics/report и explicit `Strict`/`AllowSafePartial` policy.
 
 Текущий живой поток:

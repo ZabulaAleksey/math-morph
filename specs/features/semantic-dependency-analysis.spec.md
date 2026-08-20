@@ -23,9 +23,9 @@
 
 ### FR-SEMANTIC-100 — `SymbolTable`
 
-`SymbolTable` строится по упорядоченной последовательности top-level `MathExpression`. Он индексирует только `Definition` с identifier target и `FunctionDefinition` с identifier name и identifier-only parameters. Для каждой записи сохраняются стабильный source ordinal, тип определения и неизменённый cloned expression.
+`SymbolTable` строится по последовательности top-level `MathExpression` со строго возрастающими source ordinals. Он индексирует только `Definition` с identifier target и `FunctionDefinition` с identifier name и identifier-only parameters. Для каждой записи сохраняются стабильный source ordinal, тип определения и одна каноническая неизменённая копия expression; индексы и ordered views могут разделять её через `Arc`.
 
-Неопределяющие выражения не становятся символами. Правая часть определения и body функции на этом этапе не обходятся, не вычисляются и не подставляются. Повторные определения одного ключа доступны как детерминированная история в source order; lookup последней revision не удаляет предыдущие.
+Неопределяющие выражения не становятся символами. Правая часть определения и body функции на этом этапе не обходятся семантически, не вычисляются и не подставляются; bounded resource preflight обязан проверить их форму до клонирования. Повторные определения одного ключа доступны как детерминированная история в source order; lookup последней revision не удаляет предыдущие. Для последующих этапов доступен отдельный lookup последней revision строго перед ordinal точки использования.
 
 ### FR-SEMANTIC-101 — variable references
 
@@ -33,11 +33,11 @@ Reference collector извлекает свободные variable/function refe
 
 ### FR-SEMANTIC-102 — dependency graph
 
-Dependency graph связывает каждую definition revision с видимыми referenced definitions. Граф сохраняет source ordinals и детерминированный порядок рёбер. Неизвестные и неоднозначные ссылки не создают guessed edge.
+Dependency graph связывает каждую definition revision с видимыми referenced definitions. Scalar reference разрешается только в последнюю revision со строго меньшим source ordinal; поздние определения не влияют назад. Function body может ссылаться на собственную callable revision только для обнаружения recursion/cycle, но не для неявного выполнения. Граф сохраняет source ordinals и детерминированный порядок рёбер. Неизвестные и неоднозначные ссылки не создают guessed edge.
 
 ### FR-SEMANTIC-103 — worksheet evaluation order
 
-Для ациклического графа возвращается стабильный topological order. При нескольких допустимых узлах tie-break выполняется по source ordinal. Original worksheet/AST не переставляется и не изменяется.
+Для ациклического графа возвращается стабильный topological order, совместимый с top-to-bottom worksheet visibility. При нескольких допустимых узлах tie-break выполняется по source ordinal. Forward reference не переупорядочивает worksheet, а диагностируется как undefined. Original worksheet/AST не переставляется и не изменяется.
 
 ### FR-SEMANTIC-104 — undefined-variable diagnostic
 
@@ -49,7 +49,7 @@ Dependency graph связывает каждую definition revision с види
 
 ### NFR-SEMANTIC-001 — resource limits
 
-Public analysis entry points ограничивают число входных expressions, definitions, references, graph nodes/edges и глубину AST. Значения выше hard ceilings или нулевые обязательные budgets отклоняются как `InvalidLimits`. Переполнение счётчиков завершается typed error.
+Public analysis entry points ограничивают число входных expressions, definitions, references, graph nodes/edges, глубину и суммарное число AST nodes, суммарные payload text bytes, размер одного identifier и число элементов вложенных коллекций. Проверка borrowed AST выполняется до clone/index allocation. Значения выше hard ceilings или нулевые обязательные budgets отклоняются как `InvalidLimits`. Переполнение счётчиков завершается typed error.
 
 ### SEC-SEMANTIC-001 — data minimization
 
@@ -62,6 +62,7 @@ Public analysis entry points ограничивают число входных 
 - `AC-SEMANTIC-100-C`: non-definition expressions не попадают в таблицу; RHS/body остаются неизменными и не вычисляются.
 - `AC-SEMANTIC-100-D`: malformed targets/parameters и resource limits дают typed redacted errors.
 - `AC-SEMANTIC-100-E`: одинаковый input и limits дают равный `SymbolTable`; Original AST не изменяется.
+- `AC-SEMANTIC-100-F`: cumulative node/text/collection budgets применяются до clone, AST хранится одной canonical копией, а visible-before lookup не видит текущую или позднюю revision.
 
 ## 5. Критерии приёмки этапов 101–105
 

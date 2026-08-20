@@ -705,3 +705,28 @@ cargo run -p mathmorph-cli --bin mathmorph --locked -- convert ./path/to/input.x
 3. Открыть созданный `.docx` в Word и проверить, что формула редактируется как equation.
 4. Повторить команду без удаления output и убедиться, что файл не перезаписывается.
 5. Запустить `cargo test -p mathmorph-cli --locked` и `cargo test -p conversion-core --locked`.
+
+## 2026-08-20 — Этап 100: ordered и bounded `SymbolTable`
+
+### Что изменено
+
+- `math-engine` индексирует scalar и function definitions раздельно, хранит повторные revisions и выбирает только definition строго до точки использования.
+- Borrowed AST проверяется до clone по cumulative budgets; одна canonical копия разделяется через `Arc`.
+- Ошибки и `Debug` не содержат имена символов, literals или полный AST.
+
+### Команды проверки
+
+```powershell
+cargo test -p math-engine --locked
+cargo clippy -p math-engine --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+python -B scripts/validate_project.py
+```
+
+### Как повторить самостоятельно
+
+1. Создать два определения одной переменной с разными source ordinals.
+2. Проверить, что history содержит обе revisions.
+3. Вызвать visible-before lookup перед первой, между первой и второй и после второй revision.
+4. Уменьшить node/text limit и убедиться, что возвращается typed error без partial table.
+5. Запустить targeted tests и Clippy.
