@@ -2,11 +2,12 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–092 реализованы и проверены.
-- **Текущий этап:** 092 — `experimental MathType adapter` завершён в отдельной feature-ветке.
-- **В работе:** интеграция завершённого этапа 092 в `main`; продуктовая реализация следующего этапа ещё не начата.
+- **Статус:** этапы 001–092 реализованы и проверены; fallback-policy integration присутствует в `main`.
+- **Текущий продуктовый этап:** 092 завершён и интегрирован.
+- **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
+- **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** нет.
-- **Следующий ещё не начатый этап:** 093 (`compatibility doc`).
+- **Следующий ещё не начатый продуктовый этап:** 093 (`compatibility doc`).
 
 ## Реализовано
 
@@ -58,6 +59,19 @@
 - Read-only architecture/security review — PASS, существенных findings нет.
 - `EquationBackend::MathType` намеренно остаётся `EquationBackendUnavailable`.
 
+## Проверка corrective stage
+
+- `python -B scripts/validate_project.py` — PASS.
+- `python -B scripts/validate_fixtures.py` — PASS.
+- Python repository tests — PASS, 20/20.
+- TOML subagent configs — PASS через Python `tomllib`.
+- `cargo fmt --all -- --check` — PASS.
+- `cargo test --workspace --locked` — PASS.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
+- Node `v22.23.1` и pnpm `11.20.0` соответствуют project contract.
+- `pnpm.cmd install --frozen-lockfile` — PASS.
+- `pnpm.cmd run typecheck` и `pnpm.cmd run build:web` — PASS.
+
 ## Известные ограничения
 
 - Parser поддерживает подтверждённое legacy worksheet30/math30 подмножество, а не полный runtime XSD validator; Prime MCDX worksheet пока не имеет content parser.
@@ -70,6 +84,5 @@
 
 ## Следующие разумные действия
 
-1. Создать один checkpoint commit этапа 092 и отправить временную ветку в origin.
-2. Интегрировать ветку в `main` только после явного решения владельца.
-3. После интеграции начать этап 093 (`compatibility doc`) с реальными import/smoke evidence без изменения DOCX backend.
+1. Проверить и интегрировать текущую corrective fix-ветку только после явного решения владельца.
+2. После интеграции при отдельном запросе начать этап 093 (`compatibility doc`) с реальными import/smoke evidence без изменения DOCX backend.
