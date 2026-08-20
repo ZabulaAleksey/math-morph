@@ -216,6 +216,43 @@ POST conversion
 
 Частичная конвертация допускается только тогда, когда результат не вводит пользователя в заблуждение. Неподдерживаемая структура не должна исчезать незаметно.
 
+### 6.1 Recovery, retry и degraded mode
+
+Общий контракт retry/fallback/degraded/fail-closed наследуется из
+`~/codex-workspace/rules/fallback-policy.md`.
+
+MathMorph-specific цепочки являются каноническими в:
+
+`docs/FALLBACKS.md`
+
+Этот архитектурный документ не дублирует полный fallback contract.
+Его задача — определить компоненты и интерфейсы, необходимые для:
+
+- typed failures;
+- idempotency;
+- reconciliation после неизвестного результата mutation;
+- cancellation;
+- retry state;
+- recovery после disconnect;
+- observable degraded state;
+- partial-result reporting.
+
+Правило для операций с неизвестным side effect:
+
+`unknown side effect → reconciliation → retry/fallback`
+
+а не:
+
+`unknown side effect → повторить mutation`.
+
+Security-sensitive failure не переводится в менее безопасный режим:
+authentication, authorization, integrity, crypto, security validation
+и hard resource limits завершаются fail closed согласно `docs/SECURITY.md`.
+
+Конкретные product-specific цепочки parser, Mathcad version handling,
+DOCX/MathType backend, assets, partial conversion, local/WASM,
+server processing и API recovery определены только в `docs/FALLBACKS.md`.
+
 ## 7. Scaling
 
 Этап 1: Docker Compose, один API и worker.

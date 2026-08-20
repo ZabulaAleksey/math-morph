@@ -12,7 +12,26 @@
 - API: `services/api/AGENTS.md`.
 - Веб-интерфейс: `apps/web/AGENTS.md`.
 - Тесты и fixtures: `tests/AGENTS.md`.
-- Автоматически прогоняй unit, integration и component тесты после изменений; изменения тестовых файлов выполняются только в отдельном согласованном этапе.
+ - Автоматически прогоняй unit, integration и component тесты после изменений; изменения тестовых файлов выполняются только в отдельном согласованном этапе.
+ - После первой генерации изменений тестов/логики: все принятые (stabilized) тесты, fixtures и golden-сценарии запускаются только для верификации, без редактирования/удаления до отдельного согласованного этапа изменения контрактов.
+
+## Fallback routing
+
+Для задачи, содержащей retry, fallback, degraded mode, recovery,
+альтернативный backend или частичный результат, прочитай:
+
+`~/codex-workspace/rules/fallback-policy.md`
+
+и затем:
+
+`docs/FALLBACKS.md`
+
+Глобальный fallback contract не дублируется в проекте.
+`docs/FALLBACKS.md` содержит только MathMorph-specific delta.
+
+Security invariants имеют приоритет над availability:
+fallback не может ослаблять validation, limits, authorization,
+crypto, sandbox или privacy guarantees.
 
 ## Инварианты проекта
 

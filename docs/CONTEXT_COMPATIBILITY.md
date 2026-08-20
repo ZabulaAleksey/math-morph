@@ -23,6 +23,8 @@ MathMorph является предметным overlay над `~/codex-workspac
 | MCP | глобальная конфигурация и plugins | подтверждённого проектного сервера нет | `INHERITED` | проектный MCP-шаблон удалён |
 | Codex config | глобальная конфигурация | ограничить размер project docs | `EXTEND` | `.codex/config.toml` содержит только `project_doc_max_bytes` |
 | Документация context pack | project framework workspace | после создания репозитория не нужна | `OBSOLETE` | distribution README, manifest и дублирующие policy/inventory docs удалены |
+| Глобальная Fallback Policy | `~/codex-workspace/rules/fallback-policy.md` | общий retry/fallback/degraded/fail-closed contract | `INHERITED` | не копировать глобальную policy |
+| MathMorph fallback catalog | глобальная policy не содержит семантики Mathcad | parser/export/backend/privacy/recovery delta | `EXTEND` | `docs/FALLBACKS.md` |
 
 ## Правила расширения
 

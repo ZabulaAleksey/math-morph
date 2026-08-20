@@ -238,3 +238,29 @@ XML paths используют explicit stack depth limits (`quick-xml` reader +
 - [ ] Ограничения и timeout учтены.
 - [ ] Влияние на зависимости и цепочку поставки проверено.
 - [ ] Режим сбоя документирован, а для средств безопасности исключён fail-open.
+
+## Fallback security invariants
+
+Fallback не может ослаблять security boundary MathMorph.
+
+Для следующих классов действует fail closed:
+
+- authentication;
+- authorization;
+- encryption/decryption integrity;
+- signatures;
+- resource/security limits;
+- unsafe ZIP/XML/container input;
+- forbidden active content;
+- secret handling.
+
+Запрещено:
+
+- crypto failure → plaintext;
+- parser limit → повтор parsing без limit;
+- invalid signature → принять payload;
+- authorization failure → более слабый путь доступа;
+- local/WASM failure → незаметно отправить документ на server processing;
+- обязательный security review недоступен → считать review пройденным.
+
+Project-specific цепочки описаны в `docs/FALLBACKS.md`.
