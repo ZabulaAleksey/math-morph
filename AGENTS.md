@@ -12,8 +12,7 @@
 - API: `services/api/AGENTS.md`.
 - Веб-интерфейс: `apps/web/AGENTS.md`.
 - Тесты и fixtures: `tests/AGENTS.md`.
- - Автоматически прогоняй unit, integration и component тесты после изменений; изменения тестовых файлов выполняются только в отдельном согласованном этапе.
- - После первой генерации изменений тестов/логики: все принятые (stabilized) тесты, fixtures и golden-сценарии запускаются только для верификации, без редактирования/удаления до отдельного согласованного этапа изменения контрактов.
+- Автоматически прогоняй unit, integration и component тесты после изменений; изменения тестовых файлов выполняются только в отдельном согласованном этапе.
 
 ## Fallback routing
 
@@ -52,7 +51,7 @@ crypto, sandbox или privacy guarantees.
 
 ### Unit / integration / component
 - Rust-workspace: `cargo test --workspace`
-- Web-слой: `cd apps/web; npm run typecheck`
+- Web-слой: `pnpm --filter @math-morph/web typecheck`
 - Проектная валидация интеграции: `python scripts/validate_project.py`
 
 ### E2E

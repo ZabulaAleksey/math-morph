@@ -24,6 +24,7 @@ REQUIRED_FILES = (
     "docs/DEPENDENCIES.md",
     "docs/DECISIONS.md",
     "docs/DESIGN.md",
+    "docs/FALLBACKS.md",
     "docs/FORMATS.md",
     "docs/AI_PLAN.md",
     "docs/AI_STATUS.md",
@@ -135,6 +136,7 @@ def _scoped_dependency_tables(manifest: dict) -> list[str]:
                 scopes.append(f"target.{target}.{section}")
     return sorted(scopes)
 
+
 CANONICAL_DOCUMENTS = (
     "README.md",
     "specs/README.md",
@@ -145,6 +147,7 @@ CANONICAL_DOCUMENTS = (
     "docs/DECISIONS.md",
     "docs/DEPENDENCIES.md",
     "docs/DESIGN.md",
+    "docs/FALLBACKS.md",
     "docs/FORMATS.md",
     "docs/AI_PLAN.md",
     "docs/AI_STATUS.md",
@@ -203,7 +206,8 @@ def _validate_markdown_links(root: Path, errors: list[str]) -> None:
             resolved = (markdown.parent / target).resolve()
             if not resolved.exists():
                 relative = markdown.relative_to(root)
-                errors.append(f"broken Markdown link in {relative}: {raw_target}")
+                errors.append(
+                    f"broken Markdown link in {relative}: {raw_target}")
 
 
 def validate_project(root: Path) -> list[str]:
@@ -228,7 +232,8 @@ def validate_project(root: Path) -> list[str]:
             continue
         for marker in markers:
             if marker not in contents:
-                errors.append(f"context contract {relative} is missing marker: {marker}")
+                errors.append(
+                    f"context contract {relative} is missing marker: {marker}")
 
     for relative in CANONICAL_DOCUMENTS:
         path = root / relative
@@ -240,14 +245,16 @@ def validate_project(root: Path) -> list[str]:
         spec_text = spec.read_text(encoding="utf-8")
         for requirement in ("NFR-FOUNDATION-001", "NFR-CONTEXT-001", "AC-FOUNDATION-001"):
             if requirement not in spec_text:
-                errors.append(f"system SPEC is missing requirement: {requirement}")
+                errors.append(
+                    f"system SPEC is missing requirement: {requirement}")
 
     config = root / ".codex/config.toml"
     if config.is_file():
         active_config = _load_toml(config, errors)
         for forbidden in ("mcp_servers", "hooks", "agents"):
             if forbidden in active_config:
-                errors.append(f"project config must not override global {forbidden}")
+                errors.append(
+                    f"project config must not override global {forbidden}")
 
     actual_agents: set[str] = set()
     for path in (root / ".codex/agents").glob("*.toml"):
@@ -259,19 +266,23 @@ def validate_project(root: Path) -> list[str]:
             if not data.get(field):
                 errors.append(f"{path.relative_to(root)} is missing {field}")
     if actual_agents != EXPECTED_AGENTS:
-        errors.append(f"unexpected active agents: {sorted(actual_agents ^ EXPECTED_AGENTS)}")
+        errors.append(
+            f"unexpected active agents: {sorted(actual_agents ^ EXPECTED_AGENTS)}")
 
     skills_root = root / ".agents/skills"
-    actual_skills = {path.name for path in skills_root.iterdir() if path.is_dir()} if skills_root.is_dir() else set()
+    actual_skills = {path.name for path in skills_root.iterdir(
+    ) if path.is_dir()} if skills_root.is_dir() else set()
     if actual_skills != EXPECTED_SKILLS:
-        errors.append(f"unexpected active Skills: {sorted(actual_skills ^ EXPECTED_SKILLS)}")
+        errors.append(
+            f"unexpected active Skills: {sorted(actual_skills ^ EXPECTED_SKILLS)}")
 
     cargo_path = root / "Cargo.toml"
     if cargo_path.is_file():
         cargo = _load_toml(cargo_path, errors)
         members = set(cargo.get("workspace", {}).get("members", []))
         if members != set(EXPECTED_CRATES):
-            errors.append(f"unexpected Cargo workspace members: {sorted(members ^ set(EXPECTED_CRATES))}")
+            errors.append(
+                f"unexpected Cargo workspace members: {sorted(members ^ set(EXPECTED_CRATES))}")
         for relative, expected_name in EXPECTED_CRATES.items():
             manifest_path = root / relative / "Cargo.toml"
             source_path = root / relative / "src/lib.rs"
@@ -307,8 +318,10 @@ def validate_project(root: Path) -> list[str]:
     cargo_lock_path = root / "Cargo.lock"
     if cargo_lock_path.is_file():
         cargo_lock = _load_toml(cargo_lock_path, errors)
-        locked_packages = {package.get("name") for package in cargo_lock.get("package", [])}
-        missing_workspace_crates = set(EXPECTED_CRATES.values()) - locked_packages
+        locked_packages = {package.get("name")
+                           for package in cargo_lock.get("package", [])}
+        missing_workspace_crates = set(
+            EXPECTED_CRATES.values()) - locked_packages
         if missing_workspace_crates:
             errors.append(
                 f"Cargo.lock is missing workspace crates: {sorted(missing_workspace_crates)}"
@@ -326,7 +339,8 @@ def validate_project(root: Path) -> list[str]:
         dependencies = web.get("dependencies", {})
         for dependency in ("next", "react", "react-dom"):
             if dependency not in dependencies:
-                errors.append(f"web scaffold is missing dependency: {dependency}")
+                errors.append(
+                    f"web scaffold is missing dependency: {dependency}")
         if not (root / "apps/web/app/layout.tsx").is_file() or not (root / "apps/web/app/page.tsx").is_file():
             errors.append("web scaffold is missing required App Router files")
 
