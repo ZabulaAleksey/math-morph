@@ -6,3 +6,5 @@
 - Layout и physical sizes хранятся как integer micrometres; `f32/f64` в wire contract запрещены.
 - Binary assets не сериализуются: IR хранит `AssetRefIr`, bytes предоставляет `AssetResolver`.
 - `Debug` и ошибки не раскрывают text, formula payload, metadata или asset IDs.
+- Unknown schema/version не проглатывается через permissive fallback:
+  используй явную migration либо typed incompatibility error.

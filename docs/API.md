@@ -30,6 +30,22 @@
 
 Для больших файлов upload может использовать chunked/resumable flow с checksum и атомарной финализацией. Download поддерживает Range/resume и обновление короткоживущего signed URL после авторизации по стабильному document/job/export ID.
 
+## Retry, reconciliation и degraded service
+
+Client/server retry выполняется только для документированных transient failures.
+
+Invalid input, unsupported version, authorization failure,
+integrity failure и security/resource limit не retryable.
+
+Если connection потеряно после mutation и неизвестно,
+успела ли операция завершиться, client сначала восстанавливает состояние
+по job ID/idempotency key.
+
+Не создавай новую conversion автоматически.
+
+Временная недоступность вспомогательной инфраструктуры
+не должна превращать неизвестное состояние в повторный side effect.
+
 ## Состояния задач
 
 `created`, `queued`, `processing`, `completed`, `completed_with_warnings`, `failed`, `cancelled`, `expired`.

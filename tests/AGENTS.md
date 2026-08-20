@@ -25,3 +25,21 @@
   3. Аутентификация/2FA/восстановление и выдача API key.
   4. Прогресс конвертации, перезапуск после обрыва сети и восстановление скачивания.
 - Если отсутствует production-ready backend, API или CLI путь для любого сценария, оставляй явную пометку `BLOCKED_BY_BACKEND_<scen>` в `docs/ROADMAP.md` или `docs/AI_STATUS.md`; сценарий не считается закрытым до появления рабочего пути.
+
+## Fallback contract tests
+
+Для изменяемой значимой fallback-цепочки проверяй применимые сценарии:
+
+1. primary success;
+2. retryable failure + retry success;
+3. exhausted retries;
+4. non-retryable failure не повторяется;
+5. fallback success;
+6. degraded result явно помечен;
+7. fallback unavailable → fail closed;
+8. unknown side effect → reconciliation;
+9. повтор не создаёт duplicate resource/job;
+10. security failure не ослабляет validation/policy;
+11. sensitive payload не попадает в fallback telemetry/errors.
+
+Более слабый test/evidence не повышается до более сильного уровня.

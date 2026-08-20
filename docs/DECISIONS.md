@@ -204,6 +204,60 @@
 
 **Связанные требования:** `specs/features/experimental-mathtype-adapter.spec.md`, SPEC-05.
 
+## ADR-0014 — Project-specific fallback catalog имеет один канонический источник
+
+**Статус:** принято 2026-08-20.
+
+**Контекст:** в MathMorph правила отказа и деградации исторически появились
+в `SECURITY.md`, feature SPEC, отдельных ADR, `ARCHITECTURE.md`,
+локальных `AGENTS.md`, Skills и кодовых контрактах.
+
+Эти документы описывают разные аспекты системы, но без отдельного
+project-specific каталога существует риск drift, silent fallback
+и появления нескольких конкурирующих описаний одной цепочки.
+
+**Решение:** общий контракт retry/fallback/degraded/fail-closed
+наследуется из AI Dev Team:
+
+`~/codex-workspace/rules/fallback-policy.md`
+
+MathMorph хранит только предметную delta в:
+
+`docs/FALLBACKS.md`
+
+Роли документов разделяются следующим образом:
+
+- `docs/FALLBACKS.md` — конкретные MathMorph fallback/deny-path цепочки;
+- `docs/SECURITY.md` — security invariants и случаи обязательного fail closed;
+- `docs/ARCHITECTURE.md` — компоненты, state boundaries, idempotency,
+  reconciliation и recovery interfaces;
+- `docs/DECISIONS.md` — причины существенных fallback/rollback решений;
+- feature SPEC — требуемое продуктовое поведение и acceptance criteria;
+- `AGENTS.md` / Skills / subagents — краткая маршрутизация и локальные guardrails;
+- tests — фактическое evidence поведения.
+
+**Причина:** один project-specific каталог устраняет расхождение правил,
+не превращая `docs/FALLBACKS.md` в копию общей AI Dev Team policy.
+
+**Последствия:**
+
+- глобальный fallback contract в MathMorph не копируется;
+- существующие ADR `Fallback / rollback` сохраняются;
+- конкретное архитектурное поведение может оставаться описанным
+  в `ARCHITECTURE.md`, если оно необходимо для понимания компонента;
+- локальные `AGENTS.md` не должны содержать полную копию fallback-цепочек;
+- существенный новый fallback добавляется в `docs/FALLBACKS.md`
+  и связывается с соответствующими SPEC/ADR/tests;
+- silent fallback запрещён.
+
+**Fallback / rollback:** если отдельный `docs/FALLBACKS.md` перестанет
+давать пользу, решение пересматривается отдельным ADR; возврат
+к нескольким независимым конкурирующим источникам истины не допускается.
+
+**Проверка:** context compatibility audit, review ссылок из `AGENTS.md`,
+`SECURITY.md`, `ARCHITECTURE.md` и tests; отсутствие полной копии
+глобальной `rules/fallback-policy.md` внутри проекта.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

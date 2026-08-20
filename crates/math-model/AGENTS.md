@@ -5,3 +5,5 @@
 - `ExpressionOrigin::Source` хранит реальный `SourceSpan`; derived-узлам не назначай фиктивные span.
 - Публичный `Debug` не раскрывает identifier, literal, unit, QName или иной пользовательский payload.
 - Изменения сериализуемого AST должны сохранять явный Serde contract и round-trip tests.
+- При неизвестном provenance не создавай фиктивный `SourceSpan`
+  как fallback; uncertainty должна оставаться явной.

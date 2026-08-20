@@ -8,3 +8,9 @@
 - Клиентская валидация улучшает UX, но никогда не является границей безопасности.
 - Никогда не раскрывай секреты в браузерном bundle или журналах.
 - Математическая и бизнес-семантика относится к общему core и services, а не к компонентам React.
+- Помимо loading/error/no-data явно различай `stale`, `partial` и `unverified`.
+- Последнее известное состояние после потери backend нельзя выдавать за live:
+  оно получает `stale`.
+- `completed_with_warnings` нельзя визуально выдавать за полный success.
+- Compatibility result без требуемого evidence получает `unverified`.
+- UI fallback никогда не изменяет server-side security semantics.
