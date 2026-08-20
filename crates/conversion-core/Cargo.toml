@@ -1,0 +1,20 @@
+[package]
+name = "conversion-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+document-ir = { path = "../document-ir" }
+exporter-docx = { path = "../exporter-docx" }
+math-engine = { path = "../math-engine" }
+mathcad-parser = { path = "../mathcad-parser" }
+math-model = { path = "../math-model" }
+thiserror.workspace = true
+
+[dev-dependencies]
+zip.workspace = true

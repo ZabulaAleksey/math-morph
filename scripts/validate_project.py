@@ -121,6 +121,13 @@ EXPECTED_CRATES = {
     "crates/exporter-mathtype": "exporter-mathtype",
 }
 
+# Application adapters are introduced by later roadmap stages. They are valid
+# workspace members when present, while the baseline scaffold remains usable
+# for validator fixture tests that intentionally model an earlier stage.
+STAGED_CRATES = {
+    "crates/conversion-core": "conversion-core",
+}
+
 EXPECTED_CRATE_DEPENDENCIES = {
     "crates/exporter-mathml": {"document-ir", "math-model", "thiserror"},
     "crates/exporter-mathtype": {"document-ir", "exporter-mathml", "math-model"},
@@ -285,10 +292,18 @@ def validate_project(root: Path) -> list[str]:
     if cargo_path.is_file():
         cargo = _load_toml(cargo_path, errors)
         members = set(cargo.get("workspace", {}).get("members", []))
-        if members != set(EXPECTED_CRATES):
+        known_crates = EXPECTED_CRATES | STAGED_CRATES
+        missing_crates = set(EXPECTED_CRATES) - members
+        unexpected_crates = members - set(known_crates)
+        if missing_crates or unexpected_crates:
             errors.append(
-                f"unexpected Cargo workspace members: {sorted(members ^ set(EXPECTED_CRATES))}")
-        for relative, expected_name in EXPECTED_CRATES.items():
+                f"unexpected Cargo workspace members: {sorted(missing_crates | unexpected_crates)}")
+        crates_to_validate = EXPECTED_CRATES | {
+            relative: name
+            for relative, name in STAGED_CRATES.items()
+            if relative in members
+        }
+        for relative, expected_name in crates_to_validate.items():
             manifest_path = root / relative / "Cargo.toml"
             source_path = root / relative / "src/lib.rs"
             if not manifest_path.is_file() or not source_path.is_file():
