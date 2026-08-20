@@ -1,7 +1,7 @@
 # SPEC: Minimal CLI convert
 
 **Статус:** accepted
-**Версия:** 1.0.0
+**Версия:** 1.1.0
 **Дата:** 2026-08-20
 **Область:** этап 148
 
@@ -33,7 +33,9 @@ CLI вызывает production `ConversionPipeline` с `AllowSafePartial`, пе
 
 ### FR-CLI-OUTPUT-148 — безопасная запись
 
-Существующий output не перезаписывается. Input и output не могут ссылаться на один и тот же путь. Result сначала записывается в уникальный `create_new` temporary file в каталоге output, синхронизируется и затем атомарно переименовывается. При сбое удаляется только созданный этой операцией temp-файл; final artifact не появляется.
+Существующий output не перезаписывается. Input и output не могут ссылаться на один и тот же путь. Result сначала записывается в уникальный `create_new` temporary file в каталоге output, синхронизируется и публикуется атомарной no-replace операцией. Std-only реализация использует hard link из same-directory temp и не делает fallback на заменяющий `rename`.
+
+Успешная no-replace публикация является commit point. Ошибка последующего удаления собственного temp не превращает опубликованный результат в failure, а возвращается как redacted warning. До commit point при сбое удаляется только temp, ownership которого подтверждён; final artifact не появляется.
 
 ### NFR-CLI-148 — bounded I/O
 
@@ -41,7 +43,7 @@ Input читается с hard maximum до передачи core. CLI не за
 
 ### SEC-CLI-148 — файловая граница
 
-Symlink/reparse/race и existing-output случаи завершаются fail closed настолько, насколько позволяет стандартная библиотека текущей платформы. CLI не удаляет и не изменяет input, существующий output или неизвестные temporary files.
+Symlink/reparse/race и existing-output случаи завершаются fail closed настолько, насколько позволяет стандартная библиотека текущей платформы. CLI не удаляет и не изменяет input, существующий output или неизвестные temporary files. Windows UNC/device/verbatim namespaces не входят в local-file contract и отклоняются до metadata I/O.
 
 ## 3. Совместимость
 
@@ -70,3 +72,4 @@ Symlink/reparse/race и existing-output случаи завершаются fail
 ## 6. История
 
 - 1.0.0 — принят минимальный CLI contract этапа 148.
+- 1.1.0 — атомарная публикация уточнена как no-replace commit point без replacing-rename fallback; cleanup после commit является warning.

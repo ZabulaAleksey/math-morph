@@ -647,3 +647,61 @@ node %TEMP%\mathmorph-stage154-qa.mjs
 3. Переключить `system → light → dark` и перезагрузить страницу.
 4. На ширине 390 px открыть menu, выбрать «Приватність» и убедиться, что menu закрыт, а focus вернулся к кнопке.
 5. Запустить unit/component/integration tests, typecheck и production build.
+
+## 2026-08-20 — Первый реальный локальный XMCD→DOCX путь, этапы 095–099 и 143–148
+
+### Что изменено
+
+- `math-engine` отделяет immutable Original AST от presentation Display AST и ограничивает depth/node work.
+- `conversion-core` связывает detector, legacy XMCD parser, transformation, Document IR, DOCX exporter и validator; unsupported regions при разрешённой partial policy всегда попадают в report.
+- `mathmorph-cli` добавляет настоящий binary `mathmorph` с bounded input, redacted diagnostics и safe no-replace output publication.
+
+Текущий живой поток:
+
+```text
+file.xmcd
+  -> mathmorph CLI
+  -> conversion-core
+  -> WorksheetParser + TransformationPipeline
+  -> DocumentIrV1
+  -> DocxExporter(WordOmml) + DocxValidator
+  -> file.docx
+```
+
+### Как собрать и запустить
+
+Из корня проекта:
+
+```powershell
+cd ~/codex-workspace/projects/math-morph
+cargo build -p mathmorph-cli --release --locked
+./target/release/mathmorph.exe convert ./path/to/input.xmcd --to docx
+```
+
+По умолчанию рядом появится `input.docx`. Для явного пути:
+
+```powershell
+./target/release/mathmorph.exe convert ./path/to/input.xmcd --to docx --output ./path/to/result.docx
+```
+
+Без release-сборки команда запускается так:
+
+```powershell
+cargo run -p mathmorph-cli --bin mathmorph --locked -- convert ./path/to/input.xmcd --to docx
+```
+
+### Ограничения
+
+- Конвертируется подтверждённый legacy XMCD worksheet30; MCDX пока возвращает `MCDX_CONTENT_UNSUPPORTED` без output.
+- Text и поддержанные formulas становятся DOCX/редактируемым Word OMML. Plot, picture без production asset path, table/diagram и неподдержанная math-семантика пропускаются только с явным warning в partial mode.
+- Существующий DOCX не перезаписывается. Для другого результата нужно указать новый `--output` или убрать старый файл вручную после проверки.
+- Web UI пока не вызывает этот CLI/core; это отдельные frontend/API adapter этапы.
+- Полная украинская/русская/английская локализация относится к этапам 162–165.
+
+### Как повторить самостоятельно
+
+1. Собрать release binary командой `cargo build -p mathmorph-cli --release --locked`.
+2. Запустить `mathmorph.exe convert` на копии legacy `.xmcd`.
+3. Открыть созданный `.docx` в Word и проверить, что формула редактируется как equation.
+4. Повторить команду без удаления output и убедиться, что файл не перезаписывается.
+5. Запустить `cargo test -p mathmorph-cli --locked` и `cargo test -p conversion-core --locked`.

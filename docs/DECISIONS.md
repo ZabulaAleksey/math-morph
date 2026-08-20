@@ -278,6 +278,26 @@ MathMorph хранит только предметную delta в:
 
 **Связанные требования:** `FR-TRANSFORM-095..099`, `FR-CONVERT-143`, `FR-DIAG-144`, `FR-SEVERITY-145`, `FR-REPORT-146`, `FR-PARTIAL-147`, `FR-CLI-148`.
 
+## ADR-0016 — CLI публикует output атомарно без замены существующего файла
+
+**Статус:** принято, 2026-08-20.
+
+**Контекст:** проверка отсутствия output с последующим `std::fs::rename` не обеспечивает no-overwrite на Unix: файл, появившийся в race window, будет заменён. CLI также обязан удалять только принадлежащий операции temp и не возвращать failure после уже совершённой публикации.
+
+**Варианты:** (1) check + portable `rename`; (2) platform FFI `renameat2`/Windows move; (3) std-only same-filesystem hard link из синхронизированного `create_new` temp без fallback на replacing rename.
+
+**Решение:** выбран вариант 3. `hard_link(temp, output)` является атомарной no-replace публикацией и commit point. Temp удерживается открытым до публикации, ownership проверяется доступной platform metadata; Unix использует `dev+ino` и mode `0600`, Windows — exclusive `share_mode(0)` и reparse rejection. После commit cleanup failure становится redacted warning, а не false failure.
+
+**Причина:** решение не добавляет production dependency/unsafe FFI, исключает silent overwrite на поддерживаемых filesystems и сохраняет единый поведенческий контракт Windows/Unix.
+
+**Последствия:** filesystem без hard-link support завершится fail closed без output и без fallback на `rename`. Portable std не закрывает все directory-handle-relative TOCTOU окна, Windows ACL и directory-entry fsync; CLI нельзя запускать elevated над attacker-writable directories. UNC/device/verbatim Windows namespaces не входят в local-file contract.
+
+**Fallback / rollback:** replacing-rename fallback запрещён. Rollback может удалить CLI adapter, не изменяя `conversion-core` и созданные ранее DOCX.
+
+**Проверка:** process E2E, deterministic destination-before-link regression, existing output/same path/symlink/reparse tests, temp ownership/cleanup tests, Windows namespace rejection, Unix permission test и security review.
+
+**Связанные требования:** `FR-CLI-OUTPUT-148`, `NFR-CLI-148`, `SEC-CLI-148`.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

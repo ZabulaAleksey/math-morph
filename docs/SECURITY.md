@@ -14,6 +14,15 @@
 - Сбой безопасности должен завершаться отказом по умолчанию там, где это не разрушает возможность восстановления.
 - Parser и worker должны переживать повреждённый ввод без сбоя процесса или panic.
 
+### Локальная CLI-граница этапа 148
+
+- `mathmorph` читает input один раз через удерживаемый file handle и применяет hard limit до передачи `conversion-core`.
+- Existing output, совпадающий input/output, symlink и Windows reparse components отклоняются fail closed; Windows UNC/device/verbatim namespaces не входят в local-file contract.
+- Artifact записывается в same-directory `create_new` temp, синхронизируется и публикуется atomic no-replace hard link; replacing `rename` не является fallback.
+- Temp удаляется только при подтверждённом ownership. Успешная публикация — commit point; последующая cleanup-проблема сообщает redacted warning и не провоцирует retry уже совершённого side effect.
+- `Debug` и stderr не содержат absolute paths, filename, input/document/formula bytes или output artifact bytes.
+- Std-only residual: нельзя полностью закрыть directory-handle-relative TOCTOU, portable ACL и directory fsync. CLI нельзя запускать elevated над каталогом, доступным недоверенному co-writer.
+
 ---
 
 ## A01:2025 — Нарушение контроля доступа

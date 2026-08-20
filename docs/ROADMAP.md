@@ -2,7 +2,7 @@
 
 > Каждый этап должен допускать независимое тестирование. Исполняемый текст prompts находится в `docs/PROMPTS.md`.
 
-**Текущий статус:** этапы 001–093 реализованы и проверены; независимый frontend-этап 154 реализован и проверен в stacked feature-ветке. Compatibility document этапа 093 имеет общий live-evidence статус `UNVERIFIED`; этап 094 заблокирован до versioned MathType import/edit `PASS`. Следующий безопасный frontend-этап — 155. Подробные доказательства и stage status находятся только в `docs/TRACEABILITY.md`.
+**Текущий статус:** этапы 001–093, dependency-aware этапы 095–099 и 143–148, а также независимый frontend-этап 154 реализованы и проверены в stacked feature-ветке. Этап 094 заблокирован до versioned MathType import/edit `PASS`; этапы 100–142 остаются planned и не объявляются выполненными. Первый локальный legacy XMCD→DOCX CLI path доступен на этапе 148. Подробные доказательства находятся в `docs/TRACEABILITY.md`.
 
 ## Основа — 001–010
 
@@ -130,11 +130,11 @@
 
 ## Преобразование нотации — 095–099
 
-- **095** — `transformation pipeline`
-- **096** — `Definition presentation rule`
-- **097** — `SymbolMappingRegistry`
-- **098** — `NotationProfile`
-- **099** — `semantic-preservation regression`
+- **095** — `transformation pipeline` — `verified`
+- **096** — `Definition presentation rule` — `verified`
+- **097** — `SymbolMappingRegistry` — `verified`
+- **098** — `NotationProfile` — `verified`
+- **099** — `semantic-preservation regression` — `verified`
 
 ## Граф зависимостей — 100–105
 
@@ -199,15 +199,15 @@
 
 ## Единый конвейер — 143–147
 
-- **143** — `ConversionPipeline`
-- **144** — `DiagnosticsCollector`
-- **145** — `severity model`
-- **146** — `ConversionReport fidelity statuses`
-- **147** — `partial conversion`
+- **143** — `ConversionPipeline` — `verified`
+- **144** — `DiagnosticsCollector` — `verified`
+- **145** — `severity model` — `verified`
+- **146** — `ConversionReport fidelity statuses` — `verified`
+- **147** — `partial conversion` — `verified`
 
 ## CLI — 148–153
 
-- **148** — `minimal convert command`
+- **148** — `minimal convert command` — `verified`
 - **149** — `inspect command`
 - **150** — `--format/exporter registry including Typst`
 - **151** — `--complex-mode`

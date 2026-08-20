@@ -92,6 +92,26 @@ bytes
   -> structural Math AST (без evaluator)
 ```
 
+Функциональный путь этапов 095–148 добавляет поверх parser две production-границы:
+
+- `math-engine`: bounded immutable `Original AST → Display AST` presentation pipeline; он не выполняет evaluation и не изменяет исходное дерево;
+- `conversion-core`: application orchestration `detect → parse → transform → Document IR → DOCX export → DOCX validate`, bounded diagnostics/report и explicit `Strict`/`AllowSafePartial` policy.
+
+Текущий живой поток:
+
+```text
+mathmorph CLI
+  -> conversion-core
+  -> FormatDetector + WorksheetParser (legacy XMCD)
+  -> math-engine TransformationPipeline
+  -> DocumentIrV1 producer
+  -> DocxExporter(WordOmml)
+  -> DocxValidator
+  -> atomic no-replace local publication
+```
+
+Prime MCDX распознаётся безопасно, но не передаётся legacy parser и завершается typed `MCDX_CONTENT_UNSUPPORTED`.
+
 ### Shared model и Document IR
 
 Этапы 052–061 выделили две нейтральные границы:
@@ -104,7 +124,8 @@ Dependency DAG не допускает обратной связи exporter → 
 ```text
 math-model <--- mathcad-parser
      ^
-     +------ document-ir <--- exporter-docx
+     +------ math-engine
+     +------ document-ir <--- exporter-docx <--- conversion-core <--- mathmorph-cli
                         <--- exporter-mathml <--- exporter-mathtype
 ```
 
@@ -151,10 +172,12 @@ FastAPI/Pydantic/SQLAlchemy:
 
 ### CLI
 
-- Тонкий локальный адаптер конвертации и безопасной проверки формата.
+- Реализованный binary `mathmorph` предоставляет stage-148 команду `convert <input.xmcd> --to docx [--output <path>]`.
 - Переиспользует core Rust, контракты exporters и общую модель диагностики.
 - Не владеет семантикой parser и математики и не обходит ограничения ввода и безопасности.
-- Может выводить понятный человеку результат и стабильный машиночитаемый отчёт для автоматизации.
+- Выполняет bounded single-read input, redacted вывод и атомарную no-replace публикацию из same-directory `create_new` temp через hard link; replacing-rename fallback запрещён.
+- Успешная публикация является commit point; последующая cleanup-проблема выводится warning и не превращает готовый artifact в false failure.
+- Стабильный машиночитаемый JSON report, `inspect` и дополнительные options относятся к этапам 149–153.
 
 ### Слой workers
 

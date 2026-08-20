@@ -255,6 +255,31 @@ Fail closed:
 Случайный package или неподдерживаемая версия зависимости
 не являются fallback.
 
+## 17. Локальная публикация CLI
+
+Primary:
+- bounded single-read input;
+- same-directory `create_new` temp;
+- sync содержимого;
+- atomic no-replace hard-link publication.
+
+Retry/fallback отсутствуют:
+- deterministic input/conversion failure не повторяется;
+- hard-link unavailable не переключается на replacing `rename` или прямую запись final output;
+- security/identity uncertainty не ослабляет component/reparse/ownership checks.
+
+Commit point:
+- успешное создание final hard link означает completed side effect;
+- сбой последующего cleanup собственного temp даёт redacted warning, но не false failure и не retry;
+- неизвестный replacement temp не удаляется.
+
+Fail closed до commit point:
+- existing output или race-created destination;
+- input/output identity conflict;
+- symlink/reparse/Windows network или device namespace;
+- input/output/temp identity uncertainty;
+- filesystem без безопасной no-replace публикации.
+
 ## Tests
 
 Для значимых цепочек проверяются:

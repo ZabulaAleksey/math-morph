@@ -38,12 +38,14 @@
 | FR/NFR/SEC-MATHTYPE-001..005 | 092 | `specs/features/experimental-mathtype-adapter.spec.md`; `crates/exporter-mathtype/`, exact payload/port/unsupported/depth/node/output/redaction tests; `cargo test -p exporter-mathtype`, `cargo test -p exporter-docx`, workspace 106 tests, fmt, Clippy, Python 20/20, project validator, diff check и independent architecture/security review | verified |
 | FR-MTCOMP-001..005, NFR-MTCOMP-001, SEC-MTCOMP-001 | 093 | `specs/features/mathtype-compatibility-evidence.spec.md`; `docs/MATHTYPE_COMPATIBILITY.md`; exact 17-case matrix, official-source scope, environment probe, manual smoke protocol, project validator и negative contract tests | verified |
 | SPEC-05 feature-gated DOCX backend selection | 094 | Требуется versioned live MathType import/edit `PASS`; `EquationBackend::MathType` остаётся typed unavailable без fallback | blocked |
-| SPEC-04 единый конвейер | 143–147 | producer Document IR, diagnostics collector, fidelity report и partial conversion policy | planned |
-| SPEC-06 преобразования и точность | 095–111 | `crates/math-engine/`, тесты сохранения семантики и trace | planned |
+| FR-TRANSFORM-095..099, NFR/SEC-TRANSFORM-001 | 095–099 | `specs/features/transformation-pipeline.spec.md`; `crates/math-engine/`; immutable Original→Display AST, bounded transforms, profile/registry, deterministic semantic-preservation tests и два review-cycle | verified |
+| SPEC-06 dependency/evaluation extensions | 100–111 | SymbolTable, dependency graph, substitution, evaluation trace и precision policy | planned |
+| FR-CONVERT-143, FR-DIAG-144, FR-SEVERITY-145, FR-REPORT-146, FR-PARTIAL-147 | 143–147 | `specs/features/conversion-pipeline-and-report.spec.md`; `crates/conversion-core/`; XMCD→parser→transform→Document IR→DOCX→validator, bounded/redacted diagnostics, report/fidelity/partial tests и два review-cycle | verified |
 | SPEC-07 комплексные числа | 112–122 | round-trip проверки алгебраического и полярного представления и граничные тесты | planned |
 | SPEC-08 графики | 123–132 | PlotIR/ChartIR, fallback предпросмотра и fixtures восстановления | planned |
 | SPEC-09 схемы | 133–142 | DiagramIR, растровый fallback и доказательства редактируемого POC VSDX | planned |
-| SPEC-13 локальный адаптер CLI | 148–153 | команды общего core `convert` и `inspect` и тесты структурированных отчётов | planned |
+| FR/NFR/SEC-CLI-148 | 148 | `specs/features/minimal-cli-convert.spec.md`; `crates/mathmorph-cli/`; настоящий process E2E, valid DOCX/editable OMML, bounded input, no-replace publication, redaction, same-path/symlink/reparse/security regressions и два reviewer/security cycle | verified |
+| SPEC-13 расширение локального CLI | 149–153 | `inspect`, exporter registry/options и стабильный JSON/Document IR report | planned |
 | FR-WEB-SHELL-001..005, NFR-WEB-SHELL-001..002, SEC-WEB-SHELL-001 | 154 | `specs/features/visible-nextjs-shell.spec.md`; `apps/web/app/`; unit/component/integration render tests, static production build и Playwright desktop/mobile/light/dark interaction smoke | verified |
 | SPEC-10–11 converter UI и состояния конвертации | 155–161 | design compliance, dropzone, validation/settings/states, Error Boundary и localized error mapping | planned |
 | SPEC-16 интернационализация | 162–165 | внешние каталоги и проверка отсутствующих ключей в CI | planned |

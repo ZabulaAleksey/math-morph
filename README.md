@@ -4,17 +4,19 @@ MathMorph — monorepo расширяемой платформы parsing и ко
 
 ## Текущее состояние
 
-Реализованы и проверены этапы 001–092: безопасная входная граница, чтение подтверждённого legacy XMCD worksheet30, структурный Math AST, versioned Document IR, детерминированный DOCX/OMML exporter, bounded Presentation MathML renderer с golden snapshots и pure experimental MathType payload adapter без SDK/OLE/DOCX wiring. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но формулы пока не вычисляет. API endpoints и пользовательский web-flow ещё не реализованы; Prime MCDX безопасно инспектируется как контейнер без содержательного разбора внутреннего worksheet.
+Реализованы и проверены этапы 001–093, 095–099, 143–148 и независимый frontend-этап 154: безопасная входная граница, legacy XMCD worksheet30 parser, структурный Math AST, presentation transformation pipeline, versioned Document IR, общий conversion core, детерминированный DOCX/OMML exporter и локальный CLI. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но формулы пока не вычисляет. API endpoints и интерактивный web converter flow ещё не реализованы; Prime MCDX безопасно определяется, но не имеет content parser.
 
 ## Структура
 
 - `crates/mathcad-parser/` — Rust parser недоверенных Mathcad inputs;
 - `crates/math-model/` — общая source-neutral Math AST;
 - `crates/document-ir/` — backend-neutral модель документа и exporter ports;
-- `crates/math-engine/` — каркас будущей семантики и вычислений;
+- `crates/math-engine/` — bounded Original AST→Display AST presentation transforms; evaluation остаётся будущим этапом;
 - `crates/exporter-docx/` — DOCX/WordprocessingML и редактируемый OMML subset;
 - `crates/exporter-mathml/` — Presentation MathML Core renderer;
 - `crates/exporter-mathtype/` — experimental opaque MathML payload adapter без SDK/OLE/DOCX wiring;
+- `crates/conversion-core/` — общий XMCD→Document IR→DOCX orchestration, diagnostics/report и partial policy;
+- `crates/mathmorph-cli/` — локальный binary `mathmorph`;
 - `services/api/` — Python package будущего FastAPI adapter;
 - `apps/web/` — минимальный Next.js App Router shell;
 - `specs/` — канонические проверяемые требования;
@@ -59,6 +61,15 @@ pnpm.cmd --filter @math-morph/web build
 
 ## Что можно запустить сейчас
 
+Собрать и запустить реальную конвертацию legacy XMCD→DOCX:
+
+```powershell
+cargo build -p mathmorph-cli --release --locked
+./target/release/mathmorph.exe convert ./path/to/input.xmcd --to docx
+```
+
+По умолчанию рядом создаётся `input.docx`. Явный output задаётся через `--output ./path/to/result.docx`; существующий файл не перезаписывается. Prime `.mcdx` пока возвращает `MCDX_CONTENT_UNSUPPORTED` без output.
+
 Сгенерировать проверенный DOCX с редактируемой формулой и открыть его в Word:
 
 ```powershell
@@ -80,7 +91,7 @@ Get-Content crates/exporter-mathml/tests/golden/add.mathml
 pnpm.cmd run dev:web
 ```
 
-После этого откройте `http://localhost:3000`. Сейчас маршрут `/` намеренно возвращает пустую страницу: ветка содержит утверждённый Calm Blue design contract, но React-компоненты пользовательского flow ещё не реализованы.
+После этого откройте `http://localhost:3000`. Маршрут `/` показывает Calm Blue landing shell; выбор файла и подключение web UI к conversion core относятся к следующим frontend/API adapter этапам.
 
 Python package можно установить и проверить, но HTTP-сервер запускать пока нечего:
 

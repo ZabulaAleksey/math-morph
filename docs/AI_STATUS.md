@@ -2,12 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–092 интегрированы в `main`; этап 093 и независимый frontend-этап 154 реализованы и проверены в stacked feature-ветке `feature/stage-154-visible-nextjs-shell`.
+- **Статус:** этапы 001–093, 095–099, 143–148 и независимый frontend-этап 154 реализованы и проверены в stacked ветке `feature/stage-148-cli-conversion`; этапы 100–142 остаются planned.
+- **Текущий backend-этап:** 148 завершён — доступен реальный локальный legacy XMCD→DOCX путь через binary `mathmorph`.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** 155 (`design compliance checklist`) можно выполнять независимо; 094 (`feature-gated backend selection`) остаётся `blocked by versioned live evidence`.
+- **Следующие этапы:** CLI 149–153 могут расширить inspect/options/report; frontend 155–161 должен подключить реальный converter flow; i18n 162–165 добавит Ukrainian/Russian/English locale coverage. Этап 094 остаётся `blocked by versioned live evidence`.
 
 ## Реализовано
 
@@ -26,6 +27,9 @@
 - Этап 091: 17 reviewable standalone `.mathml` golden snapshots, exact inventory/byte comparison, canonical UTF-8/LF/root guard и recursive origin-invariance regression; production renderer/API не изменялись.
 - Этап 092: отдельный `exporter-mathtype` формирует opaque bounded Presentation MathML payload через production `MathMlRenderer`, не принимает raw XML и не подключает SDK/OLE/DOCX backend.
 - Этап 093: `docs/MATHTYPE_COMPATIBILITY.md` фиксирует exact 17-case matrix, official-source scope, независимые static/live/edit evidence statuses, read-only environment probe и воспроизводимый smoke protocol; validator запрещает missing/duplicate cases, неизвестные статусы и ложный `VERIFIED` при `NOT_RUN`.
+- Этапы 095–099: `math-engine` реализует bounded immutable Original AST→Display AST pipeline, explicit definition/symbol presentation rules, `NotationProfile` и deterministic semantic-preservation regressions.
+- Этапы 143–147: `conversion-core` реализует независимый от адаптеров путь `detect → parse → transform → Document IR → DOCX → validate`, bounded/redacted diagnostics, severity/fidelity report и explicit safe partial policy.
+- Этап 148: binary `mathmorph convert <input.xmcd> --to docx [--output <path>]` читает input с hard limit, использует `AllowSafePartial`, не перезаписывает output и публикует DOCX через same-directory atomic no-replace hard link.
 - Typed errors и configurable limits на JSON, XML, ZIP, images, AST/OMML depth, nodes и output bytes.
 
 ## Проверки этапов 001–092
@@ -36,7 +40,7 @@
 - `cargo fmt --all -- --check` — PASS.
 - `cargo test --workspace --locked` — PASS, 106 Rust tests.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
-- `pnpm.cmd run typecheck` и `pnpm.cmd run build:web` — PASS; `/` статически собирается, но пока возвращает пустую страницу.
+- `pnpm.cmd run typecheck` и `pnpm.cmd run build:web` — PASS; на момент проверки этапов 001–092 маршрут `/` ещё возвращал пустую страницу (заменено stage-154 shell).
 - `cargo run -p exporter-docx --example advanced_omml_reference` — PASS, reference artifact generated.
 - Structural DOCX/OMML validator — PASS.
 - Independent automated review — PASS после исправлений.
@@ -101,20 +105,32 @@
 - Финальный независимый Lighthouse review на `320 × 900` — PASS: Accessibility, Best Practices и SEO получили `100` в light и dark themes; contrast regression закрыт через semantic `--cbui-color-primary-text`.
 - Встроенный Browser runtime не загрузился из-за инфраструктурного запрета импорта `node:process`; использован разрешённый Playwright fallback без изменения project dependencies/lockfile.
 
+## Проверка функционального этапа 148
+
+- `cargo fmt --all -- --check` — PASS.
+- `cargo test --workspace --locked` — PASS, 146 Rust tests.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
+- `python -B scripts/validate_project.py` и `python -B scripts/validate_fixtures.py` — PASS.
+- Python repository tests — PASS, 29/29.
+- Process E2E настоящего `mathmorph` binary — PASS: supported XMCD создаёт structurally valid DOCX с editable `m:oMath`; mixed content возвращает warning и artifact; invalid/MCDX/oversized input не создают output.
+- Existing output, same input/output, symlink/reparse components, Windows UNC/device namespace, no-replace race, temp ownership, Unix `0600` и payload/path redaction regressions — PASS.
+- Два независимых review/security cycle завершены; overwrite через Unix `rename`, temp ownership, redacted `Debug` и post-commit cleanup semantics исправлены. Остаточные std-only TOCTOU/ACL/directory-fsync ограничения задокументированы и не имеют silent fallback.
+
 ## Известные ограничения
 
 - Parser поддерживает подтверждённое legacy worksheet30/math30 подмножество, а не полный runtime XSD validator; Prime MCDX worksheet пока не имеет content parser.
 - Corpus преимущественно synthetic; совместимость расширяется только легально доступными образцами.
-- Document IR producer из worksheet AST ещё не реализован: `math-engine` остаётся каркасом.
+- `conversion-core` producer реализован только для legacy XMCD text и поддержанной math-семантики; Prime MCDX content, assets, plots/tables/diagrams и evaluation остаются explicit unsupported/planned.
 - DOCX subset поддерживает одну страницу, text, PNG/JPEG и поддержанные OMML equations. Table, plot/diagram без preview, unsupported blocks и multiple pages отклоняются явно.
 - MathML renderer и experimental adapter покрывают только принятый scalar subset. Матрица этапа 093 документирует static coverage, но live MathType Web/Desktop compatibility не доказана; DOCX `MathType` backend по-прежнему fail closed.
-- CLI, API endpoints и интерактивный converter flow не реализованы; public landing shell видима, но не содержит file input или сетевых запросов. Workspace не содержит CLI binary.
+- Минимальный CLI реализован, но `inspect`, расширенные options и стабильный JSON report относятся к этапам 149–153. API endpoints и интерактивный web converter flow ещё не подключены; landing shell не содержит file input или сетевых запросов.
 - Пользовательские строки stage 154 изолированы в украинском typed catalog, но полноценные locale routing/catalog loading и проверка отсутствующих ключей остаются этапами 162–165; текущая shell не является полной i18n-реализацией.
 - На Windows Rust MSVC требует Visual Studio Build Tools с workload `Desktop development with C++` и доступный `link.exe`.
 
 ## Следующие разумные действия
 
-1. Проверить stacked feature-ветку `feature/stage-154-visible-nextjs-shell` и интегрировать её только после явного решения владельца.
-2. Выполнить этап 155 (`design compliance checklist`) перед dropzone; затем этап 156 может добавить реальный выбор файла без имитации backend.
-3. Предоставить явно разрешённую среду MathType Web либо установленный MathType 7 + SDK license и выполнить 17-case live import/edit smoke по `docs/MATHTYPE_COMPATIBILITY.md`.
-4. Планировать этап 094 только после versioned `PASS` evidence; до этого `EquationBackend::MathType` сохраняет typed fail-closed поведение.
+1. Проверить локальную команду этапа 148 на реальном legacy `.xmcd` и решить вопрос merge stacked ветки.
+2. Реализовать CLI этапы 149–153: `inspect`, exporter/options registry и стабильный machine-readable report.
+3. Выполнить frontend-этап 155 перед dropzone и подключать UI к живому пути только после появления выбранной browser/API adapter boundary.
+4. Реализовать i18n 162–165 для полноценного Ukrainian/Russian/English locale coverage; текущий украинский catalog stage 154 остаётся промежуточным.
+5. Планировать этап 094 только после versioned MathType `PASS`; до этого `EquationBackend::MathType` сохраняет typed fail-closed поведение.
