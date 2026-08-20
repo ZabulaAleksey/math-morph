@@ -126,6 +126,7 @@ EXPECTED_CRATES = {
 # for validator fixture tests that intentionally model an earlier stage.
 STAGED_CRATES = {
     "crates/conversion-core": "conversion-core",
+    "crates/mathmorph-cli": "mathmorph-cli",
 }
 
 EXPECTED_CRATE_DEPENDENCIES = {

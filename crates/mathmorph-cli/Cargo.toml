@@ -1,0 +1,17 @@
+[package]
+name = "mathmorph-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[[bin]]
+name = "mathmorph"
+path = "src/main.rs"
+
+[dependencies]
+conversion-core = { path = "../conversion-core" }
+
+[dev-dependencies]
+exporter-docx = { path = "../exporter-docx" }
+zip.workspace = true

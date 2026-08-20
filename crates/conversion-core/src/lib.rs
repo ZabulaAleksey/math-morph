@@ -69,12 +69,24 @@ impl Default for ConversionOptions {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub struct ConversionRequest {
     pub bytes: Vec<u8>,
     pub file_name: Option<String>,
     pub target: TargetFormat,
     pub options: ConversionOptions,
+}
+
+impl fmt::Debug for ConversionRequest {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("ConversionRequest")
+            .field("byte_len", &self.bytes.len())
+            .field("file_name_present", &self.file_name.is_some())
+            .field("target", &self.target)
+            .field("options", &self.options)
+            .finish()
+    }
 }
 
 impl ConversionRequest {
@@ -293,10 +305,20 @@ impl ConversionReport {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub struct ConversionOutcome {
     pub artifact: Vec<u8>,
     pub report: ConversionReport,
+}
+
+impl fmt::Debug for ConversionOutcome {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("ConversionOutcome")
+            .field("artifact_len", &self.artifact.len())
+            .field("report", &self.report)
+            .finish()
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -998,5 +1020,33 @@ mod tests {
     #[test]
     fn target_format_is_explicit() {
         assert_eq!(TargetFormat::Docx, TargetFormat::Docx);
+    }
+
+    #[test]
+    fn conversion_request_debug_is_redacted_to_bounded_metadata() {
+        let request = ConversionRequest::new(
+            b"SECRET_FORMULA".to_vec(),
+            Some("/absolute/private/worksheet.xmcd".to_owned()),
+            TargetFormat::Docx,
+            ConversionOptions::default(),
+        );
+        let rendered = format!("{request:?}");
+        assert!(rendered.contains("byte_len: 14"));
+        assert!(rendered.contains("file_name_present: true"));
+        assert!(!rendered.contains("SECRET_FORMULA"));
+        assert!(!rendered.contains("worksheet.xmcd"));
+        assert!(!rendered.contains("/absolute"));
+    }
+
+    #[test]
+    fn conversion_outcome_debug_is_redacted_to_artifact_length_and_report() {
+        let outcome = ConversionOutcome {
+            artifact: b"SECRET_DOCX".to_vec(),
+            report: ConversionReport::new(Vec::new(), Vec::new()),
+        };
+        let rendered = format!("{outcome:?}");
+        assert!(rendered.contains("artifact_len: 11"));
+        assert!(rendered.contains("report:"));
+        assert!(!rendered.contains("SECRET_DOCX"));
     }
 }

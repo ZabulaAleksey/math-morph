@@ -9,6 +9,7 @@ members = [
     "crates/exporter-mathml",
     "crates/exporter-mathtype",
     "crates/conversion-core",
+    "crates/mathmorph-cli",
 ]
 
 [workspace.package]
