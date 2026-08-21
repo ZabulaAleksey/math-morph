@@ -2,13 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–093, 095–103, 143–148 и независимый frontend-этап 154 реализованы и проверены в stacked ветке `feature/stage-148-cli-conversion`; этапы 104–142 остаются planned.
+- **Статус:** этапы 001–093, 095–104, 143–148 и независимый frontend-этап 154 реализованы и проверены; этапы 105–142 остаются planned.
 - **Текущий backend-этап:** 148 завершён — доступен реальный локальный legacy XMCD→DOCX путь через binary `mathmorph`.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** semantic diagnostics 104–105, затем substitution/display 106–111 и complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
+- **Следующие этапы:** circular dependency diagnostic 105, затем substitution/display 106–111 и complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
 
 ## Реализовано
 
@@ -32,6 +32,7 @@
 - Этап 101: `math-engine::ReferenceAnalyzer` детерминированно извлекает свободные variable/function references, дедуплицирует их внутри source site, учитывает lexical binders и отклоняет malformed/unsupported формы через bounded redacted errors.
 - Этап 102: `math-engine::DependencyGraph` связывает definition revisions только с видимыми prior definitions, сохраняет forward/missing references отдельно и создаёт exact callable self-edge только для последующей диагностики recursion/cycle.
 - Этап 103: `math-engine::EvaluationPlan` итеративно строит полный dependency-first порядок со stable source-ordinal tie-break; unresolved/cyclic graph возвращает typed error без partial plan.
+- Этап 104: `math-engine::SemanticDiagnostics` детерминированно превращает unresolved variable/function references в bounded typed diagnostics без сохранения symbol identity; public Debug/Display остаются redacted.
 - Этапы 143–147: `conversion-core` реализует независимый от адаптеров путь `detect → parse → transform → Document IR → DOCX → validate`, bounded/redacted diagnostics, severity/fidelity report и explicit safe partial policy.
 - Этап 148: binary `mathmorph convert <input.xmcd> --to docx [--output <path>]` читает input с hard limit, использует `AllowSafePartial`, не перезаписывает output и публикует DOCX через same-directory atomic no-replace hard link.
 - Typed errors и configurable limits на JSON, XML, ZIP, images, AST/OMML depth, nodes и output bytes.

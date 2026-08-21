@@ -142,7 +142,7 @@
 - **101** — `variable references` — `verified`
 - **102** — `dependency graph` — `verified`
 - **103** — `worksheet evaluation order` — `verified`
-- **104** — `undefined-variable diagnostic`
+- **104** — `undefined-variable diagnostic` — `verified`
 - **105** — `circular dependency diagnostic`
 
 ## Подстановка — 106–111

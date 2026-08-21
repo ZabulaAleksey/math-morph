@@ -43,7 +43,8 @@
 | FR/NFR/SEC-SEMANTIC-101 | 101 | `crates/math-engine/src/reference_analysis.rs`; bounded free variable/callable references, per-site deterministic dedup, lexical binder scopes, malformed-form rejection, 11 targeted regressions и independent/security review | verified |
 | FR/NFR/SEC-SEMANTIC-102 | 102 | `crates/math-engine/src/dependency_graph.rs`; deterministic revision graph, visible-before resolution, explicit unresolved records, bounded post-dedup output, 12 graph regressions и independent/security review | verified |
 | FR/NFR/SEC-SEMANTIC-103 | 103 | `crates/math-engine/src/evaluation_plan.rs`; bounded stable Kahn plan, dependency-first/source-order tie-break, fail-closed unresolved/cycle handling, 9 targeted regressions и independent/security review | verified |
-| FR-SEMANTIC-104..105 | 104–105 | undefined/cycle diagnostics | planned |
+| FR/NFR/SEC-SEMANTIC-104 | 104 | `crates/math-engine/src/semantic_diagnostics.rs`; bounded typed undefined variable/function diagnostics with source ordinal/category only, no symbol identity retention, forward-reference and limit/redaction regressions, independent and security review | verified |
+| FR-SEMANTIC-105 | 105 | circular dependency diagnostic | planned |
 | FR/NFR/SEC-SUBSTITUTE-106..111 | 106–111 | `specs/features/substitution-and-evaluation-display.spec.md`; substitution, trace, explicit display modes и precision policy | planned |
 | FR-CONVERT-143, FR-DIAG-144, FR-SEVERITY-145, FR-REPORT-146, FR-PARTIAL-147 | 143–147 | `specs/features/conversion-pipeline-and-report.spec.md`; `crates/conversion-core/`; XMCD→parser→transform→Document IR→DOCX→validator, bounded/redacted diagnostics, report/fidelity/partial tests и два review-cycle | verified |
 | SPEC-07 комплексные числа | 112–122 | round-trip проверки алгебраического и полярного представления и граничные тесты | planned |
