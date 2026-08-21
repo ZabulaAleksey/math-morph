@@ -1,7 +1,7 @@
 # Текущий план AI
 
 **Статус:** `in_progress`.
-**Цель:** последовательно реализовать и проверить все незакрытые этапы до 148, не ослабляя принятые контракты и evidence gates.
+**Цель:** последовательно реализовать и проверить все безопасно выполнимые этапы до 154, не ослабляя принятые контракты и evidence gates.
 **Ветка:** `feature/stage-106-simple-substitution`, stacked поверх verified этапов 093, 105, 148 и 154.
 **Backend-этап 094:** `blocked by versioned live evidence`; MathType wiring запрещён.
 
@@ -22,10 +22,13 @@
 6. Этапы 104–105 `SemanticDiagnostics` — completed.
 7. Этапы 106–111 — completed.
 8. Этапы 112–122 — completed.
-10. Этапы 123–132 — pending.
-11. Этапы 133–142 — pending/evidence-gated.
-12. Full regression, reviewer/security review, traceability/status — completed through stage 122.
-13. Этап 094 — blocked by external licensed live evidence.
+9. Этапы 123–132 — pending/evidence-gated; разрешена только подтверждённая opaque metadata, preview/series reconstruction требует fixtures.
+10. Этапы 133–142 — pending/evidence-gated; diagram detection/forensics из Mathcad требует format evidence.
+11. Этапы 143–148 — completed.
+12. Этапы 149–153 — completed.
+13. Этап 154 — completed.
+14. Full regression, reviewer/security review, traceability/status — completed through stage 154 за исключением evidence-gated 094 и 123–142.
+15. Этап 094 — blocked by external licensed live evidence.
 
 ## Канонические контракты
 
@@ -35,4 +38,5 @@
 - `specs/features/complex-numbers.spec.md`
 - `specs/features/conversion-pipeline-and-report.spec.md`
 - `specs/features/minimal-cli-convert.spec.md`
+- `specs/features/cli-inspection-and-reports.spec.md`
 - `docs/DECISIONS.md` — ADR-0015, ADR-0016, ADR-0017

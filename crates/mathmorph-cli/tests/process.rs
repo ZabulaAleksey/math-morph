@@ -136,6 +136,16 @@ fn invalid_and_mcdx_inputs_do_not_create_output() {
 }
 
 #[test]
+fn inspect_mcdx_fails_closed() {
+    let dir = temp_dir();
+    fs::write(dir.join("archive.mcdx"), mcdx()).expect("mcdx");
+    let result = run(&dir, &["inspect", "archive.mcdx"]);
+    assert_eq!(result.status.code(), Some(3));
+    assert!(String::from_utf8_lossy(&result.stderr).contains("MCDX_CONTENT_UNSUPPORTED"));
+    fs::remove_dir_all(dir).expect("cleanup");
+}
+
+#[test]
 fn existing_output_is_unchanged_and_usage_is_redacted() {
     let dir = temp_dir();
     let input = dir.join("secret.xmcd");
@@ -176,4 +186,59 @@ fn oversized_input_fails_before_conversion() {
     assert!(String::from_utf8_lossy(&result.stderr).contains("INPUT_TOO_LARGE"));
     assert!(!dir.join("large.docx").exists());
     fs::remove_dir_all(dir).expect("cleanup");
+}
+
+#[test]
+fn inspect_validate_and_export_ir_emit_versioned_json() {
+    let dir = temp_dir();
+    fs::write(dir.join("sample.xmcd"), supported()).expect("input");
+    let inspect = run(&dir, &["inspect", "sample.xmcd"]);
+    assert!(inspect.status.success(), "{:?}", inspect.stderr);
+    let inspected: serde_json::Value =
+        serde_json::from_slice(&inspect.stdout).expect("inspect json");
+    assert_eq!(inspected["schema_version"], 1);
+    assert_eq!(inspected["report"]["detected_format"], "xmcd");
+
+    let validate = run(&dir, &["validate", "sample.xmcd"]);
+    assert!(validate.status.success(), "{:?}", validate.stderr);
+    let validated: serde_json::Value =
+        serde_json::from_slice(&validate.stdout).expect("validate json");
+    assert_eq!(validated["schema_version"], 1);
+    assert_eq!(validated["kind"], "conversion_report");
+
+    let export = run(
+        &dir,
+        &["export-ir", "sample.xmcd", "--output", "sample.ir.json"],
+    );
+    assert!(export.status.success(), "{:?}", export.stderr);
+    let ir: serde_json::Value =
+        serde_json::from_slice(&fs::read(dir.join("sample.ir.json")).unwrap()).unwrap();
+    assert_eq!(ir["schema_version"], 1);
+    fs::remove_dir_all(dir).expect("cleanup");
+}
+
+#[test]
+fn exporter_registry_distinguishes_unknown_and_known_unavailable_targets() {
+    let dir = temp_dir();
+    fs::write(dir.join("sample.xmcd"), supported()).expect("input");
+    let unavailable = run(&dir, &["convert", "sample.xmcd", "--to", "typst"]);
+    assert_eq!(unavailable.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&unavailable.stderr).contains("EXPORTER_UNAVAILABLE"));
+    let unknown = run(&dir, &["convert", "sample.xmcd", "--to", "secret-format"]);
+    assert_eq!(unknown.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&unknown.stderr).contains("UNSUPPORTED_TARGET"));
+    fs::remove_dir_all(dir).expect("cleanup");
+}
+
+#[test]
+fn validate_corrupted_input_emits_machine_readable_error() {
+    let dir = temp_dir();
+    fs::write(dir.join("bad.xmcd"), b"broken").unwrap();
+    let result = run(&dir, &["validate", "bad.xmcd"]);
+    assert_eq!(result.status.code(), Some(3));
+    let error: serde_json::Value = serde_json::from_slice(&result.stderr).expect("error json");
+    assert_eq!(error["schema_version"], 1);
+    assert_eq!(error["kind"], "error");
+    assert!(error["code"].as_str().is_some());
+    fs::remove_dir_all(dir).unwrap();
 }

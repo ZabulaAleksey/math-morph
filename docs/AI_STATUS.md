@@ -2,13 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–093, 095–122, 143–148 и независимый frontend-этап 154 реализованы и проверены; этапы 123–142 остаются planned/evidence-gated.
-- **Текущий backend-этап:** 122 завершён; следующий реализуемый пакет — plot/diagram track 123–142 с обязательными format evidence gates.
+- **Статус:** этапы 001–093, 095–122 и 143–154 реализованы и проверены; этапы 123–142 остаются planned/evidence-gated.
+- **Текущий backend-этап:** 153 завершён; следующий допустимый пакет — подтверждённая часть plot/diagram track 123–142 с обязательными format evidence gates.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** проверить фактическое покрытие 123–142 и реализовать только подтверждённые format fixtures/schema части; затем закрыть CLI 149–153. Этап 094 остаётся `blocked by versioned live evidence`.
+- **Следующие этапы:** проверить фактическое покрытие 123–142 и реализовать только подтверждённые format fixtures/schema части. Этап 094 остаётся `blocked by versioned live evidence`.
 
 ## Реализовано
 
@@ -19,6 +19,7 @@
 - `math-model`: source-neutral AST, boolean expressions, units, `UnsupportedNode`, строгий Serde contract и redacted `Debug`.
 - Этапы 106–111: visibility-safe scalar substitution с lexical binders, recursive cycle/expansion protection, bounded redacted evaluation trace, explicit display modes и независимая `PrecisionPolicy`.
 - Этапы 112–122: finite complex value boundary, algebraic/polar round-trip, Cartesian arithmetic, scaled division, tolerance, bounded typed trace и precision-aware bounded presentation.
+- Этапы 149–153: bounded `inspect`, allowlisted exporter registry, `--complex-mode`/`--precision`, full-path `validate` и bounded versioned JSON/Document IR export.
 - `document-ir`: versioned V1 JSON envelope, metadata/pages/layout, text/equation/table/image/plot/diagram blocks, provenance/fidelity и external asset ports.
 - `exporter-docx`: детерминированный OPC/DOCX subset, WordprocessingML text/styles, bounded PNG/JPEG embedding, page settings и fail-closed structural validator.
 - `WordEquationExporter`: editable OMML для базовых и расширенных форм 077–086 — powers, roots, scripts, functions, grouping, vector/matrix и calculus/aggregate — с каноническими shapes и typed fail-closed errors.
@@ -144,14 +145,14 @@
 - `conversion-core` producer реализован только для legacy XMCD text и поддержанной math-семантики; Prime MCDX content, assets, plots/tables/diagrams и evaluation остаются explicit unsupported/planned.
 - DOCX subset поддерживает одну страницу, text, PNG/JPEG и поддержанные OMML equations. Table, plot/diagram без preview, unsupported blocks и multiple pages отклоняются явно.
 - MathML renderer и experimental adapter покрывают только принятый scalar subset. Матрица этапа 093 документирует static coverage, но live MathType Web/Desktop compatibility не доказана; DOCX `MathType` backend по-прежнему fail closed.
-- Минимальный CLI реализован, но `inspect`, расширенные options и стабильный JSON report относятся к этапам 149–153. API endpoints и интерактивный web converter flow ещё не подключены; landing shell не содержит file input или сетевых запросов.
+- Расширенный локальный CLI реализован, включая `inspect`, numeric options, `validate` и `export-ir`. API endpoints и интерактивный web converter flow ещё не подключены; landing shell не содержит file input или сетевых запросов.
 - Пользовательские строки stage 154 изолированы в украинском typed catalog, но полноценные locale routing/catalog loading и проверка отсутствующих ключей остаются этапами 162–165; текущая shell не является полной i18n-реализацией.
 - На Windows Rust MSVC требует Visual Studio Build Tools с workload `Desktop development with C++` и доступный `link.exe`.
 
 ## Следующие разумные действия
 
-1. Проверить локальную команду этапа 148 на реальном legacy `.xmcd` и решить вопрос merge stacked ветки.
-2. Реализовать CLI этапы 149–153: `inspect`, exporter/options registry и стабильный machine-readable report.
+1. Получить легально доступные versioned plot/diagram fixtures и зафиксировать payload/preview schema evidence для этапов 123–142.
+2. Проверить локальные команды 148–153 на реальном legacy `.xmcd`.
 3. Выполнить frontend-этап 155 перед dropzone и подключать UI к живому пути только после появления выбранной browser/API adapter boundary.
 4. Реализовать i18n 162–165 для полноценного Ukrainian/Russian/English locale coverage; текущий украинский catalog stage 154 остаётся промежуточным.
 5. Планировать этап 094 только после versioned MathType `PASS`; до этого `EquationBackend::MathType` сохраняет typed fail-closed поведение.

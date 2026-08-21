@@ -208,11 +208,11 @@
 ## CLI — 148–153
 
 - **148** — `minimal convert command` — `verified`
-- **149** — `inspect command`
-- **150** — `--format/exporter registry including Typst`
-- **151** — `--complex-mode`
-- **152** — `--precision`
-- **153** — `JSON/Document IR report`
+- **149** — `inspect command` — `verified`
+- **150** — `--format/exporter registry including Typst` — `verified`
+- **151** — `--complex-mode` — `verified`
+- **152** — `--precision` — `verified`
+- **153** — `JSON/Document IR report` — `verified`
 
 ## Веб-интерфейс — 154–161
 

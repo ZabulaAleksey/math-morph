@@ -179,7 +179,7 @@ FastAPI/Pydantic/SQLAlchemy:
 - Не владеет семантикой parser и математики и не обходит ограничения ввода и безопасности.
 - Выполняет bounded single-read input, redacted вывод и атомарную no-replace публикацию из same-directory `create_new` temp через hard link; replacing-rename fallback запрещён.
 - Успешная публикация является commit point; последующая cleanup-проблема выводится warning и не превращает готовый artifact в false failure.
-- Стабильный машиночитаемый JSON report, `inspect` и дополнительные options относятся к этапам 149–153.
+- CLI предоставляет bounded `inspect`, full-path `validate`, explicit `export-ir` и versioned machine-readable JSON. `--complex-mode` и `--precision` проходят через numeric conversion boundary; текущий подтверждённый parser subset не включает heuristic complex evaluation.
 
 ### Слой workers
 

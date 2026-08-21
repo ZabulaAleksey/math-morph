@@ -51,7 +51,7 @@
 | SPEC-08 графики | 123–132 | PlotIR/ChartIR, fallback предпросмотра и fixtures восстановления | planned |
 | SPEC-09 схемы | 133–142 | DiagramIR, растровый fallback и доказательства редактируемого POC VSDX | planned |
 | FR/NFR/SEC-CLI-148 | 148 | `specs/features/minimal-cli-convert.spec.md`; `crates/mathmorph-cli/`; настоящий process E2E, valid DOCX/editable OMML, bounded input, no-replace publication, redaction, same-path/symlink/reparse/security regressions и два reviewer/security cycle | verified |
-| SPEC-13 расширение локального CLI | 149–153 | `inspect`, exporter registry/options и стабильный JSON/Document IR report | planned |
+| FR/NFR/SEC-CLI-149..153 | 149–153 | `specs/features/cli-inspection-and-reports.spec.md`; bounded `inspect`, allowlisted exporter registry, numeric conversion options, full-path `validate`, bounded versioned JSON/Document IR, process regressions и clean independent/security review | verified |
 | FR-WEB-SHELL-001..005, NFR-WEB-SHELL-001..002, SEC-WEB-SHELL-001 | 154 | `specs/features/visible-nextjs-shell.spec.md`; `apps/web/app/`; unit/component/integration render tests, static production build и Playwright desktop/mobile/light/dark interaction smoke | verified |
 | SPEC-10–11 converter UI и состояния конвертации | 155–161 | design compliance, dropzone, validation/settings/states, Error Boundary и localized error mapping | planned |
 | SPEC-16 интернационализация | 162–165 | внешние каталоги и проверка отсутствующих ключей в CI | planned |
