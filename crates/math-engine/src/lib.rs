@@ -6,8 +6,9 @@ pub mod semantic_diagnostics;
 
 pub use evaluation_plan::{EvaluationPlan, EvaluationPlanError, EvaluationPlanLimits};
 pub use semantic_diagnostics::{
-    SemanticDiagnostic, SemanticDiagnostics, SemanticDiagnosticsError, SemanticDiagnosticsLimits,
-    UndefinedReferenceCategory, UndefinedReferenceDiagnostic,
+    CircularDependencyDiagnostic, SemanticDiagnostic, SemanticDiagnostics,
+    SemanticDiagnosticsError, SemanticDiagnosticsLimits, UndefinedReferenceCategory,
+    UndefinedReferenceDiagnostic,
 };
 pub mod reference_analysis;
 pub mod symbol_table;

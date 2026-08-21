@@ -2,13 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–093, 095–104, 143–148 и независимый frontend-этап 154 реализованы и проверены; этапы 105–142 остаются planned.
+- **Статус:** этапы 001–093, 095–105, 143–148 и независимый frontend-этап 154 реализованы и проверены; этапы 106–142 остаются planned.
 - **Текущий backend-этап:** 148 завершён — доступен реальный локальный legacy XMCD→DOCX путь через binary `mathmorph`.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** circular dependency diagnostic 105, затем substitution/display 106–111 и complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
+- **Следующие этапы:** substitution/display 106–111, затем complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
 
 ## Реализовано
 

@@ -4,8 +4,9 @@ use math_engine::{
     SymbolTableLimits, UndefinedReferenceCategory,
 };
 use math_model::{
-    Definition, DefinitionKind, DefinitionStyle, ExpressionOrigin, FunctionCall, Identifier,
-    MathExpression, MathExpressionKind, NumericBase, RealLiteral, SourceSpan,
+    Definition, DefinitionKind, DefinitionStyle, ExpressionOrigin, FunctionCall,
+    FunctionDefinition, Identifier, MathExpression, MathExpressionKind, NumericBase, RealLiteral,
+    SourceSpan,
 };
 
 fn id(name: &str) -> MathExpression {
@@ -58,6 +59,18 @@ fn call(name: &str) -> MathExpression {
         kind: MathExpressionKind::FunctionCall(FunctionCall {
             callee: Box::new(id(name)),
             arguments: vec![],
+        }),
+        origin: ExpressionOrigin::Derived,
+    }
+}
+
+fn function(name: &str, body: MathExpression) -> MathExpression {
+    MathExpression {
+        kind: MathExpressionKind::FunctionDefinition(FunctionDefinition {
+            style: DefinitionStyle::Equal,
+            name: Box::new(id(name)),
+            parameters: vec![],
+            body: Box::new(body),
         }),
         origin: ExpressionOrigin::Derived,
     }
@@ -191,6 +204,81 @@ fn diagnostic_limits_are_typed_and_fail_closed() {
     assert_eq!(
         SemanticDiagnostics::from_graph(&graph, SemanticDiagnosticsLimits::new(1))
             .expect_err("bounded output"),
+        SemanticDiagnosticsError::DiagnosticLimitExceeded { limit: 1 }
+    );
+}
+
+#[test]
+fn graph_work_limits_fail_before_scc_allocation() {
+    let node_limited_graph = graph(&[
+        (0, definition("first", real("1"))),
+        (1, definition("second", real("2"))),
+    ]);
+
+    assert_eq!(
+        SemanticDiagnostics::from_graph(
+            &node_limited_graph,
+            SemanticDiagnosticsLimits::with_graph_limits(10, 1, 10),
+        )
+        .expect_err("node work limit"),
+        SemanticDiagnosticsError::NodeLimitExceeded { limit: 1 }
+    );
+    assert_eq!(
+        SemanticDiagnostics::from_graph(
+            &node_limited_graph,
+            SemanticDiagnosticsLimits::with_graph_limits(10, 10, 0),
+        )
+        .expect_err("invalid edge work limit"),
+        SemanticDiagnosticsError::InvalidLimits
+    );
+
+    let edge_limited_graph = graph(&[
+        (0, function("first", call("first"))),
+        (1, function("second", call("second"))),
+    ]);
+    assert_eq!(
+        SemanticDiagnostics::from_graph(
+            &edge_limited_graph,
+            SemanticDiagnosticsLimits::with_graph_limits(10, 10, 1),
+        )
+        .expect_err("edge work limit"),
+        SemanticDiagnosticsError::EdgeLimitExceeded { limit: 1 }
+    );
+}
+
+#[test]
+fn callable_self_cycle_is_circular_but_scalar_self_reference_stays_undefined() {
+    let graph = graph(&[
+        (2, definition("scalar", id("scalar"))),
+        (
+            7,
+            function("secret_cycle_function", call("secret_cycle_function")),
+        ),
+    ]);
+    let diagnostics = SemanticDiagnostics::from_graph(&graph, SemanticDiagnosticsLimits::default())
+        .expect("diagnostics");
+
+    let undefined: Vec<_> = diagnostics.undefined_references().collect();
+    assert_eq!(undefined.len(), 1);
+    assert_eq!(undefined[0].source_ordinal(), 2);
+    let cycles: Vec<_> = diagnostics.circular_dependencies().collect();
+    assert_eq!(cycles.len(), 1);
+    assert_eq!(cycles[0].definition_id().source_ordinal(), 7);
+    assert_eq!(cycles[0].cycle_leader(), cycles[0].definition_id());
+    assert_eq!(cycles[0].cycle_size(), 1);
+    assert!(!format!("{diagnostics:?}").contains("secret_cycle_function"));
+}
+
+#[test]
+fn diagnostic_limit_covers_undefined_references_and_cycles_together() {
+    let graph = graph(&[
+        (2, definition("scalar", id("scalar"))),
+        (7, function("loop", call("loop"))),
+    ]);
+
+    assert_eq!(
+        SemanticDiagnostics::from_graph(&graph, SemanticDiagnosticsLimits::new(1))
+            .expect_err("the shared diagnostic budget must fail closed"),
         SemanticDiagnosticsError::DiagnosticLimitExceeded { limit: 1 }
     );
 }
