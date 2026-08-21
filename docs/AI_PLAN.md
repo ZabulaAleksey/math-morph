@@ -2,7 +2,7 @@
 
 **Статус:** `in_progress`.
 **Цель:** последовательно реализовать и проверить все незакрытые этапы до 148, не ослабляя принятые контракты и evidence gates.
-**Ветка:** `feature/stage-105-circular-diagnostics`, stacked поверх verified этапов 093, 104, 148 и 154.
+**Ветка:** `feature/stage-106-simple-substitution`, stacked поверх verified этапов 093, 105, 148 и 154.
 **Backend-этап 094:** `blocked by versioned live evidence`; MathType wiring запрещён.
 
 ## Текущий scope
@@ -20,11 +20,11 @@
 4. Этап 102 `DependencyGraph` — completed.
 5. Этап 103 `EvaluationPlan` — completed.
 6. Этапы 104–105 `SemanticDiagnostics` — completed.
-7. Этапы 106–111 — next.
-9. Этапы 112–122 — pending.
+7. Этапы 106–111 — completed.
+8. Этапы 112–122 — completed.
 10. Этапы 123–132 — pending.
 11. Этапы 133–142 — pending/evidence-gated.
-12. Full regression, reviewer/security review, traceability/status — completed through stage 104.
+12. Full regression, reviewer/security review, traceability/status — completed through stage 122.
 13. Этап 094 — blocked by external licensed live evidence.
 
 ## Канонические контракты

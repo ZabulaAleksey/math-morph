@@ -2,13 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–093, 095–105, 143–148 и независимый frontend-этап 154 реализованы и проверены; этапы 106–142 остаются planned.
-- **Текущий backend-этап:** 148 завершён — доступен реальный локальный legacy XMCD→DOCX путь через binary `mathmorph`.
+- **Статус:** этапы 001–093, 095–122, 143–148 и независимый frontend-этап 154 реализованы и проверены; этапы 123–142 остаются planned/evidence-gated.
+- **Текущий backend-этап:** 122 завершён; следующий реализуемый пакет — plot/diagram track 123–142 с обязательными format evidence gates.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** substitution/display 106–111, затем complex engine 112–122. Этап 094 остаётся `blocked by versioned live evidence`; diagram track 133–140 требует подтверждённых format fixtures/schema.
+- **Следующие этапы:** проверить фактическое покрытие 123–142 и реализовать только подтверждённые format fixtures/schema части; затем закрыть CLI 149–153. Этап 094 остаётся `blocked by versioned live evidence`.
 
 ## Реализовано
 
@@ -17,6 +17,8 @@
 - Утверждён канонический MathMorph Calm Blue UI design contract с `light`, `dark`, `system` и независимыми accessibility/density/workspace modes.
 - Этап 154: `/` статически рендерит видимую украинскую public landing shell с responsive navigation, hero/workflow preview, feature/process/privacy/API/pricing/status sections, честным staged converter state и переключателем `system → light → dark` без flash.
 - `math-model`: source-neutral AST, boolean expressions, units, `UnsupportedNode`, строгий Serde contract и redacted `Debug`.
+- Этапы 106–111: visibility-safe scalar substitution с lexical binders, recursive cycle/expansion protection, bounded redacted evaluation trace, explicit display modes и независимая `PrecisionPolicy`.
+- Этапы 112–122: finite complex value boundary, algebraic/polar round-trip, Cartesian arithmetic, scaled division, tolerance, bounded typed trace и precision-aware bounded presentation.
 - `document-ir`: versioned V1 JSON envelope, metadata/pages/layout, text/equation/table/image/plot/diagram blocks, provenance/fidelity и external asset ports.
 - `exporter-docx`: детерминированный OPC/DOCX subset, WordprocessingML text/styles, bounded PNG/JPEG embedding, page settings и fail-closed structural validator.
 - `WordEquationExporter`: editable OMML для базовых и расширенных форм 077–086 — powers, roots, scripts, functions, grouping, vector/matrix и calculus/aggregate — с каноническими shapes и typed fail-closed errors.

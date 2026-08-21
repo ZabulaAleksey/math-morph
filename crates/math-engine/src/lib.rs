@@ -1,23 +1,40 @@
 //! Backend-neutral presentation transformations for the source math AST.
 
+pub mod complex;
 pub mod dependency_graph;
+pub mod display;
 pub mod evaluation_plan;
+pub mod evaluation_trace;
 pub mod semantic_diagnostics;
+pub mod substitution;
 
+pub use display::{DisplayError, DisplayMode, display};
 pub use evaluation_plan::{EvaluationPlan, EvaluationPlanError, EvaluationPlanLimits};
+pub use evaluation_trace::{EvaluationTrace, EvaluationTraceKind, EvaluationTraceStep};
 pub use semantic_diagnostics::{
     CircularDependencyDiagnostic, SemanticDiagnostic, SemanticDiagnostics,
     SemanticDiagnosticsError, SemanticDiagnosticsLimits, UndefinedReferenceCategory,
     UndefinedReferenceDiagnostic,
 };
+pub use substitution::{
+    SubstitutionEngine, SubstitutionError, SubstitutionFailure, SubstitutionLimits,
+    SubstitutionResult,
+};
+pub mod precision;
 pub mod reference_analysis;
 pub mod symbol_table;
 
+pub use complex::{
+    AlgebraicRepresentation, ComplexError, ComplexLimits, ComplexOperation, ComplexOutputMode,
+    ComplexPresentation, ComplexTrace, ComplexTraceStep, ComplexValue, PolarRepresentation,
+    Tolerance,
+};
 pub use dependency_graph::{
     DefinitionId, DefinitionNamespace, DependencyEdge, DependencyGraph, DependencyGraphError,
     DependencyGraphLimits, DependencyNode, GraphLimits, UnresolvedReference,
 };
 
+pub use precision::{PrecisionPolicy, PrecisionPolicyError};
 pub use reference_analysis::{
     ARRAY_INDEX_TARGET_POLICY, ArrayIndexTargetPolicy, ReferenceAnalysis, ReferenceAnalyzer,
     ReferenceDedupPolicy, ReferenceError, ReferenceIdentity, ReferenceInput, ReferenceLimits,
