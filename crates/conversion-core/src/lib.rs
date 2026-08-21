@@ -1,27 +1,56 @@
 //! Application core for deterministic, fail-closed XMCD to DOCX conversion.
 
 use document_ir::{
-    BlockContentIr, BlockId, BlockIr, DocumentIrV1, FidelityIr, FormulaDisplayModeIr, FormulaIr,
-    MetadataIr, PageIr, PageMarginsIr, PageOrientationIr, ParagraphIr, PhysicalSizeIr,
-    ProvenanceIr, SourceKindIr, TextBlockIr, TextRunIr, TextStyleIr, VerticalAlignIr,
+    BlockContentIr, BlockId, BlockIr, DocumentIrV1, DocumentIrV3, FidelityIr, FormulaDisplayModeIr,
+    FormulaIr, MetadataIr, PageIr, PageMarginsIr, PageOrientationIr, ParagraphIr, PhysicalSizeIr,
+    PlotIr, PlotMetadataIrV3, ProvenanceIr, SourceKindIr, TextBlockIr, TextRunIr, TextStyleIr,
+    VersionedDocumentIr, VerticalAlignIr,
 };
 use exporter_docx::{
     DocxExporter, DocxLimits, DocxValidator, EquationBackend, OmmlError, OmmlLimits,
     WordEquationExporter,
 };
-use math_engine::{TransformationLimits, TransformationPipeline};
+use math_engine::{
+    ComplexOutputMode, PrecisionPolicy, TransformationLimits, TransformationPipeline,
+};
 use math_model::{MathExpression, MathExpressionKind};
 use mathcad_parser::{
     DiagnosticCode as ParserDiagnosticCode, FormatDetector, FormatError, InlineKind, InputFormat,
     MathParseOutcome, RegionContent, TextRun, WorksheetError, WorksheetLimits, WorksheetParser,
 };
+use serde::Serialize;
 use std::fmt;
+use std::io::{self, Write};
 use thiserror::Error;
 
 /// Requested output format.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TargetFormat {
     Docx,
+    Markdown,
+    Latex,
+    Html,
+    Pdf,
+    Json,
+    Typst,
+}
+
+impl TargetFormat {
+    pub fn parse(value: &str) -> Option<Self> {
+        match value {
+            "docx" => Some(Self::Docx),
+            "markdown" | "md" => Some(Self::Markdown),
+            "latex" | "tex" => Some(Self::Latex),
+            "html" => Some(Self::Html),
+            "pdf" => Some(Self::Pdf),
+            "json" => Some(Self::Json),
+            "typst" => Some(Self::Typst),
+            _ => None,
+        }
+    }
+    pub const fn is_available(self) -> bool {
+        matches!(self, Self::Docx)
+    }
 }
 
 /// Policy for unsupported regions and malformed math.
@@ -105,14 +134,16 @@ impl ConversionRequest {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum DiagnosticSeverity {
     Warning,
     RecoverableError,
     FatalError,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum DiagnosticCode {
     FileExtensionMismatch,
     McdxContentUnsupported,
@@ -162,7 +193,7 @@ impl fmt::Display for DiagnosticCode {
 }
 
 /// A bounded, payload-free diagnostic. It intentionally contains no filename or source text.
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Copy, Eq, PartialEq, Serialize)]
 pub struct Diagnostic {
     pub code: DiagnosticCode,
     pub severity: DiagnosticSeverity,
@@ -245,20 +276,22 @@ impl DiagnosticsCollector {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum ReportStatus {
     Completed,
     CompletedWithWarnings,
 }
 
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize)]
 pub struct DiagnosticCounts {
     pub warnings: usize,
     pub recoverable_errors: usize,
     pub fatal_errors: usize,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Fidelity {
     Exact,
     Approximate,
@@ -266,23 +299,51 @@ pub enum Fidelity {
     FallbackRendered,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 pub struct ReportItem {
     pub region_id: u64,
     pub source_ordinal: usize,
     pub fidelity: Fidelity,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct ConversionReport {
     pub status: ReportStatus,
     pub counts: DiagnosticCounts,
     pub diagnostics: Vec<Diagnostic>,
     pub items: Vec<ReportItem>,
+    pub numeric_options: NumericOptionsReport,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct NumericOptionsReport {
+    pub complex_mode: &'static str,
+    pub computation_digits: u16,
+    pub display_digits: u16,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct InspectionReport {
+    pub detected_format: String,
+    pub region_count: usize,
+    pub diagnostics: Vec<DiagnosticCode>,
+}
+impl InspectionReport {
+    pub fn to_json(&self, max_bytes: usize) -> Result<Vec<u8>, ReportSerializationError> {
+        serialize_envelope("inspection_report", self, max_bytes)
+    }
 }
 
 impl ConversionReport {
     pub fn new(diagnostics: Vec<Diagnostic>, items: Vec<ReportItem>) -> Self {
+        Self::new_with_numeric_options(diagnostics, items, NumericConversionOptions::default())
+    }
+
+    pub fn new_with_numeric_options(
+        diagnostics: Vec<Diagnostic>,
+        items: Vec<ReportItem>,
+        numeric_options: NumericConversionOptions,
+    ) -> Self {
         let mut counts = DiagnosticCounts::default();
         for diagnostic in &diagnostics {
             match diagnostic.severity {
@@ -301,14 +362,91 @@ impl ConversionReport {
             counts,
             diagnostics,
             items,
+            numeric_options: NumericOptionsReport {
+                complex_mode: match numeric_options.complex_mode {
+                    ComplexOutputMode::Algebraic => "algebraic",
+                    ComplexOutputMode::Polar => "polar",
+                    ComplexOutputMode::Both => "both",
+                },
+                computation_digits: numeric_options.precision.computation_digits(),
+                display_digits: numeric_options.precision.display_digits(),
+            },
         }
     }
+    pub fn to_json(&self, max_bytes: usize) -> Result<Vec<u8>, ReportSerializationError> {
+        serialize_envelope("conversion_report", self, max_bytes)
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ReportSerializationError {
+    InvalidLimit,
+    OutputLimitExceeded,
+    SerializationFailure,
+}
+
+#[derive(Serialize)]
+struct ReportEnvelope<'a, T> {
+    schema_version: u16,
+    kind: &'static str,
+    report: &'a T,
+}
+
+fn serialize_envelope<T: Serialize>(
+    kind: &'static str,
+    value: &T,
+    max_bytes: usize,
+) -> Result<Vec<u8>, ReportSerializationError> {
+    if max_bytes == 0 || max_bytes > 64 * 1024 * 1024 {
+        return Err(ReportSerializationError::InvalidLimit);
+    }
+    struct Limited {
+        bytes: Vec<u8>,
+        max: usize,
+        exceeded: bool,
+    }
+    impl Write for Limited {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            let Some(next) = self.bytes.len().checked_add(bytes.len()) else {
+                self.exceeded = true;
+                return Err(io::Error::other("limit"));
+            };
+            if next > self.max {
+                self.exceeded = true;
+                return Err(io::Error::other("limit"));
+            }
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    let mut output = Limited {
+        bytes: Vec::new(),
+        max: max_bytes,
+        exceeded: false,
+    };
+    let envelope = ReportEnvelope {
+        schema_version: 1,
+        kind,
+        report: value,
+    };
+    if serde_json::to_writer(&mut output, &envelope).is_err() {
+        return Err(if output.exceeded {
+            ReportSerializationError::OutputLimitExceeded
+        } else {
+            ReportSerializationError::SerializationFailure
+        });
+    }
+    Ok(output.bytes)
 }
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct ConversionOutcome {
     pub artifact: Vec<u8>,
     pub report: ConversionReport,
+    pub document: VersionedDocumentIr,
 }
 
 impl fmt::Debug for ConversionOutcome {
@@ -317,6 +455,7 @@ impl fmt::Debug for ConversionOutcome {
             .debug_struct("ConversionOutcome")
             .field("artifact_len", &self.artifact.len())
             .field("report", &self.report)
+            .field("document", &self.document)
             .finish()
     }
 }
@@ -374,12 +513,156 @@ impl fmt::Display for ConversionFailure {
 
 impl std::error::Error for ConversionFailure {}
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NumericConversionOptions {
+    pub complex_mode: ComplexOutputMode,
+    pub precision: PrecisionPolicy,
+}
+
+impl Default for NumericConversionOptions {
+    fn default() -> Self {
+        Self {
+            complex_mode: ComplexOutputMode::Algebraic,
+            precision: PrecisionPolicy::new(15, 15).expect("valid default precision"),
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
-pub struct ConversionPipeline;
+pub struct ConversionPipeline {
+    numeric_options: NumericConversionOptions,
+}
 
 impl ConversionPipeline {
     pub const fn new() -> Self {
-        Self
+        Self {
+            numeric_options: NumericConversionOptions {
+                complex_mode: ComplexOutputMode::Algebraic,
+                precision: match PrecisionPolicy::new(15, 15) {
+                    Ok(value) => value,
+                    Err(_) => panic!("valid default precision"),
+                },
+            },
+        }
+    }
+
+    pub const fn with_numeric_options(
+        complex_mode: ComplexOutputMode,
+        precision: PrecisionPolicy,
+    ) -> Self {
+        Self {
+            numeric_options: NumericConversionOptions {
+                complex_mode,
+                precision,
+            },
+        }
+    }
+
+    pub const fn numeric_options(&self) -> NumericConversionOptions {
+        self.numeric_options
+    }
+
+    pub fn convert_with_numeric_options(
+        &self,
+        request: ConversionRequest,
+        complex_mode: ComplexOutputMode,
+        precision: PrecisionPolicy,
+    ) -> Result<ConversionOutcome, ConversionFailure> {
+        Self::with_numeric_options(complex_mode, precision).convert(request)
+    }
+
+    pub fn inspect(
+        &self,
+        bytes: &[u8],
+        file_name: Option<&str>,
+        limits: ConversionLimits,
+    ) -> Result<InspectionReport, ConversionFailure> {
+        let detection = FormatDetector::default()
+            .detect(bytes, file_name)
+            .map_err(|error| {
+                bounded_fatal_failure(
+                    format_error_code(error),
+                    DiagnosticCode::InvalidInput,
+                    Vec::new(),
+                    limits.max_diagnostics,
+                )
+            })?;
+        let mut diagnostics = detection
+            .diagnostics
+            .iter()
+            .map(|_| DiagnosticCode::FileExtensionMismatch)
+            .collect::<Vec<_>>();
+        if diagnostics.len() > limits.max_diagnostics {
+            return Err(bounded_fatal_failure(
+                FailureCode::DiagnosticLimitExceeded,
+                DiagnosticCode::DiagnosticLimitExceeded,
+                Vec::new(),
+                limits.max_diagnostics,
+            ));
+        }
+        let (detected_format, region_count) = match detection.detected {
+            InputFormat::Xmcd => {
+                let worksheet = WorksheetParser::new(limits.worksheet)
+                    .parse(bytes)
+                    .map_err(|error| {
+                        bounded_fatal_failure(
+                            worksheet_error_code(error),
+                            DiagnosticCode::ParserFailure,
+                            Vec::new(),
+                            limits.max_diagnostics,
+                        )
+                    })?;
+                for diagnostic in &worksheet.diagnostics {
+                    if diagnostics.len() >= limits.max_diagnostics {
+                        return Err(bounded_fatal_failure(
+                            FailureCode::DiagnosticLimitExceeded,
+                            DiagnosticCode::DiagnosticLimitExceeded,
+                            Vec::new(),
+                            limits.max_diagnostics,
+                        ));
+                    }
+                    diagnostics.push(match diagnostic.code {
+                        ParserDiagnosticCode::FileExtensionMismatch => {
+                            DiagnosticCode::FileExtensionMismatch
+                        }
+                        ParserDiagnosticCode::UnknownRegionContent => {
+                            DiagnosticCode::UnknownRegionContent
+                        }
+                        ParserDiagnosticCode::UnknownInlineNode => {
+                            DiagnosticCode::UnknownInlineNode
+                        }
+                        ParserDiagnosticCode::UnsupportedMathNode => {
+                            DiagnosticCode::UnsupportedMathNode
+                        }
+                        ParserDiagnosticCode::UnknownContainerPart => {
+                            DiagnosticCode::UnsupportedRegion
+                        }
+                    });
+                }
+                ("xmcd".to_owned(), worksheet.regions.len())
+            }
+            InputFormat::Mcdx => {
+                return Err(bounded_fatal_failure(
+                    FailureCode::McdxContentUnsupported,
+                    DiagnosticCode::McdxContentUnsupported,
+                    Vec::new(),
+                    limits.max_diagnostics,
+                ));
+            }
+            InputFormat::Unknown => {
+                return Err(bounded_fatal_failure(
+                    FailureCode::InvalidInput,
+                    DiagnosticCode::InvalidInput,
+                    Vec::new(),
+                    limits.max_diagnostics,
+                ));
+            }
+        };
+        Ok(InspectionReport {
+            detected_format,
+            region_count,
+            diagnostics,
+        })
     }
 
     pub fn convert(
@@ -474,6 +757,7 @@ impl ConversionPipeline {
             limits.transformation,
         );
         let mut blocks = Vec::new();
+        let mut plot_metadata = Vec::new();
         let mut items = Vec::new();
         for region in worksheet.visual_order() {
             if items.len() >= limits.max_items {
@@ -591,6 +875,28 @@ impl ConversionPipeline {
                         }
                     }
                 },
+                RegionContent::Plot(plot) => {
+                    let _ = handle_unsupported(
+                        &request.options,
+                        &mut diagnostics,
+                        &mut items,
+                        region.id,
+                        region.source_ordinal,
+                    )?;
+                    let block_id = BlockId(format!("region-{}", region.id));
+                    blocks.push(BlockIr {
+                        id: block_id.clone(),
+                        provenance,
+                        fidelity: FidelityIr::Unsupported,
+                        placement: None,
+                        content: BlockContentIr::Plot(PlotIr { preview: None }),
+                    });
+                    plot_metadata.push(PlotMetadataIrV3 {
+                        block_id,
+                        item_idref: plot.item_idref.clone(),
+                        disable_calc: plot.disable_calc,
+                    });
+                }
                 _ => {
                     if handle_unsupported(
                         &request.options,
@@ -604,7 +910,12 @@ impl ConversionPipeline {
                 }
             }
         }
-        if blocks.is_empty() {
+        if !blocks.iter().any(|block| {
+            matches!(
+                block.content,
+                BlockContentIr::Text(_) | BlockContentIr::Image(_) | BlockContentIr::Equation(_)
+            )
+        }) {
             return Err(bounded_fatal_failure(
                 FailureCode::NoExportableContent,
                 DiagnosticCode::NoExportableContent,
@@ -634,6 +945,31 @@ impl ConversionPipeline {
                 limits.max_diagnostics,
             )
         })?;
+        let export_document = DocumentIrV1 {
+            metadata: document.metadata.clone(),
+            pages: document
+                .pages
+                .iter()
+                .map(|page| PageIr {
+                    size: page.size,
+                    orientation: page.orientation,
+                    margins: page.margins,
+                    blocks: page
+                        .blocks
+                        .iter()
+                        .filter(|block| {
+                            matches!(
+                                block.content,
+                                BlockContentIr::Text(_)
+                                    | BlockContentIr::Image(_)
+                                    | BlockContentIr::Equation(_)
+                            )
+                        })
+                        .cloned()
+                        .collect(),
+                })
+                .collect(),
+        };
         let exporter = DocxExporter::with_config(
             limits.docx,
             exporter_docx::DocxExportConfig {
@@ -641,7 +977,7 @@ impl ConversionPipeline {
             },
         );
         let artifact = exporter
-            .export(&document, &EmptyAssetResolver)
+            .export(&export_document, &EmptyAssetResolver)
             .map_err(|_| {
                 bounded_fatal_failure(
                     FailureCode::ExportFailure,
@@ -660,9 +996,30 @@ impl ConversionPipeline {
                     limits.max_diagnostics,
                 )
             })?;
+        let document = if plot_metadata.is_empty() {
+            VersionedDocumentIr::v1(document)
+        } else {
+            VersionedDocumentIr::v3(DocumentIrV3 {
+                document,
+                plot_metadata,
+            })
+        };
+        document.validate().map_err(|_| {
+            bounded_fatal_failure(
+                FailureCode::IrValidationFailure,
+                DiagnosticCode::ValidationFailure,
+                diagnostics.diagnostics().to_vec(),
+                limits.max_diagnostics,
+            )
+        })?;
         Ok(ConversionOutcome {
             artifact,
-            report: ConversionReport::new(diagnostics.into_diagnostics(), items),
+            report: ConversionReport::new_with_numeric_options(
+                diagnostics.into_diagnostics(),
+                items,
+                self.numeric_options,
+            ),
+            document,
         })
     }
 }
@@ -989,6 +1346,20 @@ mod tests {
     }
 
     #[test]
+    fn numeric_options_cross_the_conversion_boundary_and_are_reported() {
+        let precision = PrecisionPolicy::new(40, 12).expect("precision");
+        let pipeline = ConversionPipeline::with_numeric_options(ComplexOutputMode::Both, precision);
+        let configured = pipeline.numeric_options();
+        assert_eq!(configured.complex_mode, ComplexOutputMode::Both);
+        assert_eq!(configured.precision, precision);
+
+        let report = ConversionReport::new_with_numeric_options(Vec::new(), Vec::new(), configured);
+        assert_eq!(report.numeric_options.complex_mode, "both");
+        assert_eq!(report.numeric_options.computation_digits, 40);
+        assert_eq!(report.numeric_options.display_digits, 12);
+    }
+
+    #[test]
     fn report_preserves_diagnostic_order() {
         let ordered = vec![
             Diagnostic::new(
@@ -1043,6 +1414,20 @@ mod tests {
         let outcome = ConversionOutcome {
             artifact: b"SECRET_DOCX".to_vec(),
             report: ConversionReport::new(Vec::new(), Vec::new()),
+            document: VersionedDocumentIr::v1(DocumentIrV1 {
+                metadata: MetadataIr::default(),
+                pages: vec![PageIr {
+                    size: PhysicalSizeIr::a4_portrait(),
+                    orientation: PageOrientationIr::Portrait,
+                    margins: PageMarginsIr {
+                        top_um: 1,
+                        right_um: 1,
+                        bottom_um: 1,
+                        left_um: 1,
+                    },
+                    blocks: Vec::new(),
+                }],
+            }),
         };
         let rendered = format!("{outcome:?}");
         assert!(rendered.contains("artifact_len: 11"));

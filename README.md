@@ -4,7 +4,7 @@ MathMorph — monorepo расширяемой платформы parsing и ко
 
 ## Текущее состояние
 
-Реализованы и проверены этапы 001–093, 095–099, 143–148 и независимый frontend-этап 154: безопасная входная граница, legacy XMCD worksheet30 parser, структурный Math AST, presentation transformation pipeline, versioned Document IR, общий conversion core, детерминированный DOCX/OMML exporter и локальный CLI. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но формулы пока не вычисляет. API endpoints и интерактивный web converter flow ещё не реализованы; Prime MCDX безопасно определяется, но не имеет content parser.
+Реализованы и проверены этапы 001–093, 095–124, 127 и 143–154, а также component previews 126/134: безопасная входная граница, legacy XMCD worksheet30 parser, структурный Math AST, presentation/semantic math engine, versioned Document IR, общий conversion core, детерминированный DOCX/OMML exporter и расширенный локальный CLI. Остальные части 125/128–142 зависят от подтверждённых plot/diagram payload или live Visio fixtures и остаются evidence-gated; этап 094 зависит от live MathType evidence. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но полный worksheet evaluator пока не подключён. API endpoints и интерактивный web converter flow ещё не реализованы; Prime MCDX безопасно определяется, но не имеет content parser.
 
 ## Структура
 
@@ -69,6 +69,22 @@ cargo build -p mathmorph-cli --release --locked
 ```
 
 По умолчанию рядом создаётся `input.docx`. Явный output задаётся через `--output ./path/to/result.docx`; существующий файл не перезаписывается. Prime `.mcdx` пока возвращает `MCDX_CONTENT_UNSUPPORTED` без output.
+
+Проверить структуру входа, выполнить полный validation path без публикации DOCX или экспортировать versioned Document IR:
+
+```powershell
+./target/release/mathmorph.exe inspect ./path/to/input.xmcd
+./target/release/mathmorph.exe validate ./path/to/input.xmcd
+./target/release/mathmorph.exe export-ir ./path/to/input.xmcd --output ./path/to/input.ir.json
+```
+
+Для `convert` также доступны alias `--format`, режим представления комплексных чисел и precision policy:
+
+```powershell
+./target/release/mathmorph.exe convert ./path/to/input.xmcd --format docx --complex-mode both --precision 15
+```
+
+Registry распознаёт `docx`, `markdown`, `latex`, `html`, `pdf`, `json` и `typst`, но production exporter пока существует только для `docx`; остальные известные форматы возвращают `EXPORTER_UNAVAILABLE` до чтения input.
 
 Сгенерировать проверенный DOCX с редактируемой формулой и открыть его в Word:
 

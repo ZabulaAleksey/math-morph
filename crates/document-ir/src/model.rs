@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 pub const DOCUMENT_IR_SCHEMA_VERSION: u16 = 1;
+pub const DOCUMENT_IR_V3_SCHEMA_VERSION: u16 = 3;
 const MAX_PAGES: usize = 1_024;
 const MAX_BLOCKS: usize = 100_000;
 const MAX_TABLE_DEPTH: usize = 16;
@@ -18,6 +19,7 @@ const MAX_EXPRESSION_NODES: usize = 100_000;
 #[derive(Clone, Eq, PartialEq)]
 pub enum VersionedDocumentIr {
     V1(DocumentIrV1),
+    V3(DocumentIrV3),
 }
 
 impl VersionedDocumentIr {
@@ -25,20 +27,102 @@ impl VersionedDocumentIr {
         Self::V1(document)
     }
 
+    pub const fn v3(document: DocumentIrV3) -> Self {
+        Self::V3(document)
+    }
+
     pub const fn schema_version(&self) -> u16 {
         match self {
             Self::V1(_) => DOCUMENT_IR_SCHEMA_VERSION,
+            Self::V3(_) => DOCUMENT_IR_V3_SCHEMA_VERSION,
         }
     }
 
     pub const fn as_v1(&self) -> &DocumentIrV1 {
         match self {
             Self::V1(document) => document,
+            Self::V3(document) => &document.document,
+        }
+    }
+
+    pub const fn as_v3(&self) -> Option<&DocumentIrV3> {
+        match self {
+            Self::V1(_) => None,
+            Self::V3(document) => Some(document),
         }
     }
 
     pub fn validate(&self) -> Result<(), DocumentIrValidationError> {
-        self.as_v1().validate()
+        match self {
+            Self::V1(document) => document.validate(),
+            Self::V3(document) => document.validate(),
+        }
+    }
+}
+
+#[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct DocumentIrV3 {
+    pub document: DocumentIrV1,
+    pub plot_metadata: Vec<PlotMetadataIrV3>,
+}
+
+impl DocumentIrV3 {
+    pub fn validate(&self) -> Result<(), DocumentIrValidationError> {
+        self.document.validate()?;
+        if self.plot_metadata.len() > MAX_BLOCKS {
+            return Err(DocumentIrValidationError::PlotMetadataLimitExceeded);
+        }
+        let mut plot_ids = Vec::new();
+        for page in &self.document.pages {
+            collect_plot_ids(&page.blocks, &mut plot_ids)?;
+        }
+        if plot_ids.len() != self.plot_metadata.len() {
+            return Err(DocumentIrValidationError::InvalidPlotMetadata);
+        }
+        for (expected, metadata) in plot_ids.iter().zip(&self.plot_metadata) {
+            if expected != &metadata.block_id.0 {
+                return Err(DocumentIrValidationError::InvalidPlotMetadata);
+            }
+            if let Some(reference) = &metadata.item_idref {
+                if reference.is_empty()
+                    || reference.len() > MAX_ID_BYTES
+                    || reference.chars().any(char::is_control)
+                {
+                    return Err(DocumentIrValidationError::InvalidPlotMetadata);
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl fmt::Debug for DocumentIrV3 {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("DocumentIrV3")
+            .field("page_count", &self.document.pages.len())
+            .field("plot_metadata_count", &self.plot_metadata.len())
+            .finish()
+    }
+}
+
+#[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PlotMetadataIrV3 {
+    pub block_id: BlockId,
+    pub item_idref: Option<String>,
+    pub disable_calc: bool,
+}
+
+impl fmt::Debug for PlotMetadataIrV3 {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("PlotMetadataIrV3")
+            .field("block_id", &self.block_id)
+            .field("has_item_idref", &self.item_idref.is_some())
+            .field("disable_calc", &self.disable_calc)
+            .finish()
     }
 }
 
@@ -477,6 +561,10 @@ pub enum DocumentIrValidationError {
     InvalidProvenance,
     #[error("document IR contains invalid formula provenance")]
     InvalidFormula,
+    #[error("document IR plot metadata limit exceeded")]
+    PlotMetadataLimitExceeded,
+    #[error("document IR contains invalid plot metadata")]
+    InvalidPlotMetadata,
 }
 
 #[derive(Default)]
@@ -570,6 +658,28 @@ fn validate_block(
         }
         BlockContentIr::Unsupported(unsupported) => validate_value_length(&unsupported.kind),
     }
+}
+
+fn collect_plot_ids(
+    blocks: &[BlockIr],
+    output: &mut Vec<String>,
+) -> Result<(), DocumentIrValidationError> {
+    for block in blocks {
+        if matches!(block.content, BlockContentIr::Plot(_)) {
+            if output.len() >= MAX_BLOCKS {
+                return Err(DocumentIrValidationError::PlotMetadataLimitExceeded);
+            }
+            output.push(block.id.0.clone());
+        }
+        if let BlockContentIr::Table(table) = &block.content {
+            for row in &table.rows {
+                for cell in &row.cells {
+                    collect_plot_ids(&cell.blocks, output)?;
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 fn validate_table(

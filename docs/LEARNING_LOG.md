@@ -808,3 +808,55 @@ cargo test --workspace --locked
 3. Передать graph с unresolved reference и убедиться, что plan не возвращается.
 4. Передать function self-cycle и проверить `CyclePresent` без recursion/panic.
 5. Уменьшить ready/output limits и запустить targeted regressions.
+
+## 2026-08-21 — Этапы 149–153: inspection и versioned CLI reports
+
+### Что изменено
+
+- `inspect` переиспользует bounded detector/parser и возвращает JSON без path или source payload; MCDX и повреждённый input завершаются fail closed.
+- Exporter registry различает неизвестный target и известный, но ещё недоступный backend до чтения файла.
+- `--complex-mode` и `--precision` валидируются до I/O, проходят через numeric conversion boundary и отражаются в conversion report.
+- `validate` выполняет общий conversion/validation path без публикации DOCX; `export-ir` использует bounded JSON и no-replace publication.
+
+### Команды проверки
+
+```powershell
+cargo test -p conversion-core -p mathmorph-cli --locked
+cargo clippy -p conversion-core -p mathmorph-cli --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+python -B scripts/validate_project.py
+```
+
+### Как повторить самостоятельно
+
+1. Запустить `mathmorph inspect input.xmcd` и проверить `schema_version: 1`.
+2. Запустить `mathmorph validate input.xmcd` и убедиться, что DOCX не создаётся.
+3. Экспортировать `export-ir` в новый файл и повторить команду: существующий файл не должен перезаписаться.
+4. Передать `--to typst` и неизвестный format; проверить разные typed errors.
+5. Передать MCDX в `inspect` и убедиться в `MCDX_CONTENT_UNSUPPORTED`.
+
+## 2026-08-21 — Plot metadata schema 3 и явный raster fallback
+
+### Что изменено
+
+- Неизменяемый V1 contract сохранён; исторически отклонённая schema 2 не переиспользована, а plot metadata добавлена в strict schema 3.
+- `item_idref` и `disable_calc` проходят из подтверждённого XMCD parser в versioned IR без догадок о preview, axes или series.
+- DOCX принимает только явно заданный `FallbackRendered` PNG/JPEG preview; отсутствие preview или невалидный V3 sidecar завершается fail closed.
+- Mixed partial conversion сохраняет plot в IR и исключает его только из DOCX projection с явной диагностикой.
+
+### Команды проверки
+
+```powershell
+cargo test --workspace --locked
+cargo clippy --workspace --all-targets --locked -- -D warnings
+python -B scripts/validate_project.py
+python -B scripts/validate_fixtures.py
+```
+
+### Как повторить самостоятельно
+
+1. Выполнить `mathmorph export-ir` для mixed text+plot XMCD и проверить `schema_version: 3`.
+2. Удалить plot metadata entry в тестовом V3 и убедиться в typed validation failure.
+3. Передать PlotIr preview с fidelity `Exact` и проверить `UnsupportedContent`.
+4. Повторить preview с `FallbackRendered` и валидным PNG/JPEG asset — DOCX должен пройти validator.
+5. Проверить, что schema 2 по-прежнему отклоняется и V1 golden не изменился.

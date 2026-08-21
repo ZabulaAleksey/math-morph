@@ -142,12 +142,11 @@ impl DocxExporter {
         if document.pages.len() != 1 {
             return Err(DocxError::MultiplePagesUnsupported);
         }
-        if document.pages[0].blocks.iter().any(|block| {
-            !matches!(
-                block.content,
-                BlockContentIr::Text(_) | BlockContentIr::Image(_) | BlockContentIr::Equation(_)
-            )
-        }) {
+        if document.pages[0]
+            .blocks
+            .iter()
+            .any(|block| !is_supported_block(block))
+        {
             return Err(DocxError::UnsupportedContent);
         }
         let images = self.prepare_images(document, resolver)?;
@@ -205,6 +204,7 @@ impl DocxExporter {
         document: &VersionedDocumentIr,
         resolver: &R,
     ) -> Result<Vec<u8>, DocxError> {
+        document.validate()?;
         self.export(document.as_v1(), resolver)
     }
 
@@ -231,7 +231,7 @@ impl DocxExporter {
                 BlockContentIr::Text(text) => {
                     self.render_text(text, &mut output, &mut paragraphs, &mut runs)?;
                 }
-                BlockContentIr::Image(_) => {
+                BlockContentIr::Image(_) | BlockContentIr::Plot(_) | BlockContentIr::Diagram(_) => {
                     let image = images
                         .get(image_index)
                         .ok_or(DocxError::GeneratedPackageInvalid)?;
@@ -351,7 +351,7 @@ impl DocxExporter {
         let mut asset_ids = BTreeSet::new();
         let mut total_asset_bytes = 0_u64;
         for block in &document.pages[0].blocks {
-            let BlockContentIr::Image(image) = &block.content else {
+            let Some(image) = preview_or_image(block) else {
                 continue;
             };
             if images.len() >= self.limits.max_images {
@@ -526,6 +526,28 @@ impl DocxExporter {
         } else {
             Ok(())
         }
+    }
+}
+
+fn is_supported_block(block: &document_ir::BlockIr) -> bool {
+    match &block.content {
+        BlockContentIr::Text(_) | BlockContentIr::Image(_) | BlockContentIr::Equation(_) => true,
+        BlockContentIr::Plot(plot) => {
+            plot.preview.is_some() && block.fidelity == document_ir::FidelityIr::FallbackRendered
+        }
+        BlockContentIr::Diagram(diagram) => {
+            diagram.preview.is_some() && block.fidelity == document_ir::FidelityIr::FallbackRendered
+        }
+        _ => false,
+    }
+}
+
+fn preview_or_image(block: &document_ir::BlockIr) -> Option<&document_ir::ImageIr> {
+    match &block.content {
+        BlockContentIr::Image(image) => Some(image),
+        BlockContentIr::Plot(plot) => plot.preview.as_ref(),
+        BlockContentIr::Diagram(diagram) => diagram.preview.as_ref(),
+        _ => None,
     }
 }
 

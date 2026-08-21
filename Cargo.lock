@@ -23,6 +23,8 @@ dependencies = [
  "math-engine",
  "math-model",
  "mathcad-parser",
+ "serde",
+ "serde_json",
  "thiserror",
  "zip",
 ]
@@ -144,6 +146,8 @@ version = "0.0.0"
 dependencies = [
  "conversion-core",
  "exporter-docx",
+ "math-engine",
+ "serde_json",
  "zip",
 ]
 

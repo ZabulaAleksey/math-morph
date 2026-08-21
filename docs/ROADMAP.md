@@ -142,8 +142,8 @@
 - **101** — `variable references` — `verified`
 - **102** — `dependency graph` — `verified`
 - **103** — `worksheet evaluation order` — `verified`
-- **104** — `undefined-variable diagnostic`
-- **105** — `circular dependency diagnostic`
+- **104** — `undefined-variable diagnostic` — `verified`
+- **105** — `circular dependency diagnostic` — `verified`
 
 ## Подстановка — 106–111
 
@@ -170,26 +170,26 @@
 
 ## Графики — 123–127
 
-- **123** — `plot region semantics`
-- **124** — `PlotIR metadata`
-- **125** — `preview extraction`
-- **126** — `plot image→DOCX`
-- **127** — `plot fallback`
+- **123** — `plot region semantics` — `verified`
+- **124** — `PlotIR metadata` — `verified` через Document IR V3
+- **125** — `preview extraction` — `blocked by versioned fixture/schema evidence`
+- **126** — `plot image→DOCX` — `component verified`; live source path blocked by 125
+- **127** — `plot fallback` — `verified` как explicit safe partial/fail-closed policy
 
 ## Будущее ChartIR/Excel — 128–132
 
-- **128** — `ChartIR`
-- **129** — `series expression extraction`
-- **130** — `reconstruction fixtures`
-- **131** — `ChartExporter`
-- **132** — `experimental Excel chart POC`
+- **128** — `ChartIR` — `blocked by plot schema evidence`
+- **129** — `series expression extraction` — `blocked by plot schema evidence`
+- **130** — `reconstruction fixtures` — `blocked by legal versioned fixtures`
+- **131** — `ChartExporter` — `blocked by 128–130`
+- **132** — `experimental Excel chart POC` — `blocked by 128–131`
 
 ## Будущее диаграмм и Visio — 133–142
 
-- **133** — `diagram detection`
-- **134** — `diagram preview→DOCX`
-- **135** — `DiagramIR`
-- **136** — `shape-forensics report`
+- **133** — `diagram detection` — `blocked by versioned fixture/schema evidence`
+- **134** — `diagram preview→DOCX` — `component verified`; live source path blocked by 133
+- **135** — `DiagramIR` — partial V1 skeleton; expanded model remains planned
+- **136** — `shape-forensics report` — `blocked by diagram evidence`
 - **137** — `primitive shapes`
 - **138** — `connector graph`
 - **139** — `grouping`
@@ -208,11 +208,11 @@
 ## CLI — 148–153
 
 - **148** — `minimal convert command` — `verified`
-- **149** — `inspect command`
-- **150** — `--format/exporter registry including Typst`
-- **151** — `--complex-mode`
-- **152** — `--precision`
-- **153** — `JSON/Document IR report`
+- **149** — `inspect command` — `verified`
+- **150** — `--format/exporter registry including Typst` — `verified`
+- **151** — `--complex-mode` — `verified`
+- **152** — `--precision` — `verified`
+- **153** — `JSON/Document IR report` — `verified`
 
 ## Веб-интерфейс — 154–161
 

@@ -14,6 +14,171 @@ use std::time::{SystemTime, UNIX_EPOCH};
 const TEMP_ATTEMPTS: u32 = 16;
 
 #[derive(Clone, Eq, PartialEq)]
+pub enum CommandArguments {
+    Convert {
+        arguments: CliArguments,
+        target: TargetFormat,
+        complex_mode: math_engine::ComplexOutputMode,
+        precision: math_engine::PrecisionPolicy,
+    },
+    Inspect {
+        input: PathBuf,
+    },
+    Validate {
+        input: PathBuf,
+    },
+    ExportIr {
+        input: PathBuf,
+        output: Option<PathBuf>,
+    },
+}
+
+impl fmt::Debug for CommandArguments {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let (command, output_present) = match self {
+            Self::Convert { arguments, .. } => ("convert", arguments.output.is_some()),
+            Self::Inspect { .. } => ("inspect", false),
+            Self::Validate { .. } => ("validate", false),
+            Self::ExportIr { output, .. } => ("export-ir", output.is_some()),
+        };
+        formatter
+            .debug_struct("CommandArguments")
+            .field("command", &command)
+            .field("input_present", &true)
+            .field("output_present", &output_present)
+            .finish()
+    }
+}
+
+pub fn parse_command_args<I>(args: I) -> Result<CommandArguments, CliError>
+where
+    I: IntoIterator<Item = OsString>,
+{
+    let values: Vec<OsString> = args.into_iter().collect();
+    let Some(command) = values.first().and_then(|v| v.to_str()) else {
+        return Err(CliError::Usage("USAGE_ERROR"));
+    };
+    match command {
+        "inspect" | "validate"
+            if values.len() == 2 && !values[1].to_string_lossy().starts_with('-') =>
+        {
+            let input = PathBuf::from(values[1].clone());
+            Ok(if command == "inspect" {
+                CommandArguments::Inspect { input }
+            } else {
+                CommandArguments::Validate { input }
+            })
+        }
+        "export-ir" => {
+            let (input, output) = parse_input_output(&values[1..])?;
+            Ok(CommandArguments::ExportIr { input, output })
+        }
+        "convert" => parse_extended_convert(&values),
+        _ => Err(CliError::Usage("USAGE_ERROR")),
+    }
+}
+
+fn parse_input_output(values: &[OsString]) -> Result<(PathBuf, Option<PathBuf>), CliError> {
+    let mut input = None;
+    let mut output = None;
+    let mut index = 0;
+    while index < values.len() {
+        if values[index] == "--output" {
+            index += 1;
+            if output.is_some() || index >= values.len() {
+                return Err(CliError::Usage("USAGE_ERROR"));
+            }
+            if values[index].is_empty() || values[index].to_string_lossy().starts_with('-') {
+                return Err(CliError::Usage("USAGE_ERROR"));
+            }
+            output = Some(PathBuf::from(values[index].clone()));
+        } else if values[index].to_string_lossy().starts_with('-') || input.is_some() {
+            return Err(CliError::Usage("USAGE_ERROR"));
+        } else {
+            input = Some(PathBuf::from(values[index].clone()));
+        }
+        index += 1;
+    }
+    Ok((input.ok_or(CliError::Usage("USAGE_ERROR"))?, output))
+}
+
+fn parse_extended_convert(values: &[OsString]) -> Result<CommandArguments, CliError> {
+    let mut input = None;
+    let mut output = None;
+    let mut target = None;
+    let mut complex_mode = None;
+    let mut precision = None;
+    let mut index = 1;
+    while index < values.len() {
+        let flag = values[index].to_string_lossy();
+        if matches!(
+            flag.as_ref(),
+            "--to" | "--format" | "--output" | "--complex-mode" | "--precision"
+        ) {
+            index += 1;
+            if index >= values.len() {
+                return Err(CliError::Usage("USAGE_ERROR"));
+            }
+            let value = values[index].to_string_lossy();
+            match flag.as_ref() {
+                "--to" | "--format" => {
+                    if target.is_some() {
+                        return Err(CliError::Usage("USAGE_ERROR"));
+                    }
+                    target = Some(
+                        TargetFormat::parse(&value).ok_or(CliError::Usage("UNSUPPORTED_TARGET"))?,
+                    );
+                }
+                "--output" => {
+                    if output.is_some() {
+                        return Err(CliError::Usage("USAGE_ERROR"));
+                    }
+                    output = Some(PathBuf::from(values[index].clone()));
+                }
+                "--complex-mode" => {
+                    if complex_mode.is_some() {
+                        return Err(CliError::Usage("USAGE_ERROR"));
+                    }
+                    complex_mode = Some(match value.as_ref() {
+                        "algebraic" => math_engine::ComplexOutputMode::Algebraic,
+                        "polar" => math_engine::ComplexOutputMode::Polar,
+                        "both" => math_engine::ComplexOutputMode::Both,
+                        _ => return Err(CliError::Usage("INVALID_COMPLEX_MODE")),
+                    });
+                }
+                "--precision" => {
+                    if precision.is_some() {
+                        return Err(CliError::Usage("USAGE_ERROR"));
+                    }
+                    let digits: u16 = value
+                        .parse()
+                        .map_err(|_| CliError::Usage("INVALID_PRECISION"))?;
+                    precision = Some(
+                        math_engine::PrecisionPolicy::new(digits, digits)
+                            .map_err(|_| CliError::Usage("INVALID_PRECISION"))?,
+                    );
+                }
+                _ => unreachable!(),
+            }
+        } else if flag.starts_with('-') || input.is_some() {
+            return Err(CliError::Usage("USAGE_ERROR"));
+        } else {
+            input = Some(PathBuf::from(values[index].clone()));
+        }
+        index += 1;
+    }
+    Ok(CommandArguments::Convert {
+        arguments: CliArguments {
+            input: input.ok_or(CliError::Usage("USAGE_ERROR"))?,
+            output,
+        },
+        target: target.ok_or(CliError::Usage("USAGE_ERROR"))?,
+        complex_mode: complex_mode.unwrap_or(math_engine::ComplexOutputMode::Algebraic),
+        precision: precision.unwrap_or(math_engine::PrecisionPolicy::new(15, 15).expect("default")),
+    })
+}
+
+#[derive(Clone, Eq, PartialEq)]
 pub struct CliArguments {
     pub input: PathBuf,
     pub output: Option<PathBuf>,
@@ -50,6 +215,7 @@ pub enum CliError {
     Invalid(&'static str),
     Conversion(&'static str),
     Filesystem(&'static str),
+    Machine { code: &'static str, exit: ExitCode },
 }
 
 impl CliError {
@@ -59,6 +225,7 @@ impl CliError {
             Self::Invalid(_) => ExitCode::InvalidInput,
             Self::Conversion(_) => ExitCode::Conversion,
             Self::Filesystem(_) => ExitCode::Filesystem,
+            Self::Machine { exit, .. } => *exit,
         }
     }
 
@@ -68,6 +235,7 @@ impl CliError {
             | Self::Invalid(code)
             | Self::Conversion(code)
             | Self::Filesystem(code) => code,
+            Self::Machine { code, .. } => code,
         }
     }
 }
@@ -126,6 +294,37 @@ where
 /// Windows file-id on this toolchain; uncertain metadata therefore fails closed,
 /// and this adapter never falls back to replacement-style rename.
 pub fn execute(arguments: CliArguments) -> Result<String, CliError> {
+    execute_convert(
+        arguments,
+        math_engine::ComplexOutputMode::Algebraic,
+        math_engine::PrecisionPolicy::new(15, 15).expect("default precision"),
+    )
+}
+
+pub fn execute_command(command: CommandArguments) -> Result<String, CliError> {
+    match command {
+        CommandArguments::Convert {
+            arguments,
+            target,
+            complex_mode,
+            precision,
+        } => {
+            if !target.is_available() {
+                return Err(CliError::Conversion("EXPORTER_UNAVAILABLE"));
+            }
+            execute_convert(arguments, complex_mode, precision)
+        }
+        CommandArguments::Inspect { input } => inspect(input),
+        CommandArguments::Validate { input } => validate(input),
+        CommandArguments::ExportIr { input, output } => export_ir(input, output),
+    }
+}
+
+fn execute_convert(
+    arguments: CliArguments,
+    complex_mode: math_engine::ComplexOutputMode,
+    precision: math_engine::PrecisionPolicy,
+) -> Result<String, CliError> {
     validate_path_components(&arguments.input, "INPUT_SYMLINK")?;
     let input_metadata = fs::symlink_metadata(&arguments.input)
         .map_err(|error| map_input_metadata_error(error.kind()))?;
@@ -141,18 +340,22 @@ pub fn execute(arguments: CliArguments) -> Result<String, CliError> {
 
     let bytes = read_bounded(&arguments.input)?;
     let outcome = ConversionPipeline::new()
-        .convert(ConversionRequest::new(
-            bytes,
-            arguments
-                .input
-                .file_name()
-                .map(|name| name.to_string_lossy().into_owned()),
-            TargetFormat::Docx,
-            ConversionOptions {
-                partial_policy: PartialPolicy::AllowSafePartial,
-                ..ConversionOptions::default()
-            },
-        ))
+        .convert_with_numeric_options(
+            ConversionRequest::new(
+                bytes,
+                arguments
+                    .input
+                    .file_name()
+                    .map(|name| name.to_string_lossy().into_owned()),
+                TargetFormat::Docx,
+                ConversionOptions {
+                    partial_policy: PartialPolicy::AllowSafePartial,
+                    ..ConversionOptions::default()
+                },
+            ),
+            complex_mode,
+            precision,
+        )
         .map_err(map_conversion_error)?;
 
     let temp_cleanup_warning = write_atomic(&output, &outcome.artifact)?;
@@ -174,6 +377,81 @@ pub fn execute(arguments: CliArguments) -> Result<String, CliError> {
         Ok(status.to_owned())
     } else {
         Ok(format!("{status}: {}", warning_codes.join(",")))
+    }
+}
+
+fn safe_read(input: &Path) -> Result<(Vec<u8>, Option<String>), CliError> {
+    validate_path_components(input, "INPUT_SYMLINK")?;
+    let metadata = fs::symlink_metadata(input).map_err(|e| map_input_metadata_error(e.kind()))?;
+    if !metadata.is_file() {
+        return Err(CliError::Filesystem("INPUT_NOT_FILE"));
+    }
+    let bytes = read_bounded(input)?;
+    let name = input.file_name().map(|v| v.to_string_lossy().into_owned());
+    Ok((bytes, name))
+}
+
+fn inspect(input: PathBuf) -> Result<String, CliError> {
+    let (bytes, name) = safe_read(&input)?;
+    let report = ConversionPipeline::new()
+        .inspect(&bytes, name.as_deref(), ConversionOptions::default().limits)
+        .map_err(map_conversion_error)?;
+    let bytes = report
+        .to_json(16 * 1024 * 1024)
+        .map_err(|_| CliError::Conversion("REPORT_SERIALIZATION_FAILURE"))?;
+    String::from_utf8(bytes).map_err(|_| CliError::Conversion("REPORT_SERIALIZATION_FAILURE"))
+}
+
+fn conversion_for_report(input: &Path) -> Result<conversion_core::ConversionOutcome, CliError> {
+    let (bytes, name) = safe_read(input)?;
+    ConversionPipeline::new()
+        .convert(ConversionRequest::new(
+            bytes,
+            name,
+            TargetFormat::Docx,
+            ConversionOptions {
+                partial_policy: PartialPolicy::AllowSafePartial,
+                ..ConversionOptions::default()
+            },
+        ))
+        .map_err(map_conversion_error)
+}
+
+fn validate(input: PathBuf) -> Result<String, CliError> {
+    let outcome = conversion_for_report(&input).map_err(machine_error)?;
+    let bytes = outcome
+        .report
+        .to_json(16 * 1024 * 1024)
+        .map_err(|_| CliError::Conversion("REPORT_SERIALIZATION_FAILURE"))?;
+    String::from_utf8(bytes).map_err(|_| CliError::Conversion("REPORT_SERIALIZATION_FAILURE"))
+}
+
+fn export_ir(input: PathBuf, output: Option<PathBuf>) -> Result<String, CliError> {
+    if let Some(path) = output.as_deref() {
+        reject_same_identity(&input, path)?;
+        ensure_output_available(path)?;
+    }
+    let outcome = conversion_for_report(&input)?;
+    let bytes = outcome
+        .document
+        .to_json_with_limit(64 * 1024 * 1024)
+        .map_err(|_| CliError::Conversion("IR_SERIALIZATION_FAILURE"))?;
+    if let Some(output) = output {
+        let warning = write_atomic(&output, &bytes)?;
+        Ok(if warning {
+            "completed: OUTPUT_TEMP_CLEANUP_WARNING".into()
+        } else {
+            "completed".into()
+        })
+    } else {
+        String::from_utf8(bytes).map_err(|_| CliError::Conversion("IR_SERIALIZATION_FAILURE"))
+    }
+}
+
+fn machine_error(error: CliError) -> CliError {
+    CliError::Machine {
+        code: error.code(),
+        exit: error.exit_code(),
     }
 }
 
@@ -576,7 +854,12 @@ const fn failure_code(code: FailureCode) -> &'static str {
 }
 
 pub fn render_error(error: &CliError) -> String {
-    format!("error[{}]", error.code())
+    match error {
+        CliError::Machine { code, .. } => {
+            format!(r#"{{"schema_version":1,"kind":"error","code":"{code}"}}"#)
+        }
+        _ => format!("error[{}]", error.code()),
+    }
 }
 
 #[cfg(test)]
@@ -598,6 +881,52 @@ mod tests {
     }
 
     #[test]
+    fn extended_commands_and_options_are_strictly_allowlisted() {
+        assert!(matches!(
+            parse_command_args(["inspect".into(), "worksheet.xmcd".into()]).unwrap(),
+            CommandArguments::Inspect { .. }
+        ));
+        let command = parse_command_args([
+            "convert".into(),
+            "worksheet.xmcd".into(),
+            "--format".into(),
+            "docx".into(),
+            "--complex-mode".into(),
+            "both".into(),
+            "--precision".into(),
+            "20".into(),
+        ])
+        .unwrap();
+        assert!(matches!(
+            command,
+            CommandArguments::Convert {
+                target: TargetFormat::Docx,
+                ..
+            }
+        ));
+        assert!(
+            parse_command_args([
+                "convert".into(),
+                "x".into(),
+                "--to".into(),
+                "unknown".into()
+            ])
+            .is_err()
+        );
+        assert!(
+            parse_command_args([
+                "convert".into(),
+                "x".into(),
+                "--to".into(),
+                "docx".into(),
+                "--precision".into(),
+                "0".into()
+            ])
+            .is_err()
+        );
+    }
+
+    #[test]
     fn diagnostics_are_redacted() {
         let error = CliError::Invalid("INVALID_INPUT");
         assert_eq!(render_error(&error), "error[INVALID_INPUT]");
@@ -609,6 +938,21 @@ mod tests {
         assert!(rendered.contains("input_present"));
         assert!(!rendered.contains("input.xmcd"));
         assert!(!rendered.contains("output.docx"));
+    }
+
+    #[test]
+    fn extended_command_debug_redacts_paths() {
+        let command = CommandArguments::ExportIr {
+            input: PathBuf::from("/absolute/private/SECRET_INPUT.xmcd"),
+            output: Some(PathBuf::from("/absolute/private/SECRET_OUTPUT.json")),
+        };
+        let rendered = format!("{command:?}");
+        assert!(rendered.contains("export-ir"));
+        assert!(rendered.contains("input_present: true"));
+        assert!(rendered.contains("output_present: true"));
+        assert!(!rendered.contains("SECRET_INPUT"));
+        assert!(!rendered.contains("SECRET_OUTPUT"));
+        assert!(!rendered.contains("/absolute"));
     }
 
     fn test_directory() -> PathBuf {

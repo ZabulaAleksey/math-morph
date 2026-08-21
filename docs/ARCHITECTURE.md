@@ -179,7 +179,7 @@ FastAPI/Pydantic/SQLAlchemy:
 - Не владеет семантикой parser и математики и не обходит ограничения ввода и безопасности.
 - Выполняет bounded single-read input, redacted вывод и атомарную no-replace публикацию из same-directory `create_new` temp через hard link; replacing-rename fallback запрещён.
 - Успешная публикация является commit point; последующая cleanup-проблема выводится warning и не превращает готовый artifact в false failure.
-- Стабильный машиночитаемый JSON report, `inspect` и дополнительные options относятся к этапам 149–153.
+- CLI предоставляет bounded `inspect`, full-path `validate`, explicit `export-ir` и versioned machine-readable JSON. `--complex-mode` и `--precision` проходят через numeric conversion boundary; текущий подтверждённый parser subset не включает heuristic complex evaluation.
 
 ### Слой workers
 
@@ -289,6 +289,8 @@ server processing и API recovery определены только в `docs/FAL
 - Backend MathType не влияет на parser.
 - Восстановление диаграмм Excel идёт через ChartIR.
 - Восстановление Visio идёт через DiagramIR и создаёт редактируемые shapes и connectors, а не одно изображение.
+- Document IR V1 остаётся byte-compatible. Schema 3 добавляет bounded ordered plot-metadata sidecar поверх V1 document projection; schema 2 остаётся unsupported, поскольку это закреплено принятым V1 compatibility contract.
+- Conversion core сохраняет подтверждённые `item_idref`/`disable_calc` в schema 3, а DOCX projection исключает plot без preview только с explicit unsupported diagnostic. Явный PlotIr/DiagramIr preview экспортируется лишь при `FallbackRendered` fidelity через общий PNG/JPEG asset boundary.
 - Новые выходные форматы реализуют контракт exporter.
 - REST, CLI, GUI/SDK, workers и будущий MCP являются adapters к общим Application Services и не дублируют parser или бизнес-логику задач.
 
