@@ -5,7 +5,8 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use thiserror::Error;
 
 use crate::{
-    DOCUMENT_IR_SCHEMA_VERSION, DocumentIrV1, DocumentIrValidationError, VersionedDocumentIr,
+    DOCUMENT_IR_SCHEMA_VERSION, DOCUMENT_IR_V3_SCHEMA_VERSION, DocumentIrV1, DocumentIrV3,
+    DocumentIrValidationError, VersionedDocumentIr,
 };
 
 pub const DEFAULT_MAX_SERIALIZED_BYTES: usize = 64 * 1024 * 1024;
@@ -26,9 +27,23 @@ pub enum DocumentIrError {
 
 #[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-struct Envelope {
+struct EnvelopeV1 {
     schema_version: u16,
     document: DocumentIrV1,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct EnvelopeV3 {
+    schema_version: u16,
+    document: DocumentIrV3,
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum AnyEnvelope {
+    V1(EnvelopeV1),
+    V3(EnvelopeV3),
 }
 
 #[derive(Deserialize)]
@@ -41,11 +56,18 @@ impl Serialize for VersionedDocumentIr {
     where
         S: Serializer,
     {
-        Envelope {
-            schema_version: self.schema_version(),
-            document: self.as_v1().clone(),
+        match self {
+            Self::V1(document) => EnvelopeV1 {
+                schema_version: DOCUMENT_IR_SCHEMA_VERSION,
+                document: document.clone(),
+            }
+            .serialize(serializer),
+            Self::V3(document) => EnvelopeV3 {
+                schema_version: DOCUMENT_IR_V3_SCHEMA_VERSION,
+                document: document.clone(),
+            }
+            .serialize(serializer),
         }
-        .serialize(serializer)
     }
 }
 
@@ -54,11 +76,17 @@ impl<'de> Deserialize<'de> for VersionedDocumentIr {
     where
         D: Deserializer<'de>,
     {
-        let envelope = Envelope::deserialize(deserializer)?;
-        if envelope.schema_version != DOCUMENT_IR_SCHEMA_VERSION {
-            return Err(D::Error::custom("unsupported document IR schema version"));
+        match AnyEnvelope::deserialize(deserializer)? {
+            AnyEnvelope::V1(envelope) if envelope.schema_version == DOCUMENT_IR_SCHEMA_VERSION => {
+                Ok(Self::V1(envelope.document))
+            }
+            AnyEnvelope::V3(envelope)
+                if envelope.schema_version == DOCUMENT_IR_V3_SCHEMA_VERSION =>
+            {
+                Ok(Self::V3(envelope.document))
+            }
+            _ => Err(D::Error::custom("unsupported document IR schema version")),
         }
-        Ok(Self::V1(envelope.document))
     }
 }
 
@@ -90,7 +118,10 @@ impl VersionedDocumentIr {
         }
         let probe: VersionProbe =
             serde_json::from_slice(bytes).map_err(|_| DocumentIrError::Malformed)?;
-        if probe.schema_version != DOCUMENT_IR_SCHEMA_VERSION {
+        if !matches!(
+            probe.schema_version,
+            DOCUMENT_IR_SCHEMA_VERSION | DOCUMENT_IR_V3_SCHEMA_VERSION
+        ) {
             return Err(DocumentIrError::UnsupportedVersion);
         }
         let document: Self =

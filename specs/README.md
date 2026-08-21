@@ -16,5 +16,7 @@
 - [`features/complex-numbers.spec.md`](features/complex-numbers.spec.md) — контракт этапов 112–122 для standalone scalar complex-number engine, polar/algebraic conversion, trace и output policy.
 - [`features/conversion-pipeline-and-report.spec.md`](features/conversion-pipeline-and-report.spec.md) — контракт этапов 143–147 для общего XMCD→DOCX application core, diagnostics, fidelity report и safe partial conversion.
 - [`features/minimal-cli-convert.spec.md`](features/minimal-cli-convert.spec.md) — контракт этапа 148 для настоящей локальной команды `mathmorph convert`.
+- [`features/cli-inspection-and-reports.spec.md`](features/cli-inspection-and-reports.spec.md) — контракт этапов 149–153 для `inspect`, exporter registry/options, `validate` и versioned JSON/Document IR reports.
+- [`features/plot-diagram-evidence-gates.spec.md`](features/plot-diagram-evidence-gates.spec.md) — контракт подтверждённых plot metadata/preview частей 123–142 и явных evidence gates для неизвестной семантики.
 
 Новые feature-SPEC создаются в `specs/features/` только когда системной спецификации недостаточно. `docs/ROADMAP.md`, `docs/PROMPTS.md` и `docs/TRACEABILITY.md` не являются источниками требований.

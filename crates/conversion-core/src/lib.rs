@@ -1,10 +1,10 @@
 //! Application core for deterministic, fail-closed XMCD to DOCX conversion.
 
 use document_ir::{
-    BlockContentIr, BlockId, BlockIr, DocumentIrV1, FidelityIr, FormulaDisplayModeIr, FormulaIr,
-    MetadataIr, PageIr, PageMarginsIr, PageOrientationIr, ParagraphIr, PhysicalSizeIr,
-    ProvenanceIr, SourceKindIr, TextBlockIr, TextRunIr, TextStyleIr, VersionedDocumentIr,
-    VerticalAlignIr,
+    BlockContentIr, BlockId, BlockIr, DocumentIrV1, DocumentIrV3, FidelityIr, FormulaDisplayModeIr,
+    FormulaIr, MetadataIr, PageIr, PageMarginsIr, PageOrientationIr, ParagraphIr, PhysicalSizeIr,
+    PlotIr, PlotMetadataIrV3, ProvenanceIr, SourceKindIr, TextBlockIr, TextRunIr, TextStyleIr,
+    VersionedDocumentIr, VerticalAlignIr,
 };
 use exporter_docx::{
     DocxExporter, DocxLimits, DocxValidator, EquationBackend, OmmlError, OmmlLimits,
@@ -757,6 +757,7 @@ impl ConversionPipeline {
             limits.transformation,
         );
         let mut blocks = Vec::new();
+        let mut plot_metadata = Vec::new();
         let mut items = Vec::new();
         for region in worksheet.visual_order() {
             if items.len() >= limits.max_items {
@@ -874,6 +875,28 @@ impl ConversionPipeline {
                         }
                     }
                 },
+                RegionContent::Plot(plot) => {
+                    let _ = handle_unsupported(
+                        &request.options,
+                        &mut diagnostics,
+                        &mut items,
+                        region.id,
+                        region.source_ordinal,
+                    )?;
+                    let block_id = BlockId(format!("region-{}", region.id));
+                    blocks.push(BlockIr {
+                        id: block_id.clone(),
+                        provenance,
+                        fidelity: FidelityIr::Unsupported,
+                        placement: None,
+                        content: BlockContentIr::Plot(PlotIr { preview: None }),
+                    });
+                    plot_metadata.push(PlotMetadataIrV3 {
+                        block_id,
+                        item_idref: plot.item_idref.clone(),
+                        disable_calc: plot.disable_calc,
+                    });
+                }
                 _ => {
                     if handle_unsupported(
                         &request.options,
@@ -887,7 +910,12 @@ impl ConversionPipeline {
                 }
             }
         }
-        if blocks.is_empty() {
+        if !blocks.iter().any(|block| {
+            matches!(
+                block.content,
+                BlockContentIr::Text(_) | BlockContentIr::Image(_) | BlockContentIr::Equation(_)
+            )
+        }) {
             return Err(bounded_fatal_failure(
                 FailureCode::NoExportableContent,
                 DiagnosticCode::NoExportableContent,
@@ -917,6 +945,31 @@ impl ConversionPipeline {
                 limits.max_diagnostics,
             )
         })?;
+        let export_document = DocumentIrV1 {
+            metadata: document.metadata.clone(),
+            pages: document
+                .pages
+                .iter()
+                .map(|page| PageIr {
+                    size: page.size,
+                    orientation: page.orientation,
+                    margins: page.margins,
+                    blocks: page
+                        .blocks
+                        .iter()
+                        .filter(|block| {
+                            matches!(
+                                block.content,
+                                BlockContentIr::Text(_)
+                                    | BlockContentIr::Image(_)
+                                    | BlockContentIr::Equation(_)
+                            )
+                        })
+                        .cloned()
+                        .collect(),
+                })
+                .collect(),
+        };
         let exporter = DocxExporter::with_config(
             limits.docx,
             exporter_docx::DocxExportConfig {
@@ -924,7 +977,7 @@ impl ConversionPipeline {
             },
         );
         let artifact = exporter
-            .export(&document, &EmptyAssetResolver)
+            .export(&export_document, &EmptyAssetResolver)
             .map_err(|_| {
                 bounded_fatal_failure(
                     FailureCode::ExportFailure,
@@ -943,6 +996,22 @@ impl ConversionPipeline {
                     limits.max_diagnostics,
                 )
             })?;
+        let document = if plot_metadata.is_empty() {
+            VersionedDocumentIr::v1(document)
+        } else {
+            VersionedDocumentIr::v3(DocumentIrV3 {
+                document,
+                plot_metadata,
+            })
+        };
+        document.validate().map_err(|_| {
+            bounded_fatal_failure(
+                FailureCode::IrValidationFailure,
+                DiagnosticCode::ValidationFailure,
+                diagnostics.diagnostics().to_vec(),
+                limits.max_diagnostics,
+            )
+        })?;
         Ok(ConversionOutcome {
             artifact,
             report: ConversionReport::new_with_numeric_options(
@@ -950,7 +1019,7 @@ impl ConversionPipeline {
                 items,
                 self.numeric_options,
             ),
-            document: VersionedDocumentIr::v1(document),
+            document,
         })
     }
 }

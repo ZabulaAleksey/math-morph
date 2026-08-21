@@ -280,6 +280,25 @@ Fail closed до commit point:
 - input/output/temp identity uncertainty;
 - filesystem без безопасной no-replace публикации.
 
+## 18. Plot и diagram preview
+
+Primary:
+- подтверждённая source semantics сохраняется в versioned Document IR.
+
+Fallback:
+- только явно заданный `PlotIr.preview`/`DiagramIr.preview` с fidelity `FallbackRendered`;
+- только allowlisted bounded PNG/JPEG через `AssetResolver`.
+
+Degraded mode:
+- raster preview не считается редактируемым ChartIR/DiagramIR;
+- conversion report сохраняет warning/fidelity provenance.
+
+Fail closed:
+- preview отсутствует, имеет неверную fidelity, размер, signature/media type или недоступный asset;
+- raw SVG/XML, metafile, OLE, external relationship или guessed payload mapping.
+
+Безопасный partial DOCX может исключить unsupported plot, но обязан сохранить диагностику; Document IR schema 3 сохраняет подтверждённую plot metadata без выдумывания series/axes.
+
 ## Tests
 
 Для значимых цепочек проверяются:

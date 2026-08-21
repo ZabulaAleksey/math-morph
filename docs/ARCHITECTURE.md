@@ -289,6 +289,8 @@ server processing и API recovery определены только в `docs/FAL
 - Backend MathType не влияет на parser.
 - Восстановление диаграмм Excel идёт через ChartIR.
 - Восстановление Visio идёт через DiagramIR и создаёт редактируемые shapes и connectors, а не одно изображение.
+- Document IR V1 остаётся byte-compatible. Schema 3 добавляет bounded ordered plot-metadata sidecar поверх V1 document projection; schema 2 остаётся unsupported, поскольку это закреплено принятым V1 compatibility contract.
+- Conversion core сохраняет подтверждённые `item_idref`/`disable_calc` в schema 3, а DOCX projection исключает plot без preview только с explicit unsupported diagnostic. Явный PlotIr/DiagramIr preview экспортируется лишь при `FallbackRendered` fidelity через общий PNG/JPEG asset boundary.
 - Новые выходные форматы реализуют контракт exporter.
 - REST, CLI, GUI/SDK, workers и будущий MCP являются adapters к общим Application Services и не дублируют parser или бизнес-логику задач.
 

@@ -2,13 +2,13 @@
 
 ## Снимок состояния
 
-- **Статус:** этапы 001–093, 095–122 и 143–154 реализованы и проверены; этапы 123–142 остаются planned/evidence-gated.
-- **Текущий backend-этап:** 153 завершён; следующий допустимый пакет — подтверждённая часть plot/diagram track 123–142 с обязательными format evidence gates.
+- **Статус:** этапы 001–093, 095–124, 127 и 143–154 реализованы и проверены; DOCX preview components 126/134 проверены; 125, 128–133 и 135–142 остаются blocked/planned по evidence gates.
+- **Текущий backend-этап:** подтверждённая часть plot track 123–124/127 и component previews 126/134 завершены; следующий live format пакет требует versioned fixtures/schema evidence.
 - **Текущий frontend-этап:** 154 (`Next.js shell`) завершён; публичный UX/UI уже виден, но upload/converter flow намеренно не подключён.
 - **Технический hardening:** fallback-policy, TOML subagents и Node/pnpm toolchain contract синхронизированы и проверены в текущей fix-ветке.
 - **Fallback catalog:** `docs/FALLBACKS.md` является канонической MathMorph-specific delta и обязателен для project validator.
 - **Blockers:** этап 094 нельзя начинать без versioned live MathType import/edit `PASS`; локально MathType/SDK не установлен, SDK license отсутствует, интерактивный web smoke runner недоступен.
-- **Следующие этапы:** проверить фактическое покрытие 123–142 и реализовать только подтверждённые format fixtures/schema части. Этап 094 остаётся `blocked by versioned live evidence`.
+- **Следующие этапы:** получить format/live evidence для 125, 128–133 и 135–142; неподтверждённую семантику не угадывать. Этап 094 остаётся `blocked by versioned live evidence`.
 
 ## Реализовано
 
@@ -20,7 +20,9 @@
 - Этапы 106–111: visibility-safe scalar substitution с lexical binders, recursive cycle/expansion protection, bounded redacted evaluation trace, explicit display modes и независимая `PrecisionPolicy`.
 - Этапы 112–122: finite complex value boundary, algebraic/polar round-trip, Cartesian arithmetic, scaled division, tolerance, bounded typed trace и precision-aware bounded presentation.
 - Этапы 149–153: bounded `inspect`, allowlisted exporter registry, `--complex-mode`/`--precision`, full-path `validate` и bounded versioned JSON/Document IR export.
-- `document-ir`: versioned V1 JSON envelope, metadata/pages/layout, text/equation/table/image/plot/diagram blocks, provenance/fidelity и external asset ports.
+- Этапы 123–124/127: подтверждённые plot fields сохраняются в strict Document IR schema 3; mixed partial DOCX не теряет plot из возвращаемого IR, но явно помечает его unsupported.
+- Компоненты 126/134: явно заданные `FallbackRendered` PNG/JPEG previews для PlotIr/DiagramIr проходят общий bounded AssetResolver и DOCX validator; extraction из Mathcad пока отсутствует.
+- `document-ir`: неизменный V1 JSON и strict schema 3 для plot metadata, metadata/pages/layout, text/equation/table/image/plot/diagram blocks, provenance/fidelity и external asset ports; schema 2 остаётся unsupported по принятому V1 contract.
 - `exporter-docx`: детерминированный OPC/DOCX subset, WordprocessingML text/styles, bounded PNG/JPEG embedding, page settings и fail-closed structural validator.
 - `WordEquationExporter`: editable OMML для базовых и расширенных форм 077–086 — powers, roots, scripts, functions, grouping, vector/matrix и calculus/aggregate — с каноническими shapes и typed fail-closed errors.
 - Этап 087: общие equation byte/node/depth quotas renderer/validator, iterative linear traversal с work budget, расширенный OMML allowlist и negative regressions.
@@ -138,11 +140,23 @@
 - Existing output, same input/output, symlink/reparse components, Windows UNC/device namespace, no-replace race, temp ownership, Unix `0600` и payload/path redaction regressions — PASS.
 - Два независимых review/security cycle завершены; overwrite через Unix `rename`, temp ownership, redacted `Debug` и post-commit cleanup semantics исправлены. Остаточные std-only TOCTOU/ACL/directory-fsync ограничения задокументированы и не имеют silent fallback.
 
+## Проверка этапов 123–124/127 и preview components 126/134
+
+- `cargo test --workspace --locked` — PASS, включая V1 compatibility, strict schema 3 round-trip/referential validation, mixed plot conversion, CLI `export-ir` schema 3 и DOCX preview regressions.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings` — PASS.
+- `cargo fmt --all -- --check` — PASS.
+- `python -B scripts/validate_project.py` и `python -B scripts/validate_fixtures.py` — PASS.
+- Python repository tests — PASS, 29/29.
+- `git diff --check` — PASS; только информационные Windows LF→CRLF warnings.
+- Independent code review — PASS после исправления обязательной полной schema 3 validation в `export_versioned` до V1 projection.
+- Security review — PASS: metadata/order/reference limits, redaction, strict/partial semantics и bounded PNG/JPEG asset boundary подтверждены; medium/high findings отсутствуют.
+- Live extraction preview/series/shapes из Mathcad и Visio editability — `NOT RUN / BLOCKED_BY_FORMAT_EVIDENCE`; component fixtures не выданы за live evidence.
+
 ## Известные ограничения
 
 - Parser поддерживает подтверждённое legacy worksheet30/math30 подмножество, а не полный runtime XSD validator; Prime MCDX worksheet пока не имеет content parser.
 - Corpus преимущественно synthetic; совместимость расширяется только легально доступными образцами.
-- `conversion-core` producer реализован только для legacy XMCD text и поддержанной math-семантики; Prime MCDX content, assets, plots/tables/diagrams и evaluation остаются explicit unsupported/planned.
+- `conversion-core` producer реализован для legacy XMCD text, поддержанной math-семантики и подтверждённых opaque plot metadata; Prime MCDX content, asset extraction, tables/diagrams и вычисление worksheet остаются explicit unsupported/planned.
 - DOCX subset поддерживает одну страницу, text, PNG/JPEG и поддержанные OMML equations. Table, plot/diagram без preview, unsupported blocks и multiple pages отклоняются явно.
 - MathML renderer и experimental adapter покрывают только принятый scalar subset. Матрица этапа 093 документирует static coverage, но live MathType Web/Desktop compatibility не доказана; DOCX `MathType` backend по-прежнему fail closed.
 - Расширенный локальный CLI реализован, включая `inspect`, numeric options, `validate` и `export-ir`. API endpoints и интерактивный web converter flow ещё не подключены; landing shell не содержит file input или сетевых запросов.
@@ -151,7 +165,7 @@
 
 ## Следующие разумные действия
 
-1. Получить легально доступные versioned plot/diagram fixtures и зафиксировать payload/preview schema evidence для этапов 123–142.
+1. Получить легально доступные versioned plot/diagram fixtures и зафиксировать payload/preview schema evidence для заблокированных частей 125 и 128–142.
 2. Проверить локальные команды 148–153 на реальном legacy `.xmcd`.
 3. Выполнить frontend-этап 155 перед dropzone и подключать UI к живому пути только после появления выбранной browser/API adapter boundary.
 4. Реализовать i18n 162–165 для полноценного Ukrainian/Russian/English locale coverage; текущий украинский catalog stage 154 остаётся промежуточным.

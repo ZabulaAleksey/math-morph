@@ -314,6 +314,22 @@ MathMorph хранит только предметную delta в:
 
 **Связанные требования:** `FR-SEMANTIC-100`, `NFR-SEMANTIC-001`, `SEC-SEMANTIC-001`.
 
+## ADR-0018 — Plot metadata использует Document IR schema 3 без изменения V1
+
+**Статус:** принято, 2026-08-21.
+
+**Контекст:** parser подтверждённо знает только `PlotRegion.item_idref`, `disable_calc` и provenance. `PlotIr` V1 содержит только preview, а strict V1 compatibility test уже закрепляет `schema_version = 2` как unsupported. Добавлять поля в V1, использовать opaque kind/asset ID или терять metadata при `export-ir` запрещено.
+
+**Решение:** V1 и его golden сохраняются byte-for-byte. `VersionedDocumentIr::V3` содержит V1-compatible document projection и bounded ordered `PlotMetadataIrV3` sidecar с referential validation. Conversion core создаёт V3 только при наличии plot metadata; поддержанный DOCX projection фильтрует plot без preview с явной unsupported diagnostic. Schema 2 остаётся зарезервированной unsupported версией.
+
+**Последствия:** старые V1 consumers продолжают работать; V3 consumers обязаны проверять version и metadata references. Axes, series, style, preview mapping и diagram semantics не появляются без format evidence. Explicit PlotIr/DiagramIr raster preview является `FallbackRendered`, а не редактируемой структурой.
+
+**Fallback / rollback:** silent V3→V1 downgrade запрещён. Без preview strict export fail closed; safe partial DOCX допускает omission только с report warning. Rollback может отключить V3 producer, сохранив V1 reader и parser semantics.
+
+**Проверка:** неизменный V1 golden/unknown-version contract, deterministic V3 round-trip, wrong/missing/oversized metadata regressions, mixed conversion test, explicit DOCX preview/fidelity negative tests и independent/security review.
+
+**Связанные требования:** `FR-PLOT-123`, `FR-PLOT-124`, `FR-PREVIEW-126/134`, `FR-FALLBACK-127`, `SEC-PLOT-DIAGRAM-001`.
+
 ## Шаблон ADR
 
 Используй только для значимых архитектурных или технических решений.

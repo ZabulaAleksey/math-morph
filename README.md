@@ -4,7 +4,7 @@ MathMorph — monorepo расширяемой платформы parsing и ко
 
 ## Текущее состояние
 
-Реализованы и проверены этапы 001–093, 095–122, 143–154 и независимый frontend-этап 154: безопасная входная граница, legacy XMCD worksheet30 parser, структурный Math AST, presentation/semantic math engine, versioned Document IR, общий conversion core, детерминированный DOCX/OMML exporter и расширенный локальный CLI. Этапы 123–142 зависят от подтверждённых plot/diagram payload fixtures и остаются evidence-gated; этап 094 зависит от live MathType evidence. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но полный worksheet evaluator пока не подключён. API endpoints и интерактивный web converter flow ещё не реализованы; Prime MCDX безопасно определяется, но не имеет content parser.
+Реализованы и проверены этапы 001–093, 095–124, 127 и 143–154, а также component previews 126/134: безопасная входная граница, legacy XMCD worksheet30 parser, структурный Math AST, presentation/semantic math engine, versioned Document IR, общий conversion core, детерминированный DOCX/OMML exporter и расширенный локальный CLI. Остальные части 125/128–142 зависят от подтверждённых plot/diagram payload или live Visio fixtures и остаются evidence-gated; этап 094 зависит от live MathType evidence. Parser сохраняет metadata, regions/layout/source spans и unsupported fragments, но полный worksheet evaluator пока не подключён. API endpoints и интерактивный web converter flow ещё не реализованы; Prime MCDX безопасно определяется, но не имеет content parser.
 
 ## Структура
 

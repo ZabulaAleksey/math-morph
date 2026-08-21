@@ -19,7 +19,7 @@
 
 ## 3. JSON contracts
 
-Все JSON envelopes содержат `schema_version: 1`, используют стабильные machine strings и детерминированный порядок. Conversion report содержит status, counts, ordered diagnostics и items; inspect report — detected format, region count и diagnostic codes. Filename, absolute path, document text и formula values в report diagnostics отсутствуют. Document IR по своему контракту содержит пользовательское содержимое и поэтому выводится только по явной команде `export-ir`.
+CLI report/inspect/error envelopes содержат `schema_version: 1`, используют стабильные machine strings и детерминированный порядок. Document IR использует собственную versioned schema (V1 или plot-aware schema 3). Conversion report содержит status, counts, ordered diagnostics и items; inspect report — detected format, region count и diagnostic codes. Filename, absolute path, document text и formula values в report diagnostics отсутствуют. Document IR по своему контракту содержит пользовательское содержимое и поэтому выводится только по явной команде `export-ir`.
 
 ## 4. Ограничения и безопасность
 
